@@ -1,39 +1,29 @@
-# 4Unity AOE Manager
+# 4Unity araçları
 
-## 2026-09-25 locator onarımı
+Bu depo önceki AOE Git geçmişini korur. Projeler ayrı klasörlerdedir:
 
-Güncel `9CD77CD0...70E5C28` TClient için ayrı SHA profili ve runtime semantik
-AOB/çağrı ilişkisi doğrulaması eklendi. Initial Nx repetition/restore motoru
-değişmedi; aynı-session live-validation hâlâ zorunlu.
+| Proje | Kaynaklar | Hazır sürüm |
+|---|---|---|
+| AOE Manager 1.1.17 | [AOE](AOE/) | [EXE](AOE/releases/1.1.17-research/4UnityAOEManager-1.1.17-research.exe) |
+| Invisible / Aggro 1.1.0 | [InvisibleAggro](InvisibleAggro/) | [ZIP](InvisibleAggro/releases/1.1.0/4UnityInvisibleAggro-1.1.0-win-x64.zip) |
 
-- `--aoe-diagnostic --offline`: yalnız dosya/profil doğrulaması.
-- `--aoe-diagnostic`: query/read-only canlı byte doğrulaması; debugger, HWBP,
-  settings/AutoArm veya gameplay yazısı yok. Sonuç: `logs/aoe-diagnostic.txt`.
-- `--safe-manual`: GUI'yi bu açılış için AutoAttach/AutoArm kapalı açar.
-- Testler: `build/Release/aoe_locator_tests.exe --current-image` ve
-  `build/Release/tracer_tests.exe --analysis-only`.
+Invisible/Aggro ZIP dosyasını çıkarıp EXE'yi çalıştırın. Kaynak kodu `InvisibleAggro/src`,
+test raporu ve ekran görüntüleri `InvisibleAggro/evidence` içindedir.
 
-Tam desenler, RVA eşlemeleri, sayaç sınırlaması ve count3/5 manuel akışı:
-[AOE_LOCATOR_REPAIR_2026-09-25.md](docs/AOE_LOCATOR_REPAIR_2026-09-25.md).
-`Linked020BCount` bağımsız observer olmadığı için `UNAVAILABLE`; sıfırmış gibi
-gösterilmez. Yeni profilde bu görev dışındaki target-inspector/provenance
-modülleri etkinleştirilmedi. Aşağıdaki bölümler önceki sürümün tarihî bağlamıdır.
+## Derleme
 
-Version **1.1.10-research** is a separate manager-style application built around the proven Initial Nx debugger engine. It provides Research / Recovery, Profiles, and Play tabs; SHA-selected build profiles; session-safe auto attach and auto arm; persistent per-user Windows startup configuration; DPI-aware resizing; and frozen/copyable diagnostics snapshots.
-
-Profiles support the three statically recovered TClient hashes documented in `docs/CURRENT_BUILD.md`. Unknown builds remain disabled until a verified profile is created. The current `FB13C125...` profile requires a same-session read-only validation cast before Initial Nx can arm.
-
-Build with:
+AOE için Visual Studio C++ x64 Build Tools ve CMake gerekir:
 
 ```powershell
-& 'C:\Users\Public\Documents\4UnityAOEManager\build.ps1'
+.\AOE\build.ps1
 ```
 
-Release output:
+Invisible/Aggro için .NET 9 SDK gerekir:
 
-`C:\Users\Public\Documents\4UnityAOEManager\build\Release\4UnityAOEManager.exe`
+```powershell
+.\InvisibleAggro\build.ps1
+```
 
-Settings are stored at `%LOCALAPPDATA%\4UnityAOEManager\settings.json`. Optional startup uses only `HKCU\Software\Microsoft\Windows\CurrentVersion\Run`, value name `4UnityAOEManager`.
-
-See `docs/AOE_RECOVERY_GUIDE.md` before attempting recovery after a TClient patch.
-
+AOE içindeki eski belgelerde geçen mutlak yollar tarihî çalışma klasörleridir.
+Bu kopyada AOE proje kökü `AOE/` klasörüdür; derleme betiği kendi konumunu kullanır.
+Oyun EXE'si, kullanıcı ayarları ve canlı oturum kayıtları bu depoya eklenmez.

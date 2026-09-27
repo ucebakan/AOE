@@ -1,8 +1,0 @@
-4UnityAOEManager 1.1.17-research
-Known-good continuous Initial Nx ON/OFF build
-
-File: 4UnityAOEManager-1.1.17-research.exe
-Size: 1119232 bytes
-SHA-256: 075A89DE4C08048FD4DED570DCBE915AA81F66B9B360FC0A8AAF7AF05BEAD425
-Verified tests: tracer 245/245; locator 51/51; CTest 2/2
-Saved: 2026-09-26 Europe/Istanbul

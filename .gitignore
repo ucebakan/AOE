@@ -1,22 +1,10 @@
-# Generated build trees
-/build/
-/build-*/
-
-# Runtime output
-/logs/
-*.log
-*.tmp
-__pycache__/
-*.py[cod]
-
-# Editor and OS files
+**/bin/
+**/obj/
+**/build/
+**/build-*/
+**/logs/
 .vs/
 .vscode/
 *.user
-*.suo
-Thumbs.db
-Desktop.ini
-
-# Keep versioned known-good release artifacts under releases/.
-!/releases/
-!/releases/**
+*.tmp
+__pycache__/

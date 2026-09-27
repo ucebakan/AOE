@@ -1,0 +1,274 @@
+{
+  "schemaVersion": 2,
+  "policy": {
+    "selection": "scan executable sections only; require exactly one candidate after semantic validation",
+    "zeroMatches": "unresolved",
+    "multipleMatches": "ambiguous; report every candidate and do not create or arm a profile",
+    "runtime": "exact profile bytes and direct-call targets must match live memory before debugger attachment"
+  },
+  "knownBuilds": [
+    "CD772F3F7AE7496A674783341A63E257A4902606F8A4E8FE76879DDC0E28970E",
+    "D0ECBBA10685D94E7CA632D6A9CEB9B3C2C420D609DB7CC4243AFF2F493A62C1",
+    "FB13C1257A401BB4E866247921A79D7C044AFC69CDAED9869C945940DD60B8D7",
+    "9CD77CD0C305359A3048D60C3C2FD837B907E2E61BBF8B828BFCC8E5270E5C28"
+  ],
+  "anchors": [
+    {
+      "anchorName": "AoeLifecycleCaller",
+      "maskedPattern": "41 8B 46 24 89 44 24 30 89 7C 24 28 4C 89 64 24 20 4C 8B CE 4D 8B C6 49 8B D7 49 8B CD E8 ?? ?? ?? ?? 90",
+      "semanticValidation": [
+        "R9=RSI; RCX/RDX/R8 preserved prep; direct CALL; NOP and stack-unwind epilogue; semantic_matches=1"
+      ],
+      "expectedValidMatches": 1,
+      "currentRawMatches": 1,
+      "currentValidMatches": 1,
+      "currentRva": "0x7F2F9D"
+    },
+    {
+      "anchorName": "AoeFunctionRecordDispatch",
+      "maskedPattern": "80 79 01 06 75 ?? 80 79 02 1D 75 ?? 66 83 79 08 00 75 ?? 0F B7 49 06 E8 ?? ?? ?? ?? 48 85 C0 74 ?? 41 8B 4E 24 89 4C 24 30 C7 44 24 28 01 00 00 00 89 7C 24 20 4C 8B C8 4D 8B C6 48 8B 94 24 C0 00 00 00 49 8B CD E8 ?? ?? ?? ??",
+      "semanticValidation": [
+        "record+1=6, +2=1D, +8=0; linked WORD+6; common reject branch; invocation=1; semantic_matches=1"
+      ],
+      "expectedValidMatches": 1,
+      "currentRawMatches": 1,
+      "currentValidMatches": 1,
+      "currentRva": "0x7F2EE5"
+    },
+    {
+      "anchorName": "SharedOperation020A",
+      "maskedPattern": "41 54 41 55 41 56 41 57 48 81 EC ?? ?? ?? ?? 48 8B 05 ?? ?? ?? ?? 48 33 C4 48 89 84 24 C0 00 00 00 4C 8B AC 24 A0 01 00 00 4D 8B F1",
+      "semanticValidation": [
+        "Unique independently patterned direct target of lifecycle call; operation pointer R9 retained; semantic_matches=1"
+      ],
+      "expectedValidMatches": 1,
+      "currentRawMatches": 1,
+      "currentValidMatches": 1,
+      "currentRva": "0x7BC900"
+    },
+    {
+      "anchorName": "TypedActorLookup",
+      "maskedPattern": "85 D2 74 ?? 41 0F B6 C0 FF C8 83 F8 12 77 ?? 4C 8D 0D ?? ?? ?? ?? 48 98 45 8B 84 81 ?? ?? ?? ?? 4D 03 C1 41 FF E0",
+      "semanticValidation": [
+        "Zero ID rejected; R8B namespace jump table; semantic_matches=1"
+      ],
+      "expectedValidMatches": 1,
+      "currentRawMatches": 1,
+      "currentValidMatches": 1,
+      "currentRva": "0x7BB3A0"
+    },
+    {
+      "anchorName": "SharedTypedActorCall",
+      "maskedPattern": "8B 10 85 D2 74 ?? 44 0F B6 40 04 45 84 C0 74 ?? 49 8B CC E8 ?? ?? ?? ?? 48 8B F0",
+      "semanticValidation": [
+        "Shared worker record+0 ID, record+4 type -> independent typed resolver; semantic_matches=1"
+      ],
+      "expectedValidMatches": 1,
+      "currentRawMatches": 1,
+      "currentValidMatches": 1,
+      "currentRva": "0x7BCA5A"
+    },
+    {
+      "anchorName": "OperationProducer",
+      "maskedPattern": "48 89 5C 24 08 48 89 6C 24 10 48 89 74 24 18 57 41 54 41 55 41 56 41 57 48 83 EC ?? 41 0F B6 E9 45 8B F8 44 8B E2 4C 8B E9 E8 ?? ?? ?? ??",
+      "semanticValidation": [
+        "Independent producer prologue and parameter register flow; semantic_matches=1"
+      ],
+      "expectedValidMatches": 1,
+      "currentRawMatches": 1,
+      "currentValidMatches": 1,
+      "currentRva": "0x99150"
+    },
+    {
+      "anchorName": "ProducerCall",
+      "maskedPattern": "66 89 6C 24 40 4C 89 6C 24 38 F3 44 0F 11 4C 24 30 F3 44 0F 11 54 24 28 F3 44 0F 11 5C 24 20 E8 ?? ?? ?? ??",
+      "semanticValidation": [
+        "Operation WORD argument9, vector argument8, XYZ stack handoff -> producer; semantic_matches=1"
+      ],
+      "expectedValidMatches": 1,
+      "currentRawMatches": 1,
+      "currentValidMatches": 1,
+      "currentRva": "0x7BCC57"
+    },
+    {
+      "anchorName": "RecordSerialization",
+      "maskedPattern": "8B 10 85 D2 74 ?? 0F B6 58 04 84 DB 74 ?? 48 8D 4C 24 28 E8 ?? ?? ?? ?? 48 8B C8 0F B6 D3 E8 ?? ?? ?? ?? 40 FE C5",
+      "semanticValidation": [
+        "Record+0 ID and record+4 type feed distinct serializer calls; semantic_matches=1"
+      ],
+      "expectedValidMatches": 1,
+      "currentRawMatches": 1,
+      "currentValidMatches": 1,
+      "currentRva": "0x992DE"
+    },
+    {
+      "anchorName": "TemplateLookup",
+      "maskedPattern": "4C 8B 05 ?? ?? ?? ?? 49 8B D0 49 8B 40 08 80 78 19 00 75 ?? 66 39 48 20 73 ?? 48 83 C0 10 EB ?? 48 8B D0 48 8B 00 80 78 19 00 74 ?? 80 7A 19 00 75 ?? 66 3B 4A 20 73 ?? 49 8B D0 49 3B D0 74 ?? 48 8B 42 28 C3 33 C0 C3",
+      "semanticValidation": [
+        "Function-record WORD+6 feeds lookup; WORD key+20, sentinel+19, payload+28; semantic_matches=1"
+      ],
+      "expectedValidMatches": 1,
+      "currentRawMatches": 10,
+      "currentValidMatches": 1,
+      "currentRva": "0xA6D600"
+    },
+    {
+      "anchorName": "LinkedAcquisitionPath",
+      "maskedPattern": "4C 8B C8 4D 8B C6 48 8B 94 24 C0 00 00 00 49 8B CD E8 ?? ?? ?? ??",
+      "semanticValidation": [
+        "R9 receives linked lookup result; stack invocation=1, unchanged preparation flow; semantic_matches=1"
+      ],
+      "expectedValidMatches": 1,
+      "currentRawMatches": 1,
+      "currentValidMatches": 1,
+      "currentRva": "0x7F2F2B"
+    },
+    {
+      "anchorName": "AcquisitionType2Insertion",
+      "maskedPattern": "8B BF 68 07 00 00 85 FF 0F 84 ?? ?? ?? ?? 48 8B 44 24 60 48 2B 44 24 58 48 C1 F8 03 48 83 F8 40 0F 83 ?? ?? ?? ?? B9 08 00 00 00 E8 ?? ?? ?? ?? 4C 8B F8 89 38 C6 40 04 02",
+      "semanticValidation": [
+        "actor+768 ID, capacity64, allocation8, record+0 ID/+4 type2; semantic_matches=1"
+      ],
+      "expectedValidMatches": 1,
+      "currentRawMatches": 1,
+      "currentValidMatches": 1,
+      "currentRva": "0x7DA977"
+    },
+    {
+      "anchorName": "AcquisitionRadiusGuard",
+      "maskedPattern": "F3 41 0F 10 46 48 0F 2F C1 0F 86 ?? ?? ?? ??",
+      "semanticValidation": [
+        "Template+48 radius comparison immediately precedes the uniquely validated type2 insertion path; semantic_matches=1"
+      ],
+      "expectedValidMatches": 1,
+      "currentRawMatches": 3,
+      "currentValidMatches": 1,
+      "currentRva": "0x7DA935"
+    },
+    {
+      "anchorName": "TargetVectorBuilder",
+      "maskedPattern": "48 8D 8F 60 06 00 00 48 8B 51 08 48 3B 51 10",
+      "semanticValidation": [
+        "Owner+660 vector begin/end/capacity; independently unique handler sequence; semantic_matches=1"
+      ],
+      "expectedValidMatches": 1,
+      "currentRawMatches": 1,
+      "currentValidMatches": 1,
+      "currentRva": "0x6CB40"
+    },
+    {
+      "anchorName": "ParsedActionBoundary",
+      "maskedPattern": "66 47 39 74 6F 3C",
+      "semanticValidation": [
+        "Same initial action handler as target-vector creation; semantic_matches=1"
+      ],
+      "expectedValidMatches": 1,
+      "currentRawMatches": 1,
+      "currentValidMatches": 1,
+      "currentRva": "0x6CB73"
+    }
+  ],
+  "runtimeImplementation": "src/aoe_locator.cpp; catalog mirrors the compiled locator, not a runtime-loaded configuration",
+  "legacyAnchorPatterns": [
+    {
+      "anchorName": "initialSharedCall",
+      "maskedPattern": "41 8B 46 24 89 44 24 30 89 7C 24 28 4C 89 64 24 20 4C 8B CE 4D 8B C6 49 8B D7 49 8B CD E8 ?? ?? ?? ?? 90",
+      "semanticValidation": [
+        "decode the E8 at pattern+29",
+        "callee must match sharedWorker",
+        "return byte must be 90",
+        "arguments RCX/RDX/R8/R9 must be prepared by the preceding four moves"
+      ],
+      "knownRvas": {
+        "CD772F3F": "0x7F091D",
+        "D0ECBBA1": "0x7F195D",
+        "FB13C125": "0x7F277D"
+      },
+      "currentRawMatches": 1,
+      "classification": "D: stable mask, relocated semantic validation required"
+    },
+    {
+      "anchorName": "sharedWorker",
+      "maskedPattern": "41 54 41 55 41 56 41 57 48 81 EC 58 01 00 00",
+      "semanticValidation": [
+        "must contain typedActorLookup call",
+        "must compare actor+0x7CA and actor+0x7E4",
+        "must directly call producer"
+      ],
+      "knownRvas": {
+        "CD772F3F": "0x7BB160",
+        "D0ECBBA1": "0x7BBDE0",
+        "FB13C125": "0x7BC4C0"
+      },
+      "currentRawMatches": 4,
+      "classification": "B: multiple raw matches; not safe alone"
+    },
+    {
+      "anchorName": "typedActorLookup",
+      "maskedPattern": "85 D2 74 ?? 41 0F B6 C0 FF C8 83 F8 12 77 ?? 4C",
+      "semanticValidation": [
+        "EDX zero is rejected",
+        "R8B selects a 0x13-entry namespace jump table",
+        "type 2 helper reads context+0x1120",
+        "tree key is node+0x20 and payload is node+0x28"
+      ],
+      "knownRvas": {
+        "CD772F3F": "0x7B9BD0",
+        "D0ECBBA1": "0x7BA720",
+        "FB13C125": "0x7BAF60"
+      },
+      "currentRawMatches": 1,
+      "classification": "D: stable mask, relocated semantic validation required"
+    },
+    {
+      "anchorName": "targetVectorBuilder",
+      "maskedPattern": "48 8D 8F 60 06 00 00 48 8B 51 08 48 3B 51 10",
+      "semanticValidation": [
+        "allocation size is 8",
+        "record ID stored at +0",
+        "record type stored at +4",
+        "vector begin/end/capacity are +0/+8/+0x10"
+      ],
+      "knownRvas": {
+        "CD772F3F": "0x6CC60",
+        "D0ECBBA1": "0x6CC60",
+        "FB13C125": "0x6CB40"
+      },
+      "currentRawMatches": 1,
+      "classification": "D: stable mask, relocated semantic validation required"
+    },
+    {
+      "anchorName": "producer",
+      "maskedPattern": "48 89 5C 24 08 48 89 6C 24 10 48 89 74 24 18 57",
+      "semanticValidation": [
+        "serializes record ID from +0",
+        "serializes record type from +4",
+        "caller must be sharedWorker producerCall"
+      ],
+      "knownRvas": {
+        "CD772F3F": "0x99240",
+        "D0ECBBA1": "0x99240",
+        "FB13C125": "0x99150"
+      },
+      "currentRawMatches": 975,
+      "classification": "B: multiple raw matches; not safe alone"
+    },
+    {
+      "anchorName": "templateLookup",
+      "maskedPattern": "4C 8B 05 ?? ?? ?? ?? 49 8B D0 49 8B 40 08 80 78 19 00",
+      "semanticValidation": [
+        "lookup key is CX",
+        "ordered-tree sentinel is +0x19",
+        "key is +0x20",
+        "payload is +0x28"
+      ],
+      "knownRvas": {
+        "CD772F3F": "0xA61090",
+        "D0ECBBA1": "0xA65AF0",
+        "FB13C125": "0xA6B9B0"
+      },
+      "currentRawMatches": 48,
+      "classification": "B: multiple raw matches; not safe alone"
+    }
+  ]
+}

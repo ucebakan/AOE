@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "targetSha256": "CD772F3F7AE7496A674783341A63E257A4902606F8A4E8FE76879DDC0E28970E",
+  "created": "2026-09-18",
+  "notes": "Known working Initial Nx profile. RVAs are module-relative and must be resolved from each live session base.",
+  "validation": {
+    "requireHashMatch": true,
+    "requireModuleBounds": true,
+    "requireExecutableAnchors": true,
+    "initialCallExpectedBytes": "E8 3E A8 FC FF",
+    "initialReturnExpectedBytes": "90",
+    "initialPrepExpectedBytes": "41 8B 46 24"
+  },
+  "anchors": {
+    "initialPrepRva": "0x7F0900",
+    "initialCallRva": "0x7F091D",
+    "initialReturnRva": "0x7F0922",
+    "sharedWorkerRva": "0x7BB160",
+    "producerRva": "0x99240",
+    "templateLookupRva": "0xA61090",
+    "wrapperRva": "0x7F09B0",
+    "initialHandlerRva": "0x6C950",
+    "dispatchRva": "0x7D292E",
+    "linkedActivationRva": "0x7A9740",
+    "periodicUpdateRva": "0x79C980"
+  }
+}

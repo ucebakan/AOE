@@ -1,0 +1,58 @@
+{
+  "failures": 0,
+  "tests": [
+    {
+      "name": "Invisible modifies only the flag and restores its baseline",
+      "status": "PASS"
+    },
+    {
+      "name": "Aggro to Invisible restores both writers and visual state",
+      "status": "PASS"
+    },
+    {
+      "name": "Natural pre-existing stealth is preserved",
+      "status": "PASS"
+    },
+    {
+      "name": "Every failed write, including partial writes, rolls the batch back",
+      "status": "PASS"
+    },
+    {
+      "name": "Journal failure prevents all writes",
+      "status": "PASS"
+    },
+    {
+      "name": "Unowned external code changes are not overwritten",
+      "status": "PASS"
+    },
+    {
+      "name": "Journal commit failure rolls successful writes back",
+      "status": "PASS"
+    },
+    {
+      "name": "External data changes survive cleanup while code restores",
+      "status": "PASS"
+    },
+    {
+      "name": "Interrupted-session ownership can be restored",
+      "status": "PASS"
+    },
+    {
+      "name": "Current TClient SHA and all five unique signatures",
+      "status": "PASS"
+    },
+    {
+      "name": "Known SHA and repeated cache access do not rescan",
+      "status": "PASS"
+    },
+    {
+      "name": "Unknown SHA requires approval; approved profile persists and reloads without scanning",
+      "status": "PASS"
+    },
+    {
+      "name": "Recovery rejects missing or ambiguous signatures",
+      "status": "PASS"
+    }
+  ],
+  "liveGameplayTest": false
+}
