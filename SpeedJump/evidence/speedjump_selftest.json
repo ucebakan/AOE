@@ -1,0 +1,28 @@
+{
+  "status": "PASS",
+  "tests": 20,
+  "passed": [
+    "current SHA",
+    "derived offsets",
+    "RTTI-derived vtables",
+    "four unique code signatures",
+    "same SHA profile has zero AOB scans",
+    "profile contains no session addresses",
+    "reject corrupt field offset",
+    "reject corrupt original bytes",
+    "ambiguous AOB fail closed",
+    "new SHA unequal compare/store displacement rejected",
+    "independent concurrent toggles",
+    "periodic pins run",
+    "jump stop joins before restore",
+    "jump OFF preserves Speed",
+    "Speed OFF stops without fixed restore write",
+    "toggles perform no AOB scan",
+    "app exit restores patch and disposes session",
+    "pin failure rolls back jump patch",
+    "process exit stops writers and clears session",
+    "duplicate writer start rejected"
+  ],
+  "live_game_writes": 0,
+  "limits": "Memory effects simulated; no in-game causal test, no process patch, no future-build compatibility claim."
+}

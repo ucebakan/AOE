@@ -27,3 +27,12 @@ Invisible/Aggro için .NET 9 SDK gerekir:
 AOE içindeki eski belgelerde geçen mutlak yollar tarihî çalışma klasörleridir.
 Bu kopyada AOE proje kökü `AOE/` klasörüdür; derleme betiği kendi konumunu kullanır.
 Oyun EXE'si, kullanıcı ayarları ve canlı oturum kayıtları bu depoya eklenmez.
+
+## Speed / Jump 1.0.0
+
+[Kaynaklar ve kullanım](SpeedJump/) · [Windows x64 ZIP](SpeedJump/releases/1.0.0/4UnitySpeedJump-1.0.0-win-x64.zip)
+
+Paketin tamamını aynı klasöre çıkarıp `4UnitySpeedJump.exe` dosyasını çalıştırın.
+SHA profili, imzalar ve README pakete dahildir. Arayüzde yalnız SPEED/JUMP vardır.
+Derleme: `.\SpeedJump\build.ps1`. Statik/self-test kanıtları `SpeedJump/evidence` içindedir.
+Canlı oyun testi bu teslim oturumunda doğrulanmadı; ayrıntılar proje README'sindedir.
