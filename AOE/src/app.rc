@@ -1,8 +1,8 @@
 #include <Windows.h>
 1 RT_MANIFEST "app.manifest"
 1 VERSIONINFO
-FILEVERSION 1,1,13,0
-PRODUCTVERSION 1,1,13,0
+FILEVERSION 1,1,18,0
+PRODUCTVERSION 1,1,18,0
  FILEFLAGSMASK 0x3fL
  FILEFLAGS 0
  FILEOS VOS_NT_WINDOWS32
@@ -14,11 +14,11 @@ BEGIN
   BEGIN
    VALUE "CompanyName", "4Unity Research\0"
    VALUE "FileDescription", "4Unity AOE Manager\0"
-      VALUE "FileVersion", "1.1.17-research\0"
+      VALUE "FileVersion", "1.1.18-research\0"
    VALUE "InternalName", "4UnityAOEManager\0"
    VALUE "OriginalFilename", "4UnityAOEManager.exe\0"
    VALUE "ProductName", "4Unity AOE Manager\0"
-      VALUE "ProductVersion", "1.1.17-research\0"
+      VALUE "ProductVersion", "1.1.18-research\0"
   END
  END
  BLOCK "VarFileInfo"

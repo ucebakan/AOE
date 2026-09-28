@@ -5,7 +5,7 @@
 
 namespace aoe {
 inline constexpr char Initial2xLimitation[] = "Repeating the client-side initial 0x0209 call establishes only whether the client can execute and serialize the prepared operation the configured number of times. It does not by itself prove that a remote server accepts the operations as independent gameplay effects or damage instances.";
-constexpr uint32_t MinInitialCalls=1,MaxInitialCalls=100,DefaultInitialCalls=2;
+constexpr uint32_t MinInitialCalls=1,MaxInitialCalls=0x7FFFFFFFu,DefaultInitialCalls=2;
 enum class InitialCallAction { Ignore, FirstAccepted, SecondObserved, Aborted };
 enum class InitialReturnAction { Ignore, Redirect, Completed, Aborted };
 bool ValidInitialCallCount(uint32_t value);

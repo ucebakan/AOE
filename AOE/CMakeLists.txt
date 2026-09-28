@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.25)
-project(4UnityAOEManager VERSION 1.1.17 LANGUAGES CXX RC)
+project(4UnityAOEManager VERSION 1.1.18 LANGUAGES CXX RC)
 if(NOT WIN32 OR NOT CMAKE_SIZEOF_VOID_P EQUAL 8)
   message(FATAL_ERROR "4UnityAOEManager requires Windows x64.")
 endif()

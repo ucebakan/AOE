@@ -1,0 +1,10 @@
+4UnityAOEManager 1.1.18-research
+Known-good build with the former Initial Nx 100-call application cap removed.
+
+Accepted Initial Calls: 1 through 2147483647
+Explicitly verified inputs: 1000 and 100000
+File: 4UnityAOEManager-1.1.18-research.exe
+Size: 1119232 bytes
+SHA-256: 228D61E62E0BAE17AB6BBC8A066296153063604045FAA087AD363FE7DD06DA9C
+Verified tests: tracer 245/245; locator 51/51; CTest 2/2
+Saved: 2026-09-29 Europe/Istanbul
