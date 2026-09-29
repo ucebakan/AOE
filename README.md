@@ -36,3 +36,10 @@ Paketin tamamını aynı klasöre çıkarıp `4UnitySpeedJump.exe` dosyasını �
 SHA profili, imzalar ve README pakete dahildir. Arayüzde yalnız SPEED/JUMP vardır.
 Derleme: `.\SpeedJump\build.ps1`. Statik/self-test kanıtları `SpeedJump/evidence` içindedir.
 Canlı oyun testi bu teslim oturumunda doğrulanmadı; ayrıntılar proje README'sindedir.
+## PlayerXYZ 1.1.0
+
+[Kaynaklar ve kullanım](PlayerXYZ/) · [Windows x64 ZIP](PlayerXYZ/releases/1.1.0/PlayerXYZ-1.1.0-win-x64.zip)
+
+Canlı local P ve iki XYZ grubu; tek seferlik koordinat yazımı. SHA profili, RTTI/AOB resolver ve imzalar pakete dahildir. ZIP'in tamamını çıkarın.
+Derleme: `.\PlayerXYZ\build.ps1`. Testler: `.\PlayerXYZ\build.ps1 -SelfTest` (resolver testi mevcut referans TClient.exe gerektirir).
+Test raporları ve UI görüntüsü `PlayerXYZ/evidence` içindedir. Gelecekteki bütün build'lerin çözüleceği garanti edilmez.

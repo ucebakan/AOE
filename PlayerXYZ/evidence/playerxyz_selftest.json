@@ -1,0 +1,11 @@
+{
+  "status": "PASS",
+  "mapping": "X:70/B0, Y(height):74/B4, Z:78/B8",
+  "writes": 0,
+  "checks": [
+    "float32 coordinate encoding",
+    "12 bytes only (W preserved)",
+    "NaN rejected",
+    "decimal comma accepted"
+  ]
+}

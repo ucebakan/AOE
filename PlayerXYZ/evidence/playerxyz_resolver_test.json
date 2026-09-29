@@ -1,0 +1,15 @@
+{
+  "status": "PASS",
+  "checks": [
+    "current XYZ offsets derived",
+    "three unique signatures",
+    "known SHA no AOB scan",
+    "corrupt profile rejected",
+    "synthetic new SHA extracts changed offsets",
+    "inconsistent XYZ triplet rejected",
+    "ambiguous signature rejected",
+    "old profile schema rejected"
+  ],
+  "live_writes": 0,
+  "scope": "Synthetic relocation test is not future-build compatibility proof."
+}
