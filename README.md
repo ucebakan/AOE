@@ -50,3 +50,9 @@ Test raporları ve UI görüntüsü `PlayerXYZ/evidence` içindedir. Gelecekteki
 Oyuncuya mesafeye göre iki yönlü sıralama, atanabilir oyun içi kısayol, uygun mob sayaçları ve SHA/AOB/RTTI profil doğrulaması.
 .NET 9 Windows Desktop runtime gerekir. Derleme: `./MobTP/build.ps1`.
 Paylaşılan kaynaklar, 31 testin raporları ve arayüz görüntüsü MobTP klasöründedir.
+
+## PlayerCounter 1.0.0
+
+[Kaynaklar ve kullanım](PlayerCounter/) · [Windows x64 EXE](PlayerCounter/releases/1.0.0/PlayerCounter.exe)
+
+Salt okunur oyuncu sayacı; 300 ms yenileme, 5 ve üzeri kırmızı gösterge, gömülü SHA-256 profili ve canlı resolver kontrolü. Windows yönetici izni ister. Harici runtime gerekmez. Bilinmeyen oyun sürümünde sayı göstermez.
