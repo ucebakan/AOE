@@ -1,0 +1,27 @@
+{
+  "passed": 20,
+  "names": [
+    "radius ignores height",
+    "player outside is excluded",
+    "target outside is excluded",
+    "exactly 50 is included",
+    "no placement inside player",
+    "invalid and zero rejected",
+    "ring spacing",
+    "invalid spread",
+    "assignable and invalid shortcut keys",
+    "foreground requires a selected game",
+    "counter includes ring target filter",
+    "hotkey registration conflict preserves old assignment",
+    "B then A and readback",
+    "stale guard never writes",
+    "partial B stops before A",
+    "rebind after B stops A",
+    "failed A stops batch",
+    "changed after writes reported",
+    "overwritten readback reported",
+    "unreadable readback reported"
+  ],
+  "synthetic": true,
+  "live_game_writes": false
+}

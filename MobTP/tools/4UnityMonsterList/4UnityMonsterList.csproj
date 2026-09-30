@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net9.0-windows</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <PlatformTarget>x64</PlatformTarget>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <AssemblyName>4UnityMonsterList</AssemblyName>
+    <RootNamespace>UnityMonsterList</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../PlayerXYZ/Profile.cs" Link="PlayerProfile.cs" />
+    <EmbeddedResource Include="../PlayerXYZ/signatures.json" LogicalName="PlayerXYZ.signatures.json" />
+    <EmbeddedResource Include="../../dist/PlayerXYZ/profiles/9CD77CD0C305359A3048D60C3C2FD837B907E2E61BBF8B828BFCC8E5270E5C28.json" LogicalName="PlayerXYZ.current-profile.json" />
+  </ItemGroup>
+</Project>

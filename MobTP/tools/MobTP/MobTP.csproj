@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net9.0-windows</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <PlatformTarget>x64</PlatformTarget>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <AssemblyName>MobTP</AssemblyName>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <PublishSingleFile>true</PublishSingleFile>
+    <SelfContained>false</SelfContained>
+  </PropertyGroup>
+  <ItemGroup><ProjectReference Include="../4UnityMonsterList/4UnityMonsterList.csproj" /></ItemGroup>
+  <ItemGroup><EmbeddedResource Include="signatures.json" LogicalName="MobTP.signatures.json" /></ItemGroup>
+  <ItemGroup><EmbeddedResource Include="current-profile.json" LogicalName="MobTP.current-profile.json" /></ItemGroup>
+  <Target Name="RemoveReferencedAppLaunchers" AfterTargets="Publish">
+    <Delete Files="$(PublishDir)4UnityMonsterList.exe;$(PublishDir)4UnityMonsterList.deps.json;$(PublishDir)4UnityMonsterList.runtimeconfig.json;$(PublishDir)4UnityMonsterList.pdb" />
+  </Target>
+</Project>

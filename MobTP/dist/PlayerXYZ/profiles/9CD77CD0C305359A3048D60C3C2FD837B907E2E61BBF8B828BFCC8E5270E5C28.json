@@ -1,0 +1,33 @@
+{
+  "version": 2,
+  "sha256": "9CD77CD0C305359A3048D60C3C2FD837B907E2E61BBF8B828BFCC8E5270E5C28",
+  "image_size": 16023552,
+  "pe_timestamp": 1790155782,
+  "ctclientgame_vtable_rva": 13486448,
+  "ctclientchar_vtable_rva": 13483200,
+  "owner_to_player_offset": 10000,
+  "coordinate_a": [
+    112,
+    116,
+    120
+  ],
+  "coordinate_b": [
+    176,
+    180,
+    184
+  ],
+  "signatures": {
+    "owner": {
+      "pattern": "4D 8B 8F ?? ?? ?? ?? 4D 8B 87 ?? ?? ?? ?? 48 8D 55 E0 49 8B 8F ?? ?? ?? ?? E8 ?? ?? ?? ?? 48 8D 55 F0 49 8B 8F ?? ?? ?? ?? E8 ?? ?? ?? ??",
+      "rva": 7994161
+    },
+    "coords_a": {
+      "pattern": "8B 03 89 47 ?? 8B 43 04 89 47 ?? 8B 43 08 89 47 ?? 48 8B 5C 24 50 0F 28 74 24 30 0F 28 7C 24 20 48 83 C4 40 5F C3",
+      "rva": 8845724
+    },
+    "coords_b": {
+      "pattern": "48 8B 03 48 8B CB F3 0F 11 83 ?? ?? ?? ?? FF 90 40 04 00 00 48 8B 03 48 8B CB F3 0F 11 83 ?? ?? ?? ?? FF 90 48 04 00 00 44 8B CD 44 89 A3 ?? ?? ?? ?? 45 8B C7 F3 0F 11 83 ?? ?? ?? ?? 41 8B D4 44 89 BB ?? ?? ?? ??",
+      "rva": 8844904
+    }
+  }
+}
