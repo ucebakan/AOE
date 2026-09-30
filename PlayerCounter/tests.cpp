@@ -1,18 +1,26 @@
 #include "reader.hpp"
+#include "exit_profile.hpp"
 #include <cstring>
 #include <iostream>
 #include <limits>
 #include <stdexcept>
 #include <vector>
+#include <fstream>
 void Require(bool value, const char* message) { if (!value) throw std::runtime_error(message); }
-int main(int argc, char**) {
+int main(int argc, char** argv) {
     try {
+        if (argc > 1 && std::string(argv[1]) == "--verify-profile") {
+            std::ifstream file(pc::targetPath,std::ios::binary);
+            std::vector<unsigned char> bytes((std::istreambuf_iterator<char>(file)),{});
+            Require(pc::ValidateExitImage(bytes),"approved disk Exit AOB profile");
+            std::cout << "PASS: unique executable-section Exit AOB at 0x95F200\n"; return 0;
+        }
         if (argc > 1) {
             pc::ProcessReader reader;
             if (!reader.Open()) { std::wcerr << reader.Error() << L'\n'; return 2; }
             auto count = reader.Poll();
             if (!count) { std::wcerr << reader.Error() << L'\n'; return 3; }
-            std::cout << "Live profile verified; Player : " << *count << '\n'; return 0;
+            std::cout << "Live profile verified; Player : " << *count << "; Exit ready: " << reader.CanExit() << '\n'; return 0;
         }
         constexpr uintptr_t base = 0x140000000, context = 0x200000000;
         uintptr_t root = context; uint64_t count = 0; bool failure = false, replacement = false;
@@ -44,8 +52,57 @@ int main(int argc, char**) {
         memory[pc::getterRva]=0xE9; Require(!pc::ValidateLive(image,base),"patched resolver rejected");
         memory[pc::getterRva]=pc::getter[0]; memory[0x108]^=1;
         Require(!pc::ValidateLive(image,base),"different PE timestamp rejected");
+        memory[0x108]^=1;
+        for (const auto& guard : pc::exit_profile::guards)
+            std::memcpy(memory.data()+guard.rva,guard.bytes.data(),guard.bytes.size());
+        Require(pc::ValidateExitCode(image,base),"approved Exit code");
+        for (const auto& guard : pc::exit_profile::guards) {
+            memory[guard.rva]^=1;
+            Require(!pc::ValidateExitCode(image,base),"Exit/callee patch rejected");
+            memory[guard.rva]^=1;
+        }
+        const uintptr_t expectedRoot = context-pc::exit_profile::rootDelta;
+        uintptr_t rootTable=base+pc::exit_profile::rootVtableRva, contextTable=base+pc::exit_profile::contextVtableRva;
+        uintptr_t rootMethod=base+pc::exit_profile::rootVirtualRva;
+        std::memcpy(memory.data()+pc::exit_profile::rootVtableRva+0x2F0,&rootMethod,8);
+        root = context; rootReads = 0; replacement = false;
+        pc::Read exitRead = [&](uintptr_t p, void* d, size_t n) {
+            if (n == 8 && p == base+pc::rootRva) {
+                auto current = replacement && ++rootReads == 2 ? context+0x10000 : root;
+                std::memcpy(d,&current,8); return true;
+            }
+            if (n == 8 && p == expectedRoot) { std::memcpy(d,&rootTable,8); return true; }
+            if (n == 8 && p == context) { std::memcpy(d,&contextTable,8); return true; }
+            return image(p,d,n);
+        };
+        auto plan = pc::PrepareExit(exitRead,base);
+        Require(plan && plan->root == expectedRoot && plan->context == context && plan->function == base+0x95F200,"Exit argument and ASLR function");
+        rootTable+=8; Require(!pc::PrepareExit(exitRead,base),"wrong root type rejected"); rootTable-=8;
+        contextTable+=8; Require(!pc::PrepareExit(exitRead,base),"wrong context type rejected"); contextTable-=8;
+        root=1; Require(!pc::PrepareExit(exitRead,base),"root subtraction underflow rejected"); root=context;
+        replacement=true; rootReads=0; Require(!pc::PrepareExit(exitRead,base),"Exit context replacement rejected"); replacement=false;
+        memory[pc::exit_profile::rootVtableRva+0x2F0]^=1;
+        Require(!pc::PrepareExit(exitRead,base),"patched virtual slot rejected");
+        memory[pc::exit_profile::rootVtableRva+0x2F0]^=1;
+        // Synthetic disk fixture: AOB must occur exactly once in executable code at the approved RVA.
+        std::vector<unsigned char> disk(4096);
+        pe.FileHeader.SizeOfOptionalHeader=sizeof(IMAGE_OPTIONAL_HEADER64); pe.FileHeader.NumberOfSections=1;
+        std::memcpy(disk.data(),&dos,sizeof(dos)); std::memcpy(disk.data()+0x100,&pe,sizeof(pe));
+        IMAGE_SECTION_HEADER section{}; section.VirtualAddress=static_cast<DWORD>(pc::exit_profile::functionRva);
+        section.PointerToRawData=1024; section.SizeOfRawData=1024; section.Characteristics=IMAGE_SCN_MEM_EXECUTE;
+        std::memcpy(disk.data()+0x100+sizeof(pe),&section,sizeof(section));
+        std::memcpy(disk.data()+1024,pc::exit_profile::exitBody.data(),pc::exit_profile::exitBody.size());
+        Require(pc::ValidateExitImage(disk),"unique disk AOB");
+        disk[1024]^=1; Require(!pc::ValidateExitImage(disk),"missing AOB"); disk[1024]^=1;
+        std::memcpy(disk.data()+1280,pc::exit_profile::exitBody.data(),pc::exit_profile::exitBody.size());
+        Require(!pc::ValidateExitImage(disk),"ambiguous AOB");
+        std::fill(disk.begin()+1280,disk.begin()+1536,static_cast<unsigned char>(0));
+        section.Characteristics=0; std::memcpy(disk.data()+0x100+sizeof(pe),&section,sizeof(section));
+        Require(!pc::ValidateExitImage(disk),"non-executable AOB");
+        Require(!pc::ValidateExitImage(std::span(disk).first(128)),"truncated PE");
         pc::ProcessReader reader; reader.Close(); reader.Close(); Require(!reader.Poll(),"closed process");
-        std::cout << "PASS: counters, colors, invalid reads, context change, PE/profile and live patch guards\n";
+        Require(!reader.RequestExit(),"disconnected Exit never dispatched");
+        std::cout << "PASS: counter/color, read failures, Exit root/context/ASLR, all code patch guards, unique AOB and fail-closed dispatch\n";
         return 0;
     } catch (const std::exception& e) { std::cerr << e.what() << '\n'; return 1; }
 }

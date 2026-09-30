@@ -51,8 +51,8 @@ Oyuncuya mesafeye göre iki yönlü sıralama, atanabilir oyun içi kısayol, uy
 .NET 9 Windows Desktop runtime gerekir. Derleme: `./MobTP/build.ps1`.
 Paylaşılan kaynaklar, 31 testin raporları ve arayüz görüntüsü MobTP klasöründedir.
 
-## PlayerCounter 1.0.0
+## PlayerCounter 1.1.0
 
-[Kaynaklar ve kullanım](PlayerCounter/) · [Windows x64 EXE](PlayerCounter/releases/1.0.0/PlayerCounter.exe)
+[Kaynaklar ve kullanım](PlayerCounter/) · [Windows x64 EXE](PlayerCounter/releases/1.1.0/PlayerCounter.exe)
 
-Salt okunur oyuncu sayacı; 300 ms yenileme, 5 ve üzeri kırmızı gösterge, gömülü SHA-256 profili ve canlı resolver kontrolü. Windows yönetici izni ister. Harici runtime gerekmez. Bilinmeyen oyun sürümünde sayı göstermez.
+Salt okunur oyuncu sayacı ve kırmızı Exit butonu; 300 ms yenileme, 5 ve üzeri kırmızı gösterge. Exit yalnız tıklamayla çağrılır; SHA/build profili, tekil AOB, canlı kod ve root/context kimlik kontrolleri bulunur. Windows yönetici izni ister; harici runtime gerekmez. Derleme ve koruma/arayüz testleri geçti; canlı Exit çağrısı bu sürümle henüz denenmedi.

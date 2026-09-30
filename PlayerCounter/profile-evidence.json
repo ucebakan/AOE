@@ -1,0 +1,58 @@
+{
+  "sha256": "9CD77CD0C305359A3048D60C3C2FD837B907E2E61BBF8B828BFCC8E5270E5C28",
+  "source": "Approved on-disk TClient.exe; Exit semantics supplied by user runtime test",
+  "exit_function_range": [
+    "0x95F200",
+    "0x95F270"
+  ],
+  "root_delta": "0x19368",
+  "root_vtable": "0xCE9150",
+  "context_vtable": "0xCDC970",
+  "guards": [
+    {
+      "name": "exitBody",
+      "rva": "0x95f200",
+      "bytes": "40534883EC20488BD9E80275ECFFE8FD546CFF4885DB7450488BCBE8E0F7F3FF33D2488BCBE8060EF2FF488BCBE89E7FF3FF488B03488BCBFF90F0020000488D8BB04D010033D2488B01FF5028488BCBC683D182C90001E884F0FFFF488D8B68930100E8D894E8FF33C04883C4205BC3"
+    },
+    {
+      "name": "firstCall",
+      "rva": "0x826710",
+      "bytes": "48895C24084889742410574883EC20E8"
+    },
+    {
+      "name": "secondCall",
+      "rva": "0x24710",
+      "bytes": "48895C2408574883EC20488B3D3791E4"
+    },
+    {
+      "name": "cleanupA",
+      "rva": "0x89ea00",
+      "bytes": "48894C24085553565741544155415641"
+    },
+    {
+      "name": "cleanupB",
+      "rva": "0x880030",
+      "bytes": "48895C2410555657488D6C24F04881EC"
+    },
+    {
+      "name": "cleanupC",
+      "rva": "0x8971d0",
+      "bytes": "48895C2408574883EC20488B99582000"
+    },
+    {
+      "name": "rootVirtual",
+      "rva": "0x89bdd0",
+      "bytes": "4055564154488D6C24B94881ECB00000"
+    },
+    {
+      "name": "exitState",
+      "rva": "0x95e2e0",
+      "bytes": "48895C240848896C2410488974241857"
+    },
+    {
+      "name": "contextCleanup",
+      "rva": "0x7e8740",
+      "bytes": "40534883EC2033C0488BD9668981B0D7"
+    }
+  ]
+}

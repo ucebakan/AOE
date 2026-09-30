@@ -5,6 +5,7 @@
 #include <functional>
 #include <optional>
 #include <string>
+#include <span>
 
 namespace pc {
 inline constexpr wchar_t targetPath[] = L"C:\\Games\\4Unity\\TClient.exe";
@@ -17,12 +18,20 @@ using Read = std::function<bool(uintptr_t, void*, size_t)>;
 bool ValidPointer(uintptr_t p, size_t size);
 bool ValidateLive(const Read& read, uintptr_t base);
 std::optional<uint64_t> ReadCount(const Read& read, uintptr_t base);
+struct ExitPlan { uintptr_t context, root, function; };
+bool ValidateExitImage(std::span<const unsigned char> image);
+bool ValidateExitCode(const Read& read, uintptr_t base);
+std::optional<ExitPlan> PrepareExit(const Read& read, uintptr_t base);
 enum class Tone { Missing, Normal, Alert };
 inline Tone Color(std::optional<uint64_t> count) { return !count ? Tone::Missing : *count >= 5 ? Tone::Alert : Tone::Normal; }
 
 class ProcessReader {
     HANDLE process_ = nullptr;
     uintptr_t base_ = 0;
+    HANDLE exitThread_ = nullptr;
+    bool exitProfileValid_ = false, exitBlocked_ = false;
+    ULONGLONG lastExit_ = 0;
+    std::wstring exitError_;
     std::wstring error_ = L"Game unavailable";
     bool ReadMemory(uintptr_t address, void* data, size_t size) const;
 public:
@@ -35,6 +44,9 @@ public:
     bool IsAlive() const;
     bool Connected() const { return process_ != nullptr; }
     std::optional<uint64_t> Poll();
+    bool CanExit();
+    bool RequestExit();
+    const std::wstring& ExitError() const { return exitError_; }
     const std::wstring& Error() const { return error_; }
 };
 }
