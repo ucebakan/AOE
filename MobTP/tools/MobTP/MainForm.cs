@@ -1,4 +1,4 @@
-using UnityMonsterList;
+﻿using UnityMonsterList;
 
 namespace MobTP;
 
@@ -12,6 +12,7 @@ sealed class MainForm : Form
     readonly Button tp=new(){Text="UYGUN MOBLARI YANIMA GETİR",AutoSize=true,Height=45,Padding=new(12),Enabled=false};
     readonly NumericUpDown spread=new(){Minimum=1,Maximum=10,DecimalPlaces=1,Increment=0.5m,Value=2,Width=75};
     readonly CheckBox show=new(){Text="Arka plandaki mob listesini göster",AutoSize=true};
+    readonly ComboBox distanceOrder=new(){DropDownStyle=ComboBoxStyle.DropDownList,Width=170};
     readonly TextBox keyBox=new(){ReadOnly=true,Width=180,Text="Tıklayıp tuşa basın"};
     readonly Label keyStatus=new(){AutoSize=true,Text="Kısayol: atanmamış",Margin=new(12,8,3,0)};
     KeyBinding? pendingKey;
@@ -26,7 +27,7 @@ sealed class MainForm : Form
     World? last;
     public MainForm(bool preview=false)
     {
-        Text="MobTP 2.0 · 4Unity";ClientSize=new(1030,700);MinimumSize=new(1000,650);StartPosition=FormStartPosition.CenterScreen;DoubleBuffered=true;
+        Text="MobTP 2.1 · 4Unity";ClientSize=new(1030,700);MinimumSize=new(1000,650);StartPosition=FormStartPosition.CenterScreen;DoubleBuffered=true;
         if(!preview){settings=UserSettings.Load();spread.Value=settings.Spread;}
         var layout=new TableLayoutPanel{Dock=DockStyle.Fill,ColumnCount=1,RowCount=8,Padding=new(16)};
         foreach(float height in new[]{36f,32f,60f,65f,45f,75f,30f})layout.RowStyles.Add(new(SizeType.Absolute,height));
@@ -36,9 +37,17 @@ sealed class MainForm : Form
         buttons.Controls.AddRange([tp,new Label{Text="Çevre mesafesi",AutoSize=true,Margin=new(20,20,3,0)},spread,new Label{Text="Home sınırı: 50 XZ",AutoSize=true,Margin=new(16,20,3,0)}]);
         var keys=new FlowLayoutPanel{Dock=DockStyle.Fill};var assign=new Button{Text="Tuşu ata",AutoSize=true};var clear=new Button{Text="Kaldır",AutoSize=true};var retry=new Button{Text="Profili yeniden kontrol et",AutoSize=true};
         keys.Controls.AddRange([keyBox,assign,clear,keyStatus,retry]);
-        layout.Controls.Add(buttons,0,3);layout.Controls.Add(keys,0,4);layout.Controls.Add(result,0,5);layout.Controls.Add(show,0,6);layout.Controls.Add(grid,0,7);
-        foreach(string title in new[]{"Mob ID","Mob XYZ","Home XYZ","Oyuncu → Home","Durum"})grid.Columns.Add(title,title);
+        layout.Controls.Add(buttons,0,3);layout.Controls.Add(keys,0,4);layout.Controls.Add(result,0,5);var listOptions=new FlowLayoutPanel{Dock=DockStyle.Fill};
+        distanceOrder.Items.AddRange(["Yakından uzağa","Uzaktan yakına"]);distanceOrder.SelectedIndex=settings.DistanceDescending?1:0;
+        listOptions.Controls.AddRange([show,new Label{Text="Oyuncuya mesafe (XZ)",AutoSize=true,Margin=new(12,5,3,0)},distanceOrder]);
+        layout.Controls.Add(listOptions,0,6);layout.Controls.Add(grid,0,7);
+        foreach(string title in new[]{"Mob ID","Mob XYZ","Home XYZ","Oyuncu → Home","Oyuncu → Mob (XZ)","Durum"})grid.Columns.Add(title,title);
         grid.Columns[1].FillWeight=170;grid.Columns[2].FillWeight=170;
+        foreach(DataGridViewColumn column in grid.Columns)column.SortMode=DataGridViewColumnSortMode.NotSortable;
+        grid.Columns[4].SortMode=DataGridViewColumnSortMode.Programmatic;
+        grid.Columns[4].ValueType=typeof(double);grid.Columns[4].DefaultCellStyle.Format="F2";grid.Columns[4].DefaultCellStyle.NullValue="—";
+        distanceOrder.SelectedIndexChanged+=(_,_)=>{settings=settings with{DistanceDescending=distanceOrder.SelectedIndex==1};if(last is not null)Render(last);if(!preview)try{settings.Save();}catch(Exception ex){result.Text=ex.Message;}};
+        grid.ColumnHeaderMouseClick+=(_,e)=>{if(e.ColumnIndex==4)distanceOrder.SelectedIndex=1-distanceOrder.SelectedIndex;};
         show.CheckedChanged+=(_,_)=>grid.Visible=show.Checked;
         tp.Click+=async(_,_)=>await Teleport();timer.Tick+=async(_,_)=>await RefreshWorld();
         keyBox.KeyDown+=(_,e)=>{e.SuppressKeyPress=true;e.Handled=true;var candidate=new KeyBinding((int)e.KeyCode,(e.Control?2u:0)|(e.Alt?1u:0)|(e.Shift?4u:0));if(candidate.Valid){pendingKey=candidate;keyBox.Text=candidate.ToString();}};
@@ -102,12 +111,37 @@ sealed class MainForm : Form
                 if(!rows.TryGetValue(m.Mob.ActorPtr,out var row)){row=grid.Rows[grid.Rows.Add()];rows[m.Mob.ActorPtr]=row;}
                 string XYZ(Position? p)=>p is null?"—":$"{p.X:F1} / {p.Y:F1} / {p.Z:F1}";
                 var placement=plan.FirstOrDefault(p=>p.Mob.Mob.ActorPtr==m.Mob.ActorPtr);
-                object[] values=[m.Mob.EntityId,XYZ(m.A),XYZ(m.Home),m.PlayerHomeXZ?.ToString("F2")??"—",m.PlayerHomeXZ is null?"Home yok":placement?.Eligible==true?"TP uygun":placement is not null?"Hedef sınır dışında":"Home sınırı dışında"];
+                object[] values=[m.Mob.EntityId,XYZ(m.A),XYZ(m.Home),m.PlayerHomeXZ?.ToString("F2")??"—",w.Player is null?null!:MobCapture.Distance(Placement.Player(w.Player),m.A,true)!,m.PlayerHomeXZ is null?"Home yok":placement?.Eligible==true?"TP uygun":placement is not null?"Hedef sınır dışında":"Home sınırı dışında"];
                 for(int i=0;i<values.Length;i++)if(!Equals(row.Cells[i].Value,values[i]))row.Cells[i].Value=values[i];
             }
+            grid.Sort(new DistanceRowComparer(settings.DistanceDescending));
+            grid.Columns[4].HeaderCell.SortGlyphDirection=settings.DistanceDescending?SortOrder.Descending:SortOrder.Ascending;
             if(top>=0&&grid.Rows.Count>0)grid.FirstDisplayedScrollingRowIndex=Math.Min(top,grid.Rows.Count-1);
         }
         finally{grid.ResumeLayout();}
+    }
+    sealed class DistanceRowComparer(bool descending) : System.Collections.IComparer
+    {
+        public int Compare(object? x,object? y)
+        {
+            var a=(DataGridViewRow)x!;var b=(DataGridViewRow)y!;
+            double? da=a.Cells[4].Value as double?,db=b.Cells[4].Value as double?;
+            bool va=da.HasValue&&double.IsFinite(da.Value),vb=db.HasValue&&double.IsFinite(db.Value);
+            if(va!=vb)return va?-1:1;
+            int c=va?da!.Value.CompareTo(db!.Value):0;
+            if(c!=0)return descending?-c:c;
+            return Convert.ToUInt32(a.Cells[0].Value).CompareTo(Convert.ToUInt32(b.Cells[0].Value));
+        }
+    }
+    internal void VerifyDistanceSorting()
+    {
+        foreach(int order in new[]{0,1})
+        {
+            distanceOrder.SelectedIndex=order;
+            var distances=grid.Rows.Cast<DataGridViewRow>().Select(r=>Convert.ToDouble(r.Cells[4].Value)).ToArray();
+            if(!distances.SequenceEqual(order==0?distances.OrderBy(x=>x):distances.OrderByDescending(x=>x)))throw new InvalidOperationException("Distance sort failed");
+        }
+        distanceOrder.SelectedIndex=0;
     }
     internal void ShowList()=>show.Checked=true;
     protected override void Dispose(bool disposing){if(disposing){timer.Dispose();cancellation.Cancel();}base.Dispose(disposing);}

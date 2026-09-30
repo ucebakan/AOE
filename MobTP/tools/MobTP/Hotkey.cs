@@ -1,4 +1,4 @@
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 using System.Text.Json;
 
 namespace MobTP;
@@ -9,7 +9,7 @@ record KeyBinding(int Key,uint Modifiers)
     public override string ToString()=>(Modifiers.HasFlag(2)?"Ctrl+":"")+(Modifiers.HasFlag(1)?"Alt+":"")+(Modifiers.HasFlag(4)?"Shift+":"")+((Keys)Key).ToString();
 }
 static class ModBits { public static bool HasFlag(this uint value,uint mask)=>(value&mask)!=0; }
-record UserSettings(KeyBinding? Hotkey=null,decimal Spread=2)
+record UserSettings(KeyBinding? Hotkey=null,decimal Spread=2,bool DistanceDescending=false)
 {
     static string PathName=>Path.Combine(ProfileStore.Root,"settings.json");
     public static UserSettings Load()

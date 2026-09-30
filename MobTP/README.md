@@ -1,4 +1,4 @@
-# MobTP 2.0 — 4Unity
+# MobTP 2.1 — 4Unity
 
 MobTP.exe ayrı bir x64 WinForms uygulamasıdır. .NET 9 Windows Desktop runtime gerekir
 (Observer ile aynı runtime). Managed bağımlılıklar tek EXE içine paketlenir.
@@ -113,10 +113,20 @@ ASLR simülasyonu, bozulmuş profil ve cache kontrolü. --profile-test diskteki 
 TClient.exe'yi kullanır; oyuna yazmaz. UI sentetik olarak görüntülendi. Gerçek gelecekteki
 patch veya oyun içi hotkey/teleport davranışı bu testlerle kanıtlanmış değildir.
 
+## Mesafeye göre sıralama (2.1)
+
+Liste varsayılan olarak yakından uzağa sıralanır. Liste üstündeki seçimden
+uzaktan yakına geçilebilir; Oyuncu → Mob (XZ) başlığına tıklamak da yönü değiştirir.
+Mesafe mobun güncel A konumu ile oyuncu arasında XZ düzleminde hesaplanır;
+Oyuncu → Home ayrı bir sütundur. Sayılar metin olarak değil sayısal sıralanır.
+Eşit mesafede Mob ID kullanılır, okunamayan mesafeler sonda kalır.
+Seçim ayarlarda saklanır ve her canlı yenilemede uygulanır.
+Bu seçim liste sıralamasını değiştirir; teleport uygunluk filtresi aynı kalır.
+
 ## Depodan derleme
 
 Bu klasörden `./build.ps1` ile derleyin; çıktı `build/MobTP.exe` olur.
 `./build.ps1 -SelfTest` işlev ve Windows hotkey testlerini de çalıştırır.
 .NET 9 SDK gerekir. Paylaşılan Observer/PlayerXYZ kaynakları bu klasörde yer alır.
-Hazır paket: [MobTP 2.0.0](releases/2.0.0/MobTP-2.0.0-win-x64.zip).
+Hazır paket: [MobTP 2.1.0](releases/2.1.0/MobTP-2.1.0-win-x64.zip).
 Teslimdeki test raporları ve arayüz görüntüsü `evidence/` içindedir.

@@ -1,4 +1,4 @@
-using System.Text.Json;
+﻿using System.Text.Json;
 using UnityMonsterList;
 
 namespace MobTP;
@@ -88,7 +88,7 @@ static class Tests
             var m=new Monster(key,2,actor,actor+0x1000,a.X,a.Y,a.Z,true,5,a);
             mobs.Add(new(m,new(1,2,m.NodePtr,key,actor,key,2,3,".?AVCTClientMonster@@"),a,a,home,MobCapture.Distance(Placement.Player(player),home,true)));
         }
-        form.Render(new(DateTimeOffset.Now,null,player,mobs,"SENTETİK ÖNİZLEME · oyuna bağlı değil"));form.ShowList();Application.DoEvents();
+        form.Render(new(DateTimeOffset.Now,null,player,mobs,"SENTETİK ÖNİZLEME · oyuna bağlı değil"));form.ShowList();form.VerifyDistanceSorting();Application.DoEvents();
         using var bitmap=new Bitmap(form.Width,form.Height);form.DrawToBitmap(bitmap,new(0,0,bitmap.Width,bitmap.Height));bitmap.Save(Path.Combine(AppContext.BaseDirectory,"ui-preview.png"));
         form.Close();
     }

@@ -43,10 +43,10 @@ Canlı oyun testi bu teslim oturumunda doğrulanmadı; ayrıntılar proje README
 Canlı local P ve iki XYZ grubu; tek seferlik koordinat yazımı. SHA profili, RTTI/AOB resolver ve imzalar pakete dahildir. ZIP'in tamamını çıkarın.
 Derleme: `.\PlayerXYZ\build.ps1`. Testler: `.\PlayerXYZ\build.ps1 -SelfTest` (resolver testi mevcut referans TClient.exe gerektirir).
 Test raporları ve UI görüntüsü `PlayerXYZ/evidence` içindedir. Gelecekteki bütün build'lerin çözüleceği garanti edilmez.
-## MobTP 2.0.0
+## MobTP 2.1.0
 
-[Kaynaklar ve kullanım](MobTP/) · [Windows x64 ZIP](MobTP/releases/2.0.0/MobTP-2.0.0-win-x64.zip)
+[Kaynaklar ve kullanım](MobTP/) · [Windows x64 ZIP](MobTP/releases/2.1.0/MobTP-2.1.0-win-x64.zip)
 
-Atanabilir oyun içi kısayol, uygun mob sayaçları ve SHA/AOB/RTTI profil doğrulaması.
+Oyuncuya mesafeye göre iki yönlü sıralama, atanabilir oyun içi kısayol, uygun mob sayaçları ve SHA/AOB/RTTI profil doğrulaması.
 .NET 9 Windows Desktop runtime gerekir. Derleme: `./MobTP/build.ps1`.
 Paylaşılan kaynaklar, 31 testin raporları ve arayüz görüntüsü MobTP klasöründedir.
