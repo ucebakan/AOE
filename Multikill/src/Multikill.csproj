@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType><TargetFramework>net9.0-windows</TargetFramework><UseWindowsForms>true</UseWindowsForms>
+    <ImplicitUsings>enable</ImplicitUsings><Nullable>enable</Nullable><RuntimeIdentifier>win-x64</RuntimeIdentifier><PlatformTarget>x64</PlatformTarget>
+    <AssemblyName>4UnityMultikill</AssemblyName><Version>1.2.0</Version><ApplicationManifest>app.manifest</ApplicationManifest>
+    <PublishSingleFile>true</PublishSingleFile><SelfContained>true</SelfContained><IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+  </PropertyGroup>
+  <ItemGroup><PackageReference Include="Iced" Version="1.21.0" /><ProjectReference Include="../../Suite/Controls/UnityTools.Controls.csproj" /><EmbeddedResource Include="../profiles/known.json" LogicalName="Multikill.profile" /></ItemGroup>
+  <Target Name="RequireAdministrator" BeforeTargets="PrepareForBuild">
+    <Error Condition="'$(ApplicationManifest)' != 'app.manifest'" Text="UAC manifest must be retained." />
+    <XmlPeek XmlInputPath="$(MSBuildProjectDirectory)/app.manifest" Query="//*[local-name()='requestedExecutionLevel']/@level"><Output TaskParameter="Result" PropertyName="_UacLevel" /></XmlPeek>
+    <Error Condition="'$(_UacLevel)' != 'requireAdministrator'" Text="Multikill requires administrator UAC on every build." />
+  </Target>
+</Project>

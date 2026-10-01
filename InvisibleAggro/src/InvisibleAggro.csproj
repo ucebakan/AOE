@@ -12,4 +12,5 @@
     <RootNamespace>InvisibleAggro</RootNamespace>
     <Version>1.1.0</Version>
   </PropertyGroup>
+<ItemGroup><ProjectReference Include="../../Suite/Controls/UnityTools.Controls.csproj" /></ItemGroup>
 </Project>

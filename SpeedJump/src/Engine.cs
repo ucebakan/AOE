@@ -9,11 +9,11 @@ sealed class PinLoop : IDisposable
     public void Start(Action write)
     {
         if(task is not null)throw new InvalidOperationException("Writer already started.");
-        write(); // Initial failure must not paint a feature active.
+        UnityTools.Controls.OperationGate.Check(); write(); // Initial failure must not paint a feature active.
         Failure=null;cancellation=new();var token=cancellation.Token;
         task=Task.Run(async()=>
         {
-            try{using var timer=new PeriodicTimer(TimeSpan.FromMilliseconds(25));while(await timer.WaitForNextTickAsync(token))write();}
+            try{using var timer=new PeriodicTimer(TimeSpan.FromMilliseconds(25));while(await timer.WaitForNextTickAsync(token)){UnityTools.Controls.OperationGate.CheckContinuous();write();}}
             catch(OperationCanceledException)when(token.IsCancellationRequested){}
             catch(Exception ex){Failure=ex;}
         });
@@ -52,6 +52,7 @@ sealed class Engine : IDisposable
     }
     public void Toggle(bool isJump)
     {
+        if (UnityTools.Controls.OperationGate.Blocked) return;
         lock(gate)
         {
             if(target is null||faulted)return;

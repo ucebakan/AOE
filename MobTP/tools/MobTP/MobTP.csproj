@@ -18,4 +18,5 @@
   <Target Name="RemoveReferencedAppLaunchers" AfterTargets="Publish">
     <Delete Files="$(PublishDir)4UnityMonsterList.exe;$(PublishDir)4UnityMonsterList.deps.json;$(PublishDir)4UnityMonsterList.runtimeconfig.json;$(PublishDir)4UnityMonsterList.pdb" />
   </Target>
+<ItemGroup><ProjectReference Include="../../../Suite/Controls/UnityTools.Controls.csproj" /></ItemGroup>
 </Project>

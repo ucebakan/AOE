@@ -127,6 +127,7 @@ sealed class Engine : IDisposable
     }
     public void Toggle(StateMode selected)
     {
+        if (UnityTools.Controls.OperationGate.Blocked) return;
         var elapsed = System.Diagnostics.Stopwatch.StartNew();
         if (session is null) Attach();
         StateMode requested = mode == selected ? StateMode.Off : selected;
@@ -147,6 +148,7 @@ sealed class Engine : IDisposable
                     desired.Insert(1, new(session.Base + Profile.Writer2, Enumerable.Repeat((byte)0x90, 7).ToArray(), true));
                     desired.Add(new(session.Player + Profile.Visual, [255], false));
                 }
+                UnityTools.Controls.OperationGate.Check();
                 patches.Apply(desired);
                 mode = requested;
             }

@@ -13,4 +13,5 @@
     <Version>1.1.0</Version>
 </PropertyGroup>
   <ItemGroup><EmbeddedResource Include="signatures.json" /></ItemGroup>
+<ItemGroup><ProjectReference Include="../../Suite/Controls/UnityTools.Controls.csproj" /></ItemGroup>
 </Project>

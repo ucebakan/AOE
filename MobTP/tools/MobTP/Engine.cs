@@ -54,6 +54,7 @@ sealed class Session : IDisposable
     readonly ProfileBundle bundle;
     readonly ulong mb,context,head;
     readonly long start;
+    public int Pid => process.Id;
     public MobProfile Profile=>bundle.Profile;
     public string ProfileStatus=>bundle.Origin+" · "+Profile.Player.Sha256[..12];
     public Snapshot Source {get;}
@@ -234,7 +235,7 @@ static class Engine
                 if(expected!=old.Identity){skipped++;continue;}
                 bool Guard()
                 {
-                    if(cancel.IsCancellationRequested||hotkeyPid is not null&&!HotkeyRegistration.GameForeground(hotkeyPid)||!session.Alive())return false;
+                    if(UnityTools.Controls.OperationGate.Blocked||cancel.IsCancellationRequested||hotkeyPid is not null&&!HotkeyRegistration.GameForeground(hotkeyPid)||!session.Alive())return false;
                     var id=identity.Check();if(!id.Membership||id.Identity!=expected)return false;
                     var p=session.Player();var h=session.XYZ(old.Mob.ActorPtr,session.Profile.HomeOffset);
                     return p is not null&&p.ActorPtr==player.ActorPtr&&p.EntityId==player.EntityId&&MobCapture.Distance(origin,Placement.Player(p))<=0.25&&h==current.Home&&Placement.InBase(Placement.Player(p),h,target);

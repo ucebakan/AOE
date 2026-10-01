@@ -20,10 +20,17 @@ std::mutex mutex;
 std::condition_variable wake;
 bool stopping = false;
 HFONT font = nullptr;
+#ifdef UNITY_SUITE
+std::thread suiteWorker;
+bool suiteOverlay=false;
+#endif
 void PaintBadge(HDC dc, RECT rect, std::optional<uint64_t> value) {
     const auto tone = pc::Color(value);
     COLORREF background = tone == pc::Tone::Missing ? RGB(232,232,232) : tone == pc::Tone::Alert ? RGB(220,0,0) : RGB(255,255,255);
     COLORREF foreground = tone == pc::Tone::Missing ? RGB(85,85,85) : tone == pc::Tone::Alert ? RGB(255,255,255) : RGB(0,0,0);
+    #ifdef UNITY_SUITE
+    if(!suiteOverlay){background=tone==pc::Tone::Alert?RGB(156,52,80):RGB(32,36,48);foreground=RGB(234,237,246);}
+#endif
     auto brush = CreateSolidBrush(background); FillRect(dc, &rect, brush); DeleteObject(brush);
     auto old = SelectObject(dc, font); SetBkMode(dc, TRANSPARENT); SetTextColor(dc, foreground);
     auto text = L"Player : " + (value ? std::to_wstring(*value) : std::wstring(L"--"));
@@ -98,13 +105,30 @@ LRESULT CALLBACK WindowProc(HWND window, UINT message, WPARAM wp, LPARAM lp) {
         return 0;
     }
     case WM_ERASEBKGND: return 1;
+    case WM_PRINTCLIENT: {
+        RECT rect{};GetClientRect(window,&rect);
+#ifdef UNITY_SUITE
+        rect.right=std::max(0L,rect.right-MulDiv(suiteOverlay?64:140,GetDpiForWindow(window),96));
+#else
+        rect.right=MulDiv(136,GetDpiForWindow(window),96);
+#endif
+        PaintBadge(reinterpret_cast<HDC>(wp),rect,displayed);return 0;
+    }
     case WM_PAINT: {
         PAINTSTRUCT paint{}; HDC dc = BeginPaint(window, &paint);
         RECT rect{}; GetClientRect(window, &rect);
+        #ifdef UNITY_SUITE
+        rect.right=std::max(0L,rect.right-MulDiv(suiteOverlay?64:140,GetDpiForWindow(window),96));
+#else
         rect.right = MulDiv(136,GetDpiForWindow(window),96);
+#endif
         PaintBadge(dc,rect,displayed);
         EndPaint(window, &paint); return 0;
     }
+    #ifdef UNITY_SUITE
+    case WM_SIZE: {RECT r{};GetClientRect(window,&r);int button=MulDiv(suiteOverlay?64:140,GetDpiForWindow(window),96);SetWindowPos(exitButton,nullptr,std::max(0L,r.right-button),0,button,r.bottom,SWP_NOZORDER);InvalidateRect(window,nullptr,FALSE);return 0;}
+
+#endif
     case WM_LBUTTONDOWN: ReleaseCapture(); SendMessageW(window, WM_NCLBUTTONDOWN, HTCAPTION, 0); return 0;
     case WM_CONTEXTMENU: {
         POINT point{}; GetCursorPos(&point);
@@ -124,7 +148,12 @@ LRESULT CALLBACK WindowProc(HWND window, UINT message, WPARAM wp, LPARAM lp) {
     }
     case WM_DESTROY:
         { std::lock_guard lock(mutex); stopping = true; }
-        wake.notify_all(); PostQuitMessage(0); return 0;
+        wake.notify_all();
+#ifdef UNITY_SUITE
+        if(suiteWorker.joinable())suiteWorker.join();if(font){DeleteObject(font);font=nullptr;}return 0;
+#else
+        PostQuitMessage(0); return 0;
+#endif
     }
     return DefWindowProcW(window, message, wp, lp);
 }
@@ -191,3 +220,17 @@ int WINAPI wWinMain(HINSTANCE instance, HINSTANCE, PWSTR, int) {
     wake.notify_all(); worker.join(); DeleteObject(font); return 0;
 #endif
 }
+
+#ifdef UNITY_SUITE
+extern "C" __declspec(dllexport) HWND __cdecl CreateTool(HWND parent,const wchar_t*,int preview){
+    suiteOverlay=parent==nullptr;stopping=false;pendingReady=false;exitQueued=false;displayed.reset();pending.reset();pendingError.clear();
+    auto instance=GetModuleHandleW(nullptr);UINT dpi=parent?GetDpiForWindow(parent):GetDpiForSystem();
+    font=CreateFontW(-MulDiv(suiteOverlay?11:16,dpi,72),0,0,0,FW_BOLD,FALSE,FALSE,FALSE,DEFAULT_CHARSET,0,0,CLEARTYPE_QUALITY,0,L"Segoe UI");
+    WNDCLASSW cls{};cls.hInstance=instance;cls.lpfnWndProc=WindowProc;cls.lpszClassName=L"UnitySuiteCounter";cls.hCursor=LoadCursorW(nullptr,IDC_ARROW);RegisterClassW(&cls);
+    HWND window=CreateWindowExW(suiteOverlay?(WS_EX_TOPMOST|WS_EX_TOOLWINDOW|WS_EX_NOACTIVATE):WS_EX_CONTROLPARENT,cls.lpszClassName,L"PlayerCounter",suiteOverlay?WS_POPUP:(WS_CHILD|WS_VISIBLE),suiteOverlay?40:0,suiteOverlay?40:0,suiteOverlay?MulDiv(200,dpi,96):600,suiteOverlay?MulDiv(36,dpi,96):80,parent,nullptr,instance,nullptr);
+    if(window&&suiteOverlay)ShowWindow(window,SW_SHOWNOACTIVATE);
+    if(window&&!preview)suiteWorker=std::thread(Worker,window);return window;
+}
+extern "C" __declspec(dllexport) HWND __cdecl CreateOverlay(int preview){return CreateTool(nullptr,L"",preview);}
+extern "C" __declspec(dllexport) int __cdecl CloseTool(HWND window){if(IsWindow(window))DestroyWindow(window);return 1;}
+#endif

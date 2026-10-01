@@ -129,6 +129,12 @@ sealed class Session : ITarget
     }
     void ResolvePlayer()
     {
+        if (Profile.Sha256 == UnityTools.Controls.KnownPlayerPath.Sha)
+        {
+            (Owner, Player) = UnityTools.Controls.KnownPlayerPath.Resolve(Base, Read,
+                Profile.CtclientgameVtableRva, Profile.CtclientcharVtableRva, Profile.OwnerToPlayerOffset);
+            Health(); Files.Log("Player resolved through validated module-relative path; no heap scan."); return;
+        }
         var found=new HashSet<(long owner,long p)>();long address=0;int skipped=0;
         while(address<0x7FFFFFFF0000)
         {

@@ -44,7 +44,7 @@ static class Program
     }
 }
 
-sealed class MainForm : Form
+sealed partial class MainForm : Form
 {
     readonly Button invisible = new StateButton(), aggro = new StateButton(), approve = new StateButton();
     readonly Label status = new();
@@ -97,11 +97,11 @@ sealed class MainForm : Form
         invisible.Text = state.Mode == StateMode.Invisible ? "Invisible · AÇIK" : "Invisible";
         aggro.Text = state.Mode == StateMode.Aggro ? "Aggro · AÇIK" : "Aggro";
         invisible.BackColor = state.Mode == StateMode.Invisible ? Color.FromArgb(106, 79, 200) : Color.FromArgb(48, 53, 68);
-        aggro.BackColor = state.Mode == StateMode.Aggro ? Color.FromArgb(32, 135, 116) : Color.FromArgb(48, 53, 68);
+        aggro.BackColor = state.Mode == StateMode.Aggro ? Color.FromArgb(78, 104, 201) : Color.FromArgb(48, 53, 68);
         invisible.Enabled = aggro.Enabled = !busy && state.Ready;
         approve.Visible = state.NeedsApproval;
         approve.Enabled = !busy && !closing;
-        ClientSize = new Size(420, state.NeedsApproval ? 250 : 192);
+        if (TopLevel) ClientSize = new Size(420, state.NeedsApproval ? 250 : 192);
         status.Text = busy ? "Kontrol ediliyor…" : state.Message;
     }
     async void OnClosing(object? sender, FormClosingEventArgs e)

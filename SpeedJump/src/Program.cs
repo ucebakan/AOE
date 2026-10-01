@@ -31,7 +31,7 @@ static class Program
     }
 }
 
-sealed class MainForm : Form
+sealed partial class MainForm : Form
 {
     readonly Button speed=new StateButton(),jump=new StateButton();
     readonly Label status=new();
@@ -61,7 +61,7 @@ sealed class MainForm : Form
     {
         var v=engine.View;speed.Text=v.Speed?"SPEED · AÇIK":"SPEED";jump.Text=v.Jump?"JUMP · AÇIK":"JUMP";
         speed.BackColor=v.Speed?Color.FromArgb(106,79,200):Color.FromArgb(48,53,68);
-        jump.BackColor=v.Jump?Color.FromArgb(32,135,116):Color.FromArgb(48,53,68);
+        jump.BackColor=v.Jump?Color.FromArgb(78,104,201):Color.FromArgb(48,53,68);
         speed.Enabled=jump.Enabled=!busy&&!closing&&v.Ready;status.Text=busy?"Bağlantı kontrol ediliyor…":v.Message;
     }
     async void ClosingAsync(object? sender,FormClosingEventArgs e)

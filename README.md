@@ -1,5 +1,12 @@
 # 4Unity araçları
 
+## Birleşik uygulama
+
+[4UnityTools Control Center](Suite/) genel bakış düğmeleriyle araçları yönetir; PlayerCounter ayrı küçük pencere olarak açılır.
+[Windows x64 ZIP · tek EXE](Suite/releases/0.5.0/4UnityTools-0.5.0-win-x64.zip) · Derleme: `.\Suite\build.ps1`.
+Antrasit/lavanta arayüz, üst bilgi ve araç barı, sekmeler arasında korunan durum
+ve Player XYZ alanlarında sayı doğrulaması içerir.
+
 Bu depo önceki AOE Git geçmişini korur. Projeler ayrı klasörlerdedir:
 
 | Proje | Kaynaklar | Hazır sürüm |
@@ -56,3 +63,17 @@ Paylaşılan kaynaklar, 31 testin raporları ve arayüz görüntüsü MobTP klas
 [Kaynaklar ve kullanım](PlayerCounter/) · [Windows x64 EXE](PlayerCounter/releases/1.1.0/PlayerCounter.exe)
 
 Salt okunur oyuncu sayacı ve kırmızı Exit butonu; 300 ms yenileme, 5 ve üzeri kırmızı gösterge. Exit yalnız tıklamayla çağrılır; SHA/build profili, tekil AOB, canlı kod ve root/context kimlik kontrolleri bulunur. Windows yönetici izni ister; harici runtime gerekmez. Derleme ve koruma/arayüz testleri geçti; canlı Exit çağrısı bu sürümle henüz denenmedi.
+
+## SafeMode ve Multikill JE
+
+Birleşik 0.3 sürümünde SafeMode, Player Count >= 1 olduğunda etkin işlemleri
+geri alır. [Multikill](Multikill/) aynı uygulamaya eklenmiştir;
+[bağımsız EXE paketi](Multikill/releases/1.2.0/4UnityMultikill-1.2.0-win-x64.zip) de kullanılabilir.
+AOB, SHA/profil ve oturum doğrulaması ile patch recovery içerir.
+
+
+0.4 sürümünde ana Player XYZ kartında X/Y/Z + Işınlan bulunur. Kartlar ↕
+tutamacından sürüklenerek sıralanır, düzen saklanır. Multikill 1.1, oyun
+patch'inden sonra SHA değişimini AOB + semantik fingerprint taramasıyla karşılar.
+
+0.5 sürümünde onaylı açılış taraması 1–9 işlevin yalnız yollarını kontrol eder; aynı SHA için kalıcı profiller kullanılır. Oyun oturumu değişince canlı pointer’lar yeniden çözülür, AOE manuel doğrulaması ve tüm işlevlerin kapalı başlangıcı korunur.

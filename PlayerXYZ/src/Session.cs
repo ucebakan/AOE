@@ -99,6 +99,12 @@ sealed class Session : IDisposable
     }
     void ResolvePlayer()
     {
+        if (Profile.Sha256 == UnityTools.Controls.KnownPlayerPath.Sha)
+        {
+            (Owner, Player) = UnityTools.Controls.KnownPlayerPath.Resolve(Base, Read,
+                Profile.CtclientgameVtableRva, Profile.CtclientcharVtableRva, Profile.OwnerToPlayerOffset);
+            Health(); Files.Log("Player resolved through validated module-relative path; no heap scan."); return;
+        }
         var found=new HashSet<(long owner,long p)>();long address=0;int skipped=0;
         while(address<0x7FFFFFFF0000)
         {
@@ -162,6 +168,7 @@ sealed class Session : IDisposable
             Health();long p=Player;byte[] a=Read(p+Profile.CoordinateA[0],12),b=Read(p+Profile.CoordinateB[0],12);
             try
             {
+                UnityTools.Controls.OperationGate.Check();
                 Write(p+Profile.CoordinateA[0],data);Write(p+Profile.CoordinateB[0],data);
                 if(!Read(p+Profile.CoordinateA[0],12).SequenceEqual(data)||!Read(p+Profile.CoordinateB[0],12).SequenceEqual(data))throw new IOException("Koordinat yazımı doğrulanamadı.");
             }

@@ -29,12 +29,12 @@ static class Program
     }
 }
 
-sealed class MainForm:Form
+sealed partial class MainForm:Form
 {
     readonly Label player=new(),status=new();
     readonly Label[] fieldLabels=Enumerable.Range(0,6).Select(_=>new Label()).ToArray();
     readonly Label[] cells=Enumerable.Range(0,6).Select(_=>new Label()).ToArray();
-    readonly TextBox[] inputs=Enumerable.Range(0,3).Select(_=>new TextBox()).ToArray();
+    readonly TextBox[] inputs=Enumerable.Range(0,3).Select(_=>new CoordinateTextBox()).ToArray();
     readonly Button write=new();
     readonly System.Windows.Forms.Timer timer=new(){Interval=100};
     Session? session;bool busy,closing,allowClose;DateTime retry;
@@ -66,7 +66,7 @@ sealed class MainForm:Form
     }
     void AddLabel(string text,int x,int y,int w,int h,int size=10,bool bold=false)
     {Controls.Add(new Label{Text=text,Bounds=new(x,y,w,h),Font=new("Segoe UI",size,bold?FontStyle.Bold:FontStyle.Regular)});}
-    public static bool TryNumber(string text,out float number)=>float.TryParse(text.Trim().Replace(',','.'),NumberStyles.Float,CultureInfo.InvariantCulture,out number)&&float.IsFinite(number);
+    public static bool TryNumber(string text,out float number)=>CoordinateTextBox.TryValue(text,out number);
     async Task Poll()
     {
         if(busy||closing||session is null&&DateTime.UtcNow<retry)return;busy=true;write.Enabled=false;
@@ -87,10 +87,11 @@ sealed class MainForm:Form
     }
     async Task WriteAsync()
     {
+        if (UnityTools.Controls.OperationGate.Blocked) return;
         if(busy||closing||session is null)return;
         var v=new float[3];for(int i=0;i<3;i++)if(!TryNumber(inputs[i].Text,out v[i])){status.Text="X, Y ve Z için geçerli sayılar gir.";inputs[i].Focus();return;}
         busy=true;write.Enabled=false;
-        try{await Task.Run(()=>session.SetCoordinates(v[0],v[1],v[2]));status.Text="Altı adres yazıldı ve doğrulandı.";}
+        try{await Task.Run(()=>{ UnityTools.Controls.OperationGate.Check(); session.SetCoordinates(v[0],v[1],v[2]); });status.Text="Altı adres yazıldı ve doğrulandı.";}
         catch(Exception ex){status.Text="Yazılamadı: "+ex.Message;Files.Log(ex.ToString());}
         finally{busy=false;write.Enabled=!closing&&session is not null;}
         await Poll();

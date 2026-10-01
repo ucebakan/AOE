@@ -8,3 +8,14 @@
 *.user
 *.tmp
 __pycache__/
+
+# Release archives are tracked; extracted copies and intermediate EXEs stay local.
+/InvisibleAggro/releases/*/4UnityInvisibleAggro-*-win-x64/
+/MobTP/releases/*/MobTP-*-win-x64/
+/PlayerXYZ/releases/*/PlayerXYZ-*-win-x64/
+/SpeedJump/releases/*/4UnitySpeedJump-*-win-x64/
+/Suite/releases/*/*.exe
+/Multikill/releases/*/*.exe
+/Suite/evidence/failure.png
+/Suite/evidence/order-fixture.json
+/Suite/evidence/standalone/

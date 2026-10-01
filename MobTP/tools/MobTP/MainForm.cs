@@ -1,9 +1,9 @@
-﻿using UnityMonsterList;
+using UnityMonsterList;
 
 namespace MobTP;
 
 sealed class MobGrid : DataGridView { public MobGrid(){DoubleBuffered=true;} }
-sealed class MainForm : Form
+sealed partial class MainForm : Form
 {
     readonly Label state=new(){Dock=DockStyle.Fill,Text="Oyuncu ve moblar bekleniyor…",Font=new("Segoe UI",11),AutoEllipsis=true};
     readonly Label player=new(){Dock=DockStyle.Fill,Font=new("Consolas",11),Text="Oyuncu XYZ: —"};
@@ -12,7 +12,7 @@ sealed class MainForm : Form
     readonly Button tp=new(){Text="UYGUN MOBLARI YANIMA GETİR",AutoSize=true,Height=45,Padding=new(12),Enabled=false};
     readonly NumericUpDown spread=new(){Minimum=1,Maximum=10,DecimalPlaces=1,Increment=0.5m,Value=2,Width=75};
     readonly CheckBox show=new(){Text="Arka plandaki mob listesini göster",AutoSize=true};
-    readonly ComboBox distanceOrder=new(){DropDownStyle=ComboBoxStyle.DropDownList,Width=170};
+    readonly ComboBox distanceOrder=new UnityTools.Controls.ReadableComboBox(){DropDownStyle=ComboBoxStyle.DropDownList,Width=170};
     readonly TextBox keyBox=new(){ReadOnly=true,Width=180,Text="Tıklayıp tuşa basın"};
     readonly Label keyStatus=new(){AutoSize=true,Text="Kısayol: atanmamış",Margin=new(12,8,3,0)};
     KeyBinding? pendingKey;
@@ -23,7 +23,7 @@ sealed class MainForm : Form
     readonly SemaphoreSlim gate=new(1,1);
     readonly CancellationTokenSource cancellation=new();
     readonly Dictionary<ulong,DataGridViewRow> rows=[];
-    bool closing,moving;
+    bool closing,moving,allowClose;
     World? last;
     public MainForm(bool preview=false)
     {
@@ -56,7 +56,11 @@ sealed class MainForm : Form
         retry.Click+=async(_,_)=>{ProfileStore.Retry();await RefreshWorld();};
         spread.ValueChanged+=(_,_)=>{settings=settings with{Spread=spread.Value};if(last is not null)Render(last);if(!preview)try{settings.Save();}catch(Exception ex){result.Text=ex.Message;}};
         if(!preview)Shown+=async(_,_)=>{if(settings.Hotkey is not null)AssignKey(settings.Hotkey);await RefreshWorld();timer.Start();};
-        FormClosing+=(_,_)=>{closing=true;timer.Stop();cancellation.Cancel();hotkey?.Dispose();};
+        FormClosing+=async(_,e)=>{
+            if(allowClose)return;e.Cancel=true;if(closing)return;
+            closing=true;timer.Stop();cancellation.Cancel();hotkey?.Dispose();
+            await gate.WaitAsync();gate.Release();allowClose=true;Close();
+        };
     }
     void AssignKey(KeyBinding binding)
     {
@@ -80,6 +84,7 @@ sealed class MainForm : Form
     }
     async Task Teleport(int? hotkeyPid=null)
     {
+        if (UnityTools.Controls.OperationGate.Blocked) return;
         if(moving||closing)return;moving=true;tp.Enabled=false;spread.Enabled=false;
         double radius=(double)spread.Value;
         await gate.WaitAsync();
