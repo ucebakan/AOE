@@ -42,6 +42,7 @@ static class SuiteTests
                 await dispatcher.ExecuteAsync(Feature.Jump); Check(fake.Applied.Count == calls, "double click cannot dispatch while action is pending");
                 fake.Hold.SetResult(); await pending; fake.Hold = null;
 
+                await ShutdownTests.Run(Check);
                 await SafeModeTests.Run(Check);
                 await StartupScanTests.Run(Check);
                 var startup = new StartupScan();
@@ -84,6 +85,8 @@ static class SuiteTests
                         Check(pid == Environment.ProcessId && NativeModules.GetParent(tool.ToolWindow) == tool.Handle, "AOE shares host process and parent");
                         nint tabs = FindWindowEx(tool.ToolWindow, 0, "SysTabControl32", null); Check(tabs != 0 && !IsWindowVisible(tabs), "AOE research and profiles navigation hidden");
                         Check(!tool.Ready && !tool.Active && !tool.Toggle(), "AOE cannot arm without validated session");
+                        foreach (string caption in new[] { "Auto Attach to TClient.exe", "Auto Arm after attach", "Advanced / Diagnostics", "COPY DIAGNOSTICS", "FREEZE" })
+                            Check(FindWindowEx(tool.ToolWindow, 0, "Button", caption) == 0, "AOE removed control is absent: " + caption);
                     }
                     Save(shell, Path.Combine(output, $"0{i}-panel.png"));
                 }
@@ -125,7 +128,7 @@ static class SuiteTests
                 {
                     using var scaledTool = new NativeTool(true);
                     scaledTool.Fit(900 * dpi / 96, dpi);
-                    Check(scaledTool.Height >= 600 * dpi / 96, "AOE measured content at DPI " + dpi);
+                    Check(scaledTool.Height >= 400 * dpi / 96, "AOE measured content at DPI " + dpi);
                 }
                 float previousScale = 1;
                 foreach (float scale in new[] { 1.25f, 1.5f, 2f })

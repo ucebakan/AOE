@@ -101,7 +101,8 @@ bool Tracer::begin(uint32_t pid,std::filesystem::path path,uint64_t rva,bool fix
     {std::lock_guard l(mutex_);if(status_.phase!=Phase::Detached&&status_.phase!=Phase::Failed){error="Already attached, attaching, or restoring debugger state.";return false;}}
     if(worker_.joinable())worker_.join();detachRequested_=false;stopCaptureRequested_=false;invalidateLiveValidationOnDetach_=false;preserveLiveValidationOnDetach_=false;tickRequest_=0;initialRequest_=0;inspectorRequest_=0;visualRequest_=0;
     {std::lock_guard l(mutex_);auto preservedTick=status_.tickExperiment;status_={};status_.tickExperiment=std::move(preservedTick);status_.initial2x={};status_.liveValidation=liveValidation_;status_.phase=Phase::Attaching;status_.message="Creating a fresh target session and verifying the live module...";capture_.reset();}
-    try{worker_=std::thread(&Tracer::run,this,pid,std::move(path),rva,fixture,mode,std::move(profile));}catch(const std::exception& e){std::lock_guard l(mutex_);status_.phase=Phase::Failed;status_.message=status_.lastError=e.what();error=e.what();return false;}error.clear();return true;
+    workerFinished_.store(false,std::memory_order_release);
+    try{worker_=std::thread(&Tracer::run,this,pid,std::move(path),rva,fixture,mode,std::move(profile));}catch(const std::exception& e){workerFinished_.store(true,std::memory_order_release);std::lock_guard l(mutex_);status_.phase=Phase::Failed;status_.message=status_.lastError=e.what();error=e.what();return false;}error.clear();return true;
 }
 void Tracer::detach(){invalidateLiveValidationOnDetach_=true;preserveLiveValidationOnDetach_=false;detachRequested_=true;std::lock_guard l(mutex_);if(status_.phase==Phase::Attached||status_.phase==Phase::Attaching){status_.phase=Phase::Detaching;status_.message="Restoring per-thread breakpoint state before detaching...";}}
 bool Tracer::startCapture(Label label,double seconds,std::string& error){
@@ -146,6 +147,9 @@ std::vector<Event> Tracer::eventsSince(uint64_t id,size_t first)const{std::lock_
 std::vector<std::shared_ptr<Capture>> Tracer::takeCompleted(){std::lock_guard l(mutex_);return std::exchange(completed_,{});}
 
 void Tracer::run(uint32_t pid,std::filesystem::path path,uint64_t rva,bool fixture,TraceMode mode,BuildProfile profile){
+    // Last local destroyed: UI may destroy the tracer only after restore/drain
+    // and all worker-owned resources have actually finished, not merely a phase change.
+    struct Finished { std::atomic<bool>& value; ~Finished(){value.store(true,std::memory_order_release);} } finished{workerFinished_};
     Handle process;TargetInfo target;std::map<DWORD,ThreadState> threads;bool attached=false,initialSeen=false,exited=false,pending=false,cleaning=false,tickObservationAvailable=mode==TraceMode::Tick100,initialProducerAvailable=mode==TraceMode::Initial2x;DEBUG_EVENT event{};DWORD continuation=DBG_CONTINUE;std::string failure;int64_t attachedQpc=0,lastErrorLog=0;uint64_t hitSequence=0;
     const std::string runProfileIdentity=fixture?("fixture:"+path.filename().string()):LiveValidationProfileIdentity(profile);
     auto report=[&](const std::string& message,bool blocked=false){std::lock_guard l(mutex_);status_.lastError=message;status_.message=message;if(blocked)status_.phase=Phase::CleanupBlocked;int64_t now=QpcNow();if(now-lastErrorLog>=QpcFrequency()){Log(blocked?"cleanup_retry":"debug_error",message);lastErrorLog=now;}};

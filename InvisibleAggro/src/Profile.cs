@@ -19,20 +19,37 @@ static class Profile
     public static string GamePath = @"C:\Games\4Unity\TClient.exe";
     public const string Sha = "9CD77CD0C305359A3048D60C3C2FD837B907E2E61BBF8B828BFCC8E5270E5C28";
     public static long Context { get; private set; } = 0xE6E9C0;
-    public const long Player = 0x2710;
+    public static long Player {get;private set;} = 0x2710;
+    public static long ActorId {get;private set;} = 0x768;
+    public static long ActorType {get;private set;} = 0x7E1;
     public static long Vtable { get; private set; } = 0xCDBCC0;
-    public const long Stealth = 0x7E2, Visual = 0x47E;
+    public static long Stealth {get;private set;} = 0x7E2;
+    public static long Visual {get;private set;} = 0x47E;
     public static long Writer1 => Signatures[0].Rva + 20;
     public static long Writer2 => Signatures[1].Rva + 13;
-    public static readonly byte[] Original1 = Convert.FromHexString("88977E040000");
-    public static readonly byte[] Original2 = Convert.FromHexString("C6877E04000055");
-    public static readonly (int Rva, string Pattern, string Mask)[] Signatures = [
+    public static byte[] Original1 {get;private set;} = Convert.FromHexString("88977E040000");
+    public static byte[] Original2 {get;private set;} = Convert.FromHexString("C6877E04000055");
+    static readonly (int Rva, string Pattern, string Mask)[] BaseSignatures = [
         (0x86DEA3, "69 8F CC 08 00 00 FF 00 00 00 B8 1F 85 EB 51 F7 E1 C1 EA 08 88 97 7E 04 00 00 E8 00 00 00 00 41 BE F4 01 00 00", "xxxxxxxxxxxxxxxxxxxxxxxxxxx????xxxxxx"),
         (0x86DFF3, "3C 03 74 1B 3C 01 75 0E 80 F9 80 73 19 C6 87 7E 04 00 00 55 EB 10 3C 07 75 0C 80 F9 FF 74 07 C6 87 7E 04 00 00 FF", "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"),
         (0x86DE04, "80 BF E2 07 00 00 00 74 00 80 BF D6 07 00 00 00 74 00 48 8B 07 48 8B CF FF 90 40 02 00 00", "xx????xx?xx????xx?xxxxxxxxxxxx"),
         (0x7A09AA, "41 38 87 D7 07 00 00 0F 85 00 00 00 00 41 38 87 E2 07 00 00 74 00 41 0F B6 8F E1 07 00 00", "xxx????xx????xxx????x?xxxx????"),
         (0x7C1A20, "48 8B 05 00 00 00 00 C3 CC CC CC CC CC CC CC CC 41 B0 FF 80 FA 85 77 51", "xxx????xxxxxxxxxxxxxxxxx")
     ];
+    public static readonly (int Rva,string Pattern,string Mask)[] Signatures=CreateSignatures();
+    static (int,string,string)[] CreateSignatures()
+    {
+        var list=BaseSignatures.ToList();
+        var s=list[0];char[] mask=s.Mask.ToCharArray();for(int i=2;i<6;i++)mask[i]='?';list[0]=(s.Rva,s.Pattern,new(mask));
+        s=list[2];mask=s.Mask.ToCharArray();for(int i=25;i<29;i++)mask[i]='?';list[2]=(s.Rva,s.Pattern,new(mask));
+        string owner="4D 8B 8F ?? ?? ?? ?? 4D 8B 87 ?? ?? ?? ?? 48 8D 55 E0 49 8B 8F ?? ?? ?? ?? E8 ?? ?? ?? ?? 48 8D 55 F0 49 8B 8F ?? ?? ?? ?? E8 ?? ?? ?? ??";
+        void Add(string p){var tokens=p.Split(' ');list.Add((0,string.Join(" ",tokens.Select(t=>t=="??"?"00":t)),string.Concat(tokens.Select(t=>t=="??"?"?":"x"))));}
+        Add(owner);
+        using var json=JsonDocument.Parse(typeof(Profile).Assembly.GetManifestResourceStream("Recovery.mob.json")!);
+        Add(json.RootElement.GetProperty("constructor").GetProperty("Pattern").GetString()!);
+        Add(json.RootElement.GetProperty("host").GetProperty("Pattern").GetString()!);
+        return list.ToArray();
+    }
 
     public static byte[] VerifyDisk(bool force = false)
     {
@@ -52,7 +69,7 @@ static class Profile
         ImageSize = pe.PEHeaders.PEHeader.SizeOfImage;
         if (ActiveSha == Sha)
         {
-            SetRvas([0x86DEA3, 0x86DFF3, 0x86DE04, 0x7A09AA, 0x7C1A20]);
+            SetRvas(FindSites(image));
             Vtable = 0xCDBCC0;
         }
         else
@@ -67,8 +84,9 @@ static class Profile
             }
             catch
             {
-                NeedsApproval = true;
-                throw new InvalidOperationException("Yeni veya doğrulanamayan sürüm. Taramak için onay düğmesine basın.");
+                SetRvas(FindSites(image));
+                Vtable=FindVtable(image);
+                NeedsApproval = true; // Candidate is saved only after live validation.
             }
         }
         ValidateSites(image);
@@ -89,13 +107,23 @@ static class Profile
             byte[] actual = At(image, sig.Rva, expected.Length);
             if (actual.Where((b, i) => sig.Mask[i] != '?' && b != expected[i]).Any()) throw new InvalidOperationException("Profil imzası uyuşmuyor.");
         }
-        // This recovery schema only accepts the established player layout.
-        if (!At(image, Signatures[2].Rva + 2, 4).SequenceEqual(BitConverter.GetBytes((int)Stealth)) ||
+        Player=BitConverter.ToInt32(At(image,Signatures[5].Rva+21,4));
+        ActorType=BitConverter.ToInt32(At(image,Signatures[6].Rva+0x98,4));
+        ActorId=BitConverter.ToInt32(At(image,Signatures[7].Rva+0xD9,4));
+        Stealth=BitConverter.ToInt32(At(image,Signatures[2].Rva+2,4));
+        Visual=BitConverter.ToInt32(At(image,Writer1+2,4));
+        if(Player!=BitConverter.ToInt32(At(image,Signatures[5].Rva+37,4)) ||
+            !new[]{Player,ActorType,ActorId,Stealth,Visual}.All(x=>UnityTools.Controls.RecoveryImage.Field((ulong)x)) ||
+            BitConverter.ToInt32(At(image,Writer2+2,4))!=Visual ||
             !At(image, Signatures[3].Rva + 16, 4).SequenceEqual(BitConverter.GetBytes((int)Stealth)) ||
-            !At(image, Signatures[3].Rva + 26, 4).SequenceEqual(BitConverter.GetBytes(0x7E1)))
+            !At(image, Signatures[3].Rva + 26, 4).SequenceEqual(BitConverter.GetBytes((int)ActorType)) || Stealth!=ActorType+1)
             throw new InvalidOperationException("Oyuncu alanlarının yapısı değişmiş; yeni analiz gerekiyor.");
+        Original1=At(image,Writer1,6);Original2=At(image,Writer2,7);
         Context = Signatures[4].Rva + 7L + BitConverter.ToInt32(At(image, Signatures[4].Rva + 3, 4));
         using var pe = new PEReader(new MemoryStream(image));
+        if(Context<0||Context>=pe.PEHeaders.PEHeader!.SizeOfImage-8||
+            !pe.PEHeaders.SectionHeaders.Any(s=>Context>=s.VirtualAddress&&Context+8<=(long)s.VirtualAddress+Math.Max(s.VirtualSize,s.SizeOfRawData)&&((uint)s.SectionCharacteristics&0x20000000)==0))
+            throw new InvalidOperationException("Context root is outside data sections.");
         long imageBase = checked((long)pe.PEHeaders.PEHeader!.ImageBase);
         long col = BitConverter.ToInt64(At(image, Vtable - 8, 8)) - imageBase;
         byte[] locator = At(image, col, 24);

@@ -9,6 +9,44 @@
 void Require(bool value, const char* message) { if (!value) throw std::runtime_error(message); }
 int main(int argc, char** argv) {
     try {
+        if(argc==3&&std::string(argv[1])=="--current-image"){
+            std::ifstream file(pc::targetPath,std::ios::binary);
+            std::vector<unsigned char> disk((std::istreambuf_iterator<char>(file)),{});
+            std::string error;auto recovered=pc::RecoverCounterProfile(disk,argv[2],&error);
+            Require(bool(recovered),error.c_str());auto p=*recovered;
+            Require(pc::ValidateRecoveredCounter(p,disk),"Recovered counter disk identity");
+            Require(!pc::RecoverCounterProfile(disk,std::string(64,'A')),"Wrong SHA accepted");
+            for(auto& guard:p.guards){guard.bytes[0]^=1;Require(!pc::ValidateRecoveredCounter(p,disk),"Corrupt cache fingerprint accepted");guard.bytes[0]^=1;}
+            p.countOffset+=8;Require(!pc::ValidateRecoveredCounter(p,disk),"Wrong count operand accepted");p=*recovered;
+            p.rootSlot+=8;Require(!pc::ValidateRecoveredCounter(p,disk),"Wrong root method accepted");p=*recovered;
+            constexpr uintptr_t base=0x180000000,context=0x50010000;
+            std::vector<unsigned char> memory(p.imageSize);
+            IMAGE_DOS_HEADER dos{};std::memcpy(&dos,disk.data(),sizeof(dos));
+            std::memcpy(memory.data(),disk.data(),size_t(dos.e_lfanew)+sizeof(IMAGE_NT_HEADERS64));
+            for(const auto& g:p.guards)std::memcpy(memory.data()+g.rva,g.bytes.data(),g.bytes.size());
+            uintptr_t contextTable=base+p.contextVtable,rootTable=base+p.rootVtable,method=base+p.rootVirtual;
+            std::memcpy(memory.data()+p.rootVtable+p.rootSlot,&method,8);
+            uint64_t count=7;bool changedRoot=false,missing=false;int rootReads=0;
+            pc::Read read=[&](uintptr_t address,void* data,size_t length){
+                auto copy=[&](const auto& value){if(length!=sizeof(value))return false;std::memcpy(data,&value,length);return true;};
+                if(address==base+p.rootRva){auto root=changedRoot&&++rootReads==2?context+8:context;return copy(root);}
+                if(address==context+p.countOffset)return !missing&&copy(count);
+                if(address==context)return copy(contextTable);
+                if(address==context-p.rootDelta)return copy(rootTable);
+                if(address<base||address-base>memory.size()||length>memory.size()-(address-base))return false;
+                std::memcpy(data,memory.data()+address-base,length);return true;
+            };
+            Require(pc::ValidateLive(read,base,&p),"Recovered live code rejected");
+            Require(pc::ReadCount(read,base,&p)==7,"Dynamic count path failed");
+            count=0;Require(pc::ReadCount(read,base,&p)==0,"Verified zero count failed");
+            missing=true;Require(!pc::ReadCount(read,base,&p),"Missing count became zero");missing=false;
+            contextTable+=8;Require(!pc::ReadCount(read,base,&p),"Wrong context accepted");contextTable-=8;
+            changedRoot=true;rootReads=0;Require(!pc::ReadCount(read,base,&p),"Root replacement accepted");changedRoot=false;
+            auto plan=pc::PrepareExit(read,base,&p);Require(plan&&plan->function==base+p.exitRva&&plan->root==context-p.rootDelta,"Dynamic Exit plan failed");
+            for(const auto& g:p.guards){memory[g.rva]^=1;Require(!pc::PrepareExit(read,base,&p),"Changed live Exit evidence accepted");memory[g.rva]^=1;}
+            memory[p.guards[2].rva]^=1;Require(!pc::ValidateLive(read,base,&p),"Changed live count resolver accepted");
+            std::cout<<"PASS: automatic Counter/Exit recovery, SHA/cache/live guards, ASLR, missing count and root replacement; no game writes or Exit dispatch\n";return 0;
+        }
         if (argc > 1 && std::string(argv[1]) == "--verify-profile") {
             std::ifstream file(pc::targetPath,std::ios::binary);
             std::vector<unsigned char> bytes((std::istreambuf_iterator<char>(file)),{});

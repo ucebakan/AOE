@@ -2,6 +2,7 @@
 HWND suiteNotice=nullptr;
 int suiteHeight=700;
 bool suiteLayoutBusy=false;
+bool suiteCloseStarted=false;
 int SuiteTextHeight(HWND control,int width,int minimum=24){
     if(!control)return 0;
     int length=GetWindowTextLengthW(control);std::wstring text(size_t(length)+1,L'\0');GetWindowTextW(control,text.data(),length+1);
@@ -17,7 +18,7 @@ void LayoutSuite(){
     place(playStatus,SuiteTextHeight(playStatus,width,112));
     place(playControls[2],SuiteTextHeight(playControls[2],width));
     Place(initialCalls,{pad,y,std::min(width,ScaleUi(180,dpi)),ScaleUi(34,dpi)});Place(GetDlgItem(window,InitialSpin),{pad+std::min(width,ScaleUi(180,dpi))-ScaleUi(20,dpi),y,ScaleUi(20,dpi),ScaleUi(34,dpi)});y+=ScaleUi(44,dpi);
-    for(int id:{AutoAttach,AutoArm,HideAoeVisual})place(GetDlgItem(window,id),SuiteTextHeight(GetDlgItem(window,id),width-ScaleUi(24,dpi),30));
+    for(int id:{HideAoeVisual})place(GetDlgItem(window,id),SuiteTextHeight(GetDlgItem(window,id),width-ScaleUi(24,dpi),30));
     ShowWindow(GetDlgItem(window,StartWindows),SW_HIDE);ShowWindow(GetDlgItem(window,MinimizeArm),SW_HIDE);
     place(visualStatus,SuiteTextHeight(visualStatus,width,46));
     // Action row wraps using each button's measured caption, never truncating its text.
@@ -26,10 +27,6 @@ void LayoutSuite(){
         int w=std::min(width,std::max(ScaleUi(140,dpi),int(size.cx)+ScaleUi(32,dpi)));if(x>pad&&x+w>pad+width){x=pad;y+=rowHeight+gap;}Place(h,{x,y,w,rowHeight});x+=w+gap;}
     y+=rowHeight+gap;
     place(GetDlgItem(window,ArmNow),SuiteTextHeight(GetDlgItem(window,ArmNow),width-ScaleUi(24,dpi),34));
-    place(GetDlgItem(window,Advanced),SuiteTextHeight(GetDlgItem(window,Advanced),width-ScaleUi(24,dpi),30));
-    if(IsDlgButtonChecked(window,Advanced)==BST_CHECKED){
-        place(GetDlgItem(window,CopyDiagnostics),ScaleUi(40,dpi));place(GetDlgItem(window,FreezeDiagnostics),ScaleUi(30,dpi));place(advancedText,ScaleUi(220,dpi));
-    }
     if(suiteNotice)place(suiteNotice,SuiteTextHeight(suiteNotice,width,48));
     suiteHeight=y+ScaleUi(20,dpi);suiteLayoutBusy=false;
 }

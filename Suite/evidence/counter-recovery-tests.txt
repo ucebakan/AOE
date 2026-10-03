@@ -1,0 +1,2 @@
+PASS: counter/color, read failures, Exit root/context/ASLR, all code patch guards, unique AOB and fail-closed dispatch
+PASS: automatic Counter/Exit recovery, SHA/cache/live guards, ASLR, missing count and root replacement; no game writes or Exit dispatch

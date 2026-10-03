@@ -62,7 +62,7 @@ sealed partial class MainForm:Form
         write.FlatStyle=FlatStyle.Flat;write.FlatAppearance.BorderSize=0;write.Enabled=false;Controls.Add(write);
         status.SetBounds(233,405,410,65);status.AutoEllipsis=true;status.ForeColor=Color.FromArgb(190,197,211);status.Text="4Unity bekleniyor…";Controls.Add(status);
         write.Click+=async(_,_)=>await WriteAsync();timer.Tick+=async(_,_)=>await Poll();
-        if(!preview){Shown+=async(_,_)=>{await Poll();timer.Start();};FormClosing+=CloseAsync;}
+        if(!preview){Shown+=async(_,_)=>{await Poll();if (Enabled) timer.Start();};FormClosing+=CloseAsync;}
     }
     void AddLabel(string text,int x,int y,int w,int h,int size=10,bool bold=false)
     {Controls.Add(new Label{Text=text,Bounds=new(x,y,w,h),Font=new("Segoe UI",size,bold?FontStyle.Bold:FontStyle.Regular)});}

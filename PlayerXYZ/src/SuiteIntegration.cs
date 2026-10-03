@@ -4,10 +4,12 @@ namespace PlayerXYZ;
 
 sealed partial class MainForm
 {
+    internal bool SuiteClosing => closing;
+    internal void SuiteQuiesce() { timer.Stop(); Enabled = false; }
     internal bool SuiteReady => session is not null && !busy && !closing;
     internal bool SuiteHasCoordinates => inputs.All(x => TryNumber(x.Text, out _));
     internal string SuiteMessage => status.Text;
-    internal async Task SuiteRefreshAsync() { while (busy && !closing) await Task.Delay(30); if (!closing) { retry = DateTime.MinValue; await Poll(); timer.Start(); } }
+    internal async Task SuiteRefreshAsync() { while (busy && !closing) await Task.Delay(30); if (!closing) { retry = DateTime.MinValue; await Poll(); if (Enabled) timer.Start(); } }
     internal Task SuiteWriteAsync() => WriteAsync();
     internal void SuiteBindCoordinates(CoordinateDraft draft)
     {

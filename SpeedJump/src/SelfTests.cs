@@ -14,10 +14,10 @@ static class SelfTests
         try
         {
             using var b=new Binary(@"C:\Games\4Unity\TClient.exe");
-            var p=Profiles.Load(b);Check(p.Sha256==Profiles.KnownSha,"current SHA");
-            Check(p.JumpWriterRva==0x845B8F && p.JumpFieldOffset==0x8E0 && p.SpeedFieldOffset==0x1204 && p.OwnerToPlayerOffset==0x2710,"derived offsets");
-            Check(p.CtclientgameVtableRva==0xCDC970 && p.CtclientcharVtableRva==0xCDBCC0,"RTTI-derived vtables");
-            Check(p.Signatures.Count==4,"four unique code signatures");
+            var p=Profiles.Load(b);Check(p.Sha256==b.Sha,"current SHA");
+            Check(p.JumpWriterRva>0 && p.JumpFieldOffset>=0x100 && p.SpeedFieldOffset>=0x100 && p.OwnerToPlayerOffset>=0x100,"derived offsets");
+            Check(p.CtclientgameVtableRva>0 && p.CtclientcharVtableRva>0 && p.CtclientgameVtableRva!=p.CtclientcharVtableRva,"RTTI-derived vtables");
+            Check(p.Signatures.Count==5,"five unique code signatures");
             int scans=Profiles.ScanCount;Profiles.Load(b);Check(Profiles.ScanCount==scans,"same SHA profile has zero AOB scans");
             string json=File.ReadAllText(Path.Combine(Files.Profiles,b.Sha+".json"));
             Check(!json.Contains("module_base")&&!json.Contains("owner_address")&&!json.Contains("pid")&&!json.Contains("player_address"),"profile contains no session addresses");

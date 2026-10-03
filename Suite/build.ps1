@@ -18,6 +18,9 @@ if (-not $SkipTests) {
     $test = Start-Process -FilePath $dotnetPath -ArgumentList @("`"$testDll`"", '--self-test', "`"$taskRoot/evidence`"") -WindowStyle Hidden -PassThru
     if (-not $test.WaitForExit(120000)) { throw 'Suite UI tests did not finish within 120 seconds.' }
     if ($test.ExitCode -ne 0) { throw "Suite tests failed ($($test.ExitCode)); inspect evidence/suite-tests.json." }
+    $recovery = Start-Process -FilePath $dotnetPath -ArgumentList @("`"$testDll`"", '--recovery-test', "`"$taskRoot/evidence/recovery-tests-2026-10-03.json`"") -WindowStyle Hidden -PassThru
+    if (-not $recovery.WaitForExit(120000)) { throw 'Patch recovery tests timed out.' }
+    if ($recovery.ExitCode -ne 0) { throw 'Patch recovery tests failed; inspect evidence/recovery-tests-2026-10-03.json.' }
 }
 [xml]$suiteProject = Get-Content -LiteralPath "$taskRoot/src/4UnityTools.csproj"
 $release = Join-Path $taskRoot ("releases/" + $suiteProject.Project.PropertyGroup.Version)

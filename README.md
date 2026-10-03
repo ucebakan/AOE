@@ -3,7 +3,7 @@
 ## Birleşik uygulama
 
 [4UnityTools Control Center](Suite/) genel bakış düğmeleriyle araçları yönetir; PlayerCounter ayrı küçük pencere olarak açılır.
-[Windows x64 ZIP · tek EXE](Suite/releases/0.5.0/4UnityTools-0.5.0-win-x64.zip) · Derleme: `.\Suite\build.ps1`.
+[Windows x64 ZIP · tek EXE](Suite/releases/0.6.0/4UnityTools-0.6.0-win-x64.zip) · Derleme: `.\Suite\build.ps1`.
 Antrasit/lavanta arayüz, üst bilgi ve araç barı, sekmeler arasında korunan durum
 ve Player XYZ alanlarında sayı doğrulaması içerir.
 

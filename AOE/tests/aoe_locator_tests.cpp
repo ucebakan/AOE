@@ -386,15 +386,36 @@ int main(int argc, char** argv) {
             std::string error;
             check("current_image_locator_and_canonical_profile_match", [&] {
                 Require(aoe::LocateAoeImage(source, located, error), error);
-                Require(located.ready && located.visualReady && located.visualReader.rva==0x7F2DE3 && located.visualReader.baseRegister==aoe::X64RegisterId::Rdx && located.visualReader.fieldOffset==0x8C && !located.signatures.empty() && !located.liveEvidence.empty(), "Locator evidence incomplete");
-                Require(aoe::SelectBuildProfile(LR"(C:\Users\Public\Documents\4UnityAOEManager\profiles)",
-                                               located.image.sha256, profile, selected, error), error);
+                Require(located.ready && located.visualReady && located.visualReader.rva!=0 && located.visualReader.baseRegister==aoe::X64RegisterId::Rdx && located.visualReader.fieldOffset==0x8C && !located.signatures.empty() && !located.liveEvidence.empty(), "Locator evidence incomplete");
+                auto profiles=temporary.write(original).parent_path()/L"recovery-profiles";
+                Require(aoe::RecoverAndSaveAoeProfile(source,profiles,profile,selected,error),error);
+                aoe::BuildProfile loaded;Require(aoe::LoadBuildProfile(selected,loaded,error),error);profile=loaded;
                 Require(aoe::ValidateAoeProfile(profile, located, error), error);
             });
             Require(located.ready, "Positive locator result is required before mutation fixtures");
             const auto prepCall = Signature(located, "AoeLifecycleCaller").rva;
-            Require(prepCall >= 29, "Lifecycle call cannot contain preparation prefix");
-            const uint64_t prep = prepCall - 29;
+            Require(prepCall >= located.prepDistance, "Lifecycle call cannot contain preparation prefix");
+            const uint64_t prep = prepCall - located.prepDistance;
+            check("recovered_profile_field_and_fingerprint_tampering_rejected",[&]{
+                auto bad=profile;bad.runtime.actorIdOffset+=8;
+                Require(!aoe::ValidateAoeProfile(bad,located,error),"Wrong actor field accepted");
+                bad=profile;bad.runtime.actorTreeOffsets[2]+=8;
+                Require(!aoe::ValidateAoeProfile(bad,located,error),"Wrong typed tree accepted");
+                bad=profile;bad.runtime.liveValidationRequired=false;
+                Require(!aoe::ValidateAoeProfile(bad,located,error),"Live gate removed");
+                bad=profile;bad.runtime.sharedWorkerBytes.resize(1);
+                Require(!aoe::ValidateAoeProfile(bad,located,error),"Truncated fingerprint accepted");
+            });
+            check("same_sha_aoe_profile_uses_local_semantics_without_full_scan",[&]{
+                aoe::AoeLocatorResult cached;Require(aoe::LocateAoeImage(source,cached,error,&profile),error);
+                Require(cached.cacheUsed&&aoe::ValidateAoeProfile(profile,cached,error),error);
+            });
+            check("corrupt_aoe_cache_replaced_atomically",[&]{
+                std::ofstream(selected)<<"{}";
+                Require(aoe::RecoverAndSaveAoeProfile(source,selected.parent_path(),profile,selected,error),error);
+                Require(aoe::LoadBuildProfile(selected,profile,error),error);
+                Require(aoe::ValidateAoeProfile(profile,located,error),error);
+            });
             check("mutated_dos_header_rejected", [&] {
                 auto bytes = original;
                 bytes[0] = bytes[1] = 0;
@@ -440,7 +461,7 @@ int main(int argc, char** argv) {
                         "Masked caller should remain unique while CALL relationship rejects the worker");
             });
             check("duplicate_semantically_valid_lifecycle_is_ambiguous", [&] {
-                constexpr size_t copiedLength = 35 + 16;
+                const size_t copiedLength = located.prepDistance + 6 + (located.prepDistance==28?26:16);
                 const auto originalOffset = pe.offset(prep, copiedLength);
                 uint64_t destination = 0;
                 for (const auto& function : pe.functions) {
@@ -457,10 +478,10 @@ int main(int argc, char** argv) {
                 // Relocate the copied CALL to the same real worker so the
                 // duplicate is semantically plausible, not just matching text.
                 const auto worker = Signature(located, "SharedOperation020A").rva;
-                const auto delta = static_cast<int64_t>(worker) - static_cast<int64_t>(destination + 29 + 5);
+                const auto delta = static_cast<int64_t>(worker) - static_cast<int64_t>(destination + located.prepDistance + 5);
                 Require(delta >= INT32_MIN && delta <= INT32_MAX, "Duplicate CALL displacement does not fit rel32");
                 const auto relocatedCall = CallBytes(static_cast<int32_t>(delta));
-                std::copy(relocatedCall.begin(), relocatedCall.end(), bytes.begin() + destinationOffset + 29);
+                std::copy(relocatedCall.begin(), relocatedCall.end(), bytes.begin() + destinationOffset + located.prepDistance);
                 aoe::AoeLocatorResult rejected;
                 Require(!aoe::LocateAoeImage(temporary.write(bytes), rejected, error) && !rejected.ready,
                         "Duplicate valid lifecycle pattern was accepted");

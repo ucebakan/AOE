@@ -1,0 +1,69 @@
+4UnityTools patch inspection — 2026-10-03 (Europe/Istanbul)
+Scope: read-only inspection of installed TClient.exe, shipped application's existing logs, repository AOB templates and managed resolver binaries. No game writes, activation, remote calls or changes to distributed 4UnityTools.exe.
+Installed game SHA: D527212A9DD5191C19670760013DAB955035900F91FA7E86299887326AC81BA1
+Original profile SHA: 9CD77CD0C305359A3048D60C3C2FD837B907E2E61BBF8B828BFCC8E5270E5C28
+Findings:
+- XYZ: owner and coords_a match uniquely; coords_b has zero matches. Changed virtual call slots and register allocation break the old signature.
+- Speed/Jump: jump and owner anchors match uniquely; pair_compare and pair_write have zero matches. Both features require the complete shared profile, so Jump is also blocked.
+- MobTP: its own independent anchors match; recovery first invokes its separate copy of PlayerXYZ.Profiles.Resolve, which fails on coords_b.
+- Invisible/Aggro: signatures 0 and 2 have zero matches. New semantic candidate reads stealth +0x7EA; the profile still requires +0x7E2 and owner-to-player +0x2710.
+- AOE: original application log explicitly reports unknown_build_detected / PROFILE RECOVERY REQUIRED for the new SHA. SelectBuildProfile only loads an existing exact-SHA profile; it does not recover a missing profile automatically.
+- Counter: KnownFile requires the old exact SHA, so the new game is rejected before counting. SafeMode consequently cannot obtain a verified count.
+- Multikill: new SHA profile already exists in local cache; independent semantic disk recovery succeeds. Live feature activation was not tested.
+Instruction observations: owner-to-player +0x2710 -> +0x2760; jump field +0x8E0 -> +0x8E8. These disk observations alone do not verify a live player/session.
+The distributed EXE and the current publish output have different hashes; reflection results below are from the current managed build. Actual distributed-application XYZ/Speed/MobTP/AOE failures are independently confirmed by its 2026-10-03 runtime logs.
+
+Detailed disk scans and resolver outputs:
+SHA256 D527212A9DD5191C19670760013DAB955035900F91FA7E86299887326AC81BA1
+PE 0x6ac06dd3 0x1060000
+XYZ owner hits ['0x155f44']
+XYZ coords_a hits ['0x22bddc']
+XYZ coords_b hits []
+ candidate 0x22bab1 fixed-byte mismatches 6 bytes 48 8b 03 48 8b cb f3 0f 11 83 b0 00 00 00 ff 90 48 04 00 00 48 8b 03 48 8b cb f3 0f 11 83 b4 00 00 00 ff 90 50 04 00 00 44 8b cd 44 89 ab 98 12 00 00 45 8b c4 f3 0f 11 83 b8 00 00 00 41 8b d5 44 89 a3 9c 12 00 00
+ candidate 0x20fcea fixed-byte mismatches 21 bytes 48 8b 03 48 8b cb f3 0f 11 83 b0 00 00 00 ff 90 48 04 00 00 48 8b 03 48 8b cb f3 0f 11 83 b4 00 00 00 ff 90 50 04 00 00 ba 50 54 00 00 c7 83 98 12 00 00 50 54 00 00 eb 43 48 8b 03 48 8b cb ff 90 40 04 00 00 48 8b
+ candidate 0x20fd2f fixed-byte mismatches 21 bytes 48 8b 03 48 8b cb f3 0f 11 83 b0 00 00 00 ff 90 48 04 00 00 48 8b 03 48 8b cb f3 0f 11 83 b4 00 00 00 ff 90 50 04 00 00 ba 2c 54 00 00 c7 83 98 12 00 00 2c 54 00 00 48 8b cb f3 0f 11 83 b8 00 00 00 c6 83 f0 12 00
+SpeedJump jump hits ['0x200e7f']
+SpeedJump pair_compare hits []
+SpeedJump pair_write hits []
+SpeedJump owner hits ['0x155f44']
+MobTP root_a hits ['0x14539f']
+MobTP root_b hits ['0x148b1f']
+MobTP host hits ['0x720b0']
+MobTP constructor hits ['0x1fd2d0']
+MobTP home hits ['0x717f1']
+MobTP registry_shape hits ['0x171390', '0x1713e0', '0x1718c0', '0x171a5f', '0x171af0', '0x171b40', '0x1727f0', '0x172840', '0x172890', '0x1729c0', '0x172a10', '0x172af0', '0x172b40', '0x1ed1c0', '0xa24ae0', '0xa24b30', '0xa72670']
+MobTP factory hits ['0x464a6']
+InvisibleAggro 0 hits []
+InvisibleAggro 1 hits ['0x22a413']
+InvisibleAggro 2 hits []
+ candidate 0x22a224 fixed-byte mismatches 1 bytes 80 bf ea 07 00 00 00 74 32 80 bf de 07 00 00 00 74 4c 48 8b 07 48 8b cf ff 90 48 02 00 00
+ candidate 0x10d6b9 fixed-byte mismatches 9 bytes 80 bf d0 00 00 00 00 74 66 80 bf d1 00 00 00 00 74 5d 48 8b b7 e0 00 00 00 48 8b 9f d8 00
+ candidate 0x15d396 fixed-byte mismatches 9 bytes 80 bf fa 56 c7 00 00 74 09 80 bf 8e 53 c7 00 00 74 20 48 85 ed 74 09 80 bd e1 18 00 00 00
+InvisibleAggro 3 hits ['0x156efa']
+InvisibleAggro 4 hits ['0x178050']
+PlayerXYZ.Profiles FAILED System.IO.IOException: İmza tekil değil: 0 eşleşme.
+   at PlayerXYZ.Binary.FindUnique(String pattern)
+   at PlayerXYZ.Profiles.<>c__DisplayClass7_0.<Resolve>b__1(KeyValuePair`2 k)
+   at System.Linq.Enumerable.ToDictionary[TSource,TKey,TElement](IEnumerable`1 source, Func`2 keySelector, Func`2 elementSelector, IEqualityComparer`1 comparer)
+   at System.Linq.Enumerable.ToDictionary[TSource,TKey,TElement](IEnumerable`1 source, Func`2 keySelector, Func`2 elementSelector)
+   at PlayerXYZ.Profiles.Resolve(Binary bin)
+   at System.RuntimeMethodHandle.InvokeMethod(Object target, Void** arguments, Signature sig, Boolean isConstructor)
+   at System.Reflection.MethodBaseInvoker.InvokeDirectByRefWithFewArgs(Object obj, Span`1 copyOfArgs, BindingFlags invokeAttr)
+SpeedJump.Profiles FAILED System.IO.IOException: İmza tekil değil: 0 eşleşme.
+   at SpeedJump.Binary.FindUnique(String pattern)
+   at SpeedJump.Profiles.<>c__DisplayClass7_0.<Resolve>b__1(KeyValuePair`2 k)
+   at System.Linq.Enumerable.ToDictionary[TSource,TKey,TElement](IEnumerable`1 source, Func`2 keySelector, Func`2 elementSelector, IEqualityComparer`1 comparer)
+   at System.Linq.Enumerable.ToDictionary[TSource,TKey,TElement](IEnumerable`1 source, Func`2 keySelector, Func`2 elementSelector)
+   at SpeedJump.Profiles.Resolve(Binary bin)
+   at System.RuntimeMethodHandle.InvokeMethod(Object target, Void** arguments, Signature sig, Boolean isConstructor)
+   at System.Reflection.MethodBaseInvoker.InvokeDirectByRefWithFewArgs(Object obj, Span`1 copyOfArgs, BindingFlags invokeAttr)
+MobTP.ProfileStore FAILED System.IO.IOException: İmza tekil değil: 0 eşleşme.
+   at PlayerXYZ.Binary.FindUnique(String pattern)
+   at PlayerXYZ.Profiles.<>c__DisplayClass7_0.<Resolve>b__1(KeyValuePair`2 k)
+   at System.Linq.Enumerable.ToDictionary[TSource,TKey,TElement](IEnumerable`1 source, Func`2 keySelector, Func`2 elementSelector, IEqualityComparer`1 comparer)
+   at System.Linq.Enumerable.ToDictionary[TSource,TKey,TElement](IEnumerable`1 source, Func`2 keySelector, Func`2 elementSelector)
+   at PlayerXYZ.Profiles.Resolve(Binary bin)
+   at MobTP.ProfileStore.Resolve(Binary b)
+   at System.RuntimeMethodHandle.InvokeMethod(Object target, Void** arguments, Signature sig, Boolean isConstructor)
+   at System.Reflection.MethodBaseInvoker.InvokeDirectByRefWithFewArgs(Object obj, Span`1 copyOfArgs, BindingFlags invokeAttr)
+Multikill.BuildRecovery OK {"Sha256":"D527212A9DD5191C19670760013DAB955035900F91FA7E86299887326AC81BA1","ImageSize":17170432,"Timestamp":1790995923,"SignatureRva":1645214,"PatchOffset":16,"Aob":"0FC6D2000F51CAF3410F1046480F2FC10F86780100008BBF7007000085FF0F846A010000488B442460482B44245848C1F8034883F8400F8352010000B908000000E8CCCD9D004C8BF88938C6400402","Original":"0F8678010000","Patched":"0F8478010000"}

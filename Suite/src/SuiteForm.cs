@@ -55,7 +55,7 @@ sealed class SuiteForm : Form
         brand.ColumnStyles.Add(new(SizeType.Percent, 100)); brand.ColumnStyles.Add(new(SizeType.AutoSize));
         var branding = new ContentStack { Padding = new(0) }; branding.AddRow(Responsive.Text("4UNITY  /  TOOLS", 19, true));
         var edition = Responsive.Text("CONTROL CENTER", 8); edition.ForeColor = Palette.Muted; branding.AddRow(edition); brand.Controls.Add(branding, 0, 0);
-        var version = Responsive.Text("0.5", 11); version.ForeColor = Palette.Accent; version.Anchor = AnchorStyles.Right; brand.Controls.Add(version, 1, 0); layout.Controls.Add(brand, 0, 0);
+        var version = Responsive.Text(typeof(SuiteForm).Assembly.GetName().Version!.ToString(3), 11); version.ForeColor = Palette.Accent; version.Anchor = AnchorStyles.Right; brand.Controls.Add(version, 1, 0); layout.Controls.Add(brand, 0, 0);
         var information = new ContentStack { BackColor = Palette.Elevated, Padding = new(12, 3, 12, 3), Margin = new(0, 0, 0, 6) };
         info.ForeColor = Palette.Muted; information.AddRow(info); layout.Controls.Add(information, 0, 1);
         navigation.Margin = new(0, 0, 0, 4);
@@ -205,8 +205,7 @@ sealed class SuiteForm : Form
     async Task<bool> RestoreForSafety()
     {
         // Block embedded UI and hotkeys before awaiting outstanding commands.
-        foreach (var page in Workspace.Pages.Values) page.Enabled = false;
-        Workspace.Aoe?.StopForSafety();
+        Workspace.Quiesce();
         bool result = await CloseTools();
         footer.Text = result ? "SafeMode · etkin işlemler geri alındı." : "SafeMode · geri alma bekliyor; işlemler engelli.";
         return result;
@@ -214,10 +213,11 @@ sealed class SuiteForm : Form
     internal async Task<bool> CloseTools()
     {
         closing = true; navigation.Enabled = Overview.Enabled = false; footer.Text = "İşlemler tamamlanıyor; araçlar kapatılıyor…";
+        Workspace.Quiesce();
         scanCancel?.Cancel();
         if (scanTask is not null) await scanTask;
         while (Actions.Busy) await Task.Delay(40);
-        var blocked = await Workspace.CloseAsync(); closing = false; navigation.Enabled = Overview.Enabled = true;
+        var blocked = await Workspace.CloseAsync(page => footer.Text = $"Sırayla kapatılıyor · {Names[page]}…"); closing = false; navigation.Enabled = Overview.Enabled = true;
         if (blocked is int page) { if (!Safety.Blocked) SelectPage(page); footer.Text = "Araç henüz kapanamadı. Geri alma / işlem durumunu kontrol edip yeniden dene."; return false; }
         SelectPage(0); return true;
     }

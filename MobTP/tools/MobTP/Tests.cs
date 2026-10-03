@@ -8,11 +8,11 @@ static class Tests
     {
         using var b=new PlayerXYZ.Binary(@"C:\Games\4Unity\TClient.exe");
         var p=ProfileStore.Resolve(b);
-        if(p.RootRva!=0xE6E9C0||p.RegistryOffset!=0x1120||p.ActorIdOffset!=0x768||p.ActorTypeOffset!=0x7E1||p.ActorSize!=0x1320||p.HomeOffset!=0x12D8||p.MonsterVtableRva!=0xCE5578)throw new Exception("Current anchors mismatch");
+        if(b.Sha==PlayerXYZ.Profiles.KnownSha&&(p.RootRva!=0xE6E9C0||p.RegistryOffset!=0x1120||p.ActorIdOffset!=0x768||p.ActorTypeOffset!=0x7E1||p.ActorSize!=0x1320||p.HomeOffset!=0x12D8||p.MonsterVtableRva!=0xCE5578))throw new Exception("Current anchors mismatch");
         int passed=1;
         p.HomeOffset+=4;bool rejected=false;try{ProfileStore.Validate(b,p);}catch(IOException){rejected=true;}if(!rejected)throw new Exception("Tampered profile accepted");p.HomeOffset-=4;passed++;
         var bundle=ProfileStore.Load(@"C:\Games\4Unity\TClient.exe");int scans=ProfileStore.ScanCount;ProfileStore.Load(@"C:\Games\4Unity\TClient.exe");if(scans!=ProfileStore.ScanCount)throw new Exception("Repeated scans");passed++;
-        if(ProfileStore.Embedded(b) is null||scans!=ProfileStore.ScanCount)throw new Exception("Embedded profile rescan");passed++;
+        if((b.Sha==PlayerXYZ.Profiles.KnownSha&&ProfileStore.Embedded(b) is null)||scans!=ProfileStore.ScanCount)throw new Exception("Embedded profile rescan");passed++;
         int Raw(int rva)=>b.Pe.PEHeaders.SectionHeaders.Where(s=>rva>=s.VirtualAddress&&rva<s.VirtualAddress+s.SizeOfRawData).Select(s=>s.PointerToRawData+rva-s.VirtualAddress).Single();
         var changed=b.Data.ToArray();changed[0x20]^=1;
         using(var future=new PlayerXYZ.Binary(changed)){var resolved=ProfileStore.Resolve(future);if(resolved.Player.Sha256==b.Sha||resolved.HomeOffset!=p.HomeOffset)throw new Exception("Changed SHA not resolved");}passed++;
@@ -32,7 +32,7 @@ static class Tests
         foreach(int vt in new[]{p.MonsterVtableRva,p.Player.CtclientcharVtableRva,p.Player.CtclientgameVtableRva})
         {
             pointerSlots.Add(vt-8);pointerSlots.Add(vt);
-            if(vt!=p.Player.CtclientgameVtableRva){pointerSlots.Add(vt+0xB0);pointerSlots.Add(vt+0x450);}
+            if(vt!=p.Player.CtclientgameVtableRva){foreach(int slot in ProfileStore.CoordinateSlots(b,p))pointerSlots.Add(vt+slot);}
         }
         liveBundle.ValidateLive((address,length)=>{int rva=(int)(address-relocated);var bytes=Live((ulong)b.ImageBase+(uint)rva,length);return length==8&&pointerSlots.Contains(rva)?BitConverter.GetBytes(BitConverter.ToUInt64(bytes)+0x100000):bytes;},relocated);passed++;
         rejected=false;try{liveBundle.ValidateLive((address,length)=>{var bytes=Live(address,length);if(address==(ulong)b.ImageBase+(uint)p.Signatures["home"].Rva)bytes[0]^=1;return bytes;},(ulong)b.ImageBase);}catch(IOException){rejected=true;}if(!rejected)throw new Exception("Live code patch accepted");passed++;

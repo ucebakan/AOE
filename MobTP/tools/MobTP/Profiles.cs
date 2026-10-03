@@ -41,7 +41,7 @@ sealed class ProfileBundle(MobProfile profile,Binary binary,string origin)
             if(BitConverter.ToUInt64(read(mb+(uint)vt-8,8))!=mb+(uint)col||
                 !read(mb+(uint)col,24).SequenceEqual(b.At(col,24))||
                 !read(mb+(uint)td+16,name.Length+1).SequenceEqual(System.Text.Encoding.ASCII.GetBytes(name+"\0")))throw new IOException("Live RTTI/profile mismatch");
-            foreach(int slot in vt==p.Player.CtclientgameVtableRva?new[]{0}:new[]{0,0xB0,0x450})
+            foreach(int slot in vt==p.Player.CtclientgameVtableRva?new[]{0}:new[]{0}.Concat(ProfileStore.CoordinateSlots(b,p)))
             {
                 long target=b.I64(vt+slot)-b.ImageBase;
                 if(target<0||target>=p.Player.ImageSize||BitConverter.ToUInt64(read(mb+(uint)(vt+slot),8))!=mb+(ulong)target)throw new IOException("Live vtable mismatch");
@@ -59,6 +59,12 @@ static class ProfileStore
     static readonly Dictionary<string,string> Failed=[];
     public static void Retry(){lock(Cache)Failed.Clear();}
     public static int ScanCount {get;private set;}
+    public static int[] CoordinateSlots(Binary b,MobProfile p)
+    {
+        using var recovery=new UnityTools.Controls.RecoveryImage(b.Data);
+        return new[]{recovery.MethodSlot(p.Player.CtclientcharVtableRva,p.Player.Signatures["coords_a"].Rva),
+            recovery.MethodSlot(p.Player.CtclientcharVtableRva,p.Player.Signatures["coords_b"].Rva)};
+    }
     public static MobProfile? Embedded(Binary b)
     {
         using var stream=typeof(ProfileStore).Assembly.GetManifestResourceStream("MobTP.current-profile.json")!;
@@ -90,7 +96,8 @@ static class ProfileStore
             b.RelativeCall(factory+6)!=lookup||b.RelativeCall(factory+0x2A)!=ctor||
             b.I32(home+0x54)!=goal+8||b.I32(ctor+0xB4)!=goal||b.I32(ctor+0xBA)!=goal+8)throw new IOException("Root/registry/constructor/Home ilişkisi uyuşmuyor.");
         b.ValidateRtti(vt,".?AVCTClientMonster@@");
-        foreach(int slot in new[]{0xB0,0x450})if(b.I64(vt+slot)!=b.I64(p.Player.CtclientcharVtableRva+slot))throw new IOException("Monster/player coordinate method ilişkisi değişti.");
+        foreach(int slot in CoordinateSlots(b,p))if(b.I64(vt+slot)!=b.I64(p.Player.CtclientcharVtableRva+slot))throw new IOException("Monster/player coordinate method ilişkisi değişti.");
+        if(rootRva!=p.Player.RootRva)throw new IOException("Mob/player root ilişkisi uyuşmuyor.");
         if(size<0x100||size>0x20000||registry<0x100||registry>0x10000||registry%8!=0||id<0x100||id>size-4||type<0x100||type>=size||goal<0x100||goal>size-12||goal%4!=0)throw new IOException("Geçersiz mob layout.");
         foreach(int coordinate in new[]{p.Player.CoordinateA[0],p.Player.CoordinateB[0]})
             if(coordinate>size-12||coordinate<goal+12&&goal<coordinate+12||coordinate<id+4&&id<coordinate+12||type>=coordinate&&type<coordinate+12)throw new IOException("Yazma alanı overlap/bounds hatası.");

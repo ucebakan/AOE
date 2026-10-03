@@ -15,6 +15,8 @@ sealed class BuildProfile
     public int PeTimestamp { get; set; }
     public int CtclientgameVtableRva { get; set; }
     public int CtclientcharVtableRva { get; set; }
+    public int RootRva {get;set;}
+    public int CoordinateOffset {get;set;}
     public int OwnerToPlayerOffset { get; set; }
     public int SpeedFieldOffset { get; set; }
     public int SpeedValue { get; set; } = 23452;
@@ -153,7 +155,9 @@ static class Profiles
         p.JumpWriterRva=p.Signatures["jump"].Rva+26;
         p.JumpFieldOffset=bin.I32(p.JumpWriterRva+4);
         p.JumpWriterOriginalBytes=Convert.ToHexString(bin.At(p.JumpWriterRva,8));
-        p.SpeedFieldOffset=bin.I32(p.Signatures["pair_compare"].Rva+16);
+        p.CoordinateOffset=bin.I32(p.Signatures["pair_write"].Rva+17)-8;
+        p.SpeedFieldOffset=bin.I32(p.Signatures["pair_compare"].Rva+14);
+        p.RootRva=p.Signatures["root"].Rva+7+bin.I32(p.Signatures["root"].Rva+3);
         p.OwnerToPlayerOffset=bin.I32(p.Signatures["owner"].Rva+21);
         Validate(bin,p); return p;
     }
@@ -165,14 +169,24 @@ static class Profiles
             if(!p.Signatures.TryGetValue(name,out var s) || s.Pattern!=t.Pattern || !b.Executable(s.Rva,Binary.Pattern(t.Pattern).Length) || !Binary.Match(b.At(s.Rva,Binary.Pattern(t.Pattern).Length),Binary.Pattern(t.Pattern)))throw new IOException("Profil imzası geçersiz: "+name);
         }
         int c=p.Signatures["pair_compare"].Rva,w=p.Signatures["pair_write"].Rva,j=p.Signatures["jump"].Rva,o=p.Signatures["owner"].Rva;
-        int first=b.I32(c+5),second=b.I32(c+16);
+        int first=b.I32(c+3),second=b.I32(c+14);
+        if(p.CoordinateOffset!=b.I32(w+17)-8 || p.CoordinateOffset<0x20 || p.CoordinateOffset>0x10000 || (p.CoordinateOffset&3)!=0)throw new IOException("Coordinate operand mismatch.");
         if(first<0x100 || second!=first+4 || second>0x10000 || b.I32(w+6)!=first || b.I32(w+27)!=second || p.SpeedFieldOffset!=second)throw new IOException("Adjacent pair displacement uyuşmuyor.");
         if(p.JumpWriterRva!=j+26 || !b.At(j+26,4).SequenceEqual(Convert.FromHexString("F30F118B")) || p.JumpFieldOffset!=b.I32(j+30) || p.JumpFieldOffset<0x100 || p.JumpFieldOffset>0x10000 || p.JumpWriterOriginalBytes!=Convert.ToHexString(b.At(j+26,8)))throw new IOException("MOVSS [RBX+disp32],XMM1 doğrulanamadı.");
         if(p.OwnerToPlayerOffset!=b.I32(o+21) || p.OwnerToPlayerOffset!=b.I32(o+37) || p.OwnerToPlayerOffset<0x100 || p.OwnerToPlayerOffset>0x10000)throw new IOException("Owner offset uyuşmuyor.");
         b.ValidateRtti(p.CtclientcharVtableRva,".?AVCTClientChar@@");b.ValidateRtti(p.CtclientgameVtableRva,".?AVCTClientGame@@");
-        int setter=checked((int)(b.I64(p.CtclientcharVtableRva+0xB0)-b.ImageBase));
-        int update=checked((int)(b.I64(p.CtclientcharVtableRva+0x4B8)-b.ImageBase));
-        if(!(setter<c && c<w && w-setter<0x1000) || !(update<j && j-update<0x1000) || b.RelativeCall(o+25)!=update)throw new IOException("CTClientChar method ilişkisi uyuşmuyor.");
+        using var recovery=new UnityTools.Controls.RecoveryImage(b.Data);
+        int setter=recovery.Function(c).Start, update=recovery.Call(o+25);
+        recovery.MethodSlot(p.CtclientcharVtableRva,c); recovery.MethodSlot(p.CtclientcharVtableRva,update);
+        if(recovery.FunctionRoot(w)!=setter || recovery.FunctionRoot(j)!=update || update==setter ||
+            p.RootRva!=p.Signatures["root"].Rva+7+b.I32(p.Signatures["root"].Rva+3) || p.RootRva<0 || p.RootRva>=p.ImageSize-8 || b.Executable(p.RootRva,8))
+            throw new IOException("CTClientChar method/root ilişkisi uyuşmuyor.");
+        var cmp=recovery.Decode(c,Binary.Pattern(p.Signatures["pair_compare"].Pattern).Length);
+        var write=recovery.Decode(w,Binary.Pattern(p.Signatures["pair_write"].Pattern).Length);
+        if(cmp[0].Mnemonic!=Iced.Intel.Mnemonic.Cmp || cmp[3].Mnemonic!=Iced.Intel.Mnemonic.Cmp ||
+            !UnityTools.Controls.RecoveryImage.Mem(cmp[0],0,Iced.Intel.Register.RBX) || !UnityTools.Controls.RecoveryImage.Mem(cmp[3],0,Iced.Intel.Register.RBX) ||
+            write[3].Mnemonic!=Iced.Intel.Mnemonic.Movss || !UnityTools.Controls.RecoveryImage.Mem(write[3],0,Iced.Intel.Register.RBX) || cmp[0].Op1Register!=write[1].Op1Register || cmp[3].Op1Register!=write[5].Op1Register)
+            throw new IOException("Speed compare/write dataflow uyuşmuyor.");
         if(b.Sha==KnownSha && (p.CtclientgameVtableRva!=0xCDC970 || p.CtclientcharVtableRva!=0xCDBCC0 || p.SpeedFieldOffset!=0x1204 || p.JumpFieldOffset!=0x8E0 || p.JumpWriterRva!=0x845B8F || p.OwnerToPlayerOffset!=0x2710))throw new IOException("Current-build anchors uyuşmuyor.");
     }
 }

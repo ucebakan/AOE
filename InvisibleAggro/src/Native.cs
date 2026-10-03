@@ -91,9 +91,16 @@ sealed class GameSession : IMemory, IDisposable
                 if (matches != 1) throw new InvalidOperationException("Oyun modülü doğrulanamadı.");
             }
             finally { Native.CloseHandle(snapshot); }
+            using(var pe=new System.Reflection.PortableExecutable.PEReader(new MemoryStream(session.Disk)))
+            {
+                int nt=BitConverter.ToInt32(session.Read(session.Base+0x3C,4));
+                if(nt<64||nt>4096||BitConverter.ToInt32(session.Read(session.Base+nt,4))!=0x4550||
+                    BitConverter.ToInt32(session.Read(session.Base+nt+8,4))!=pe.PEHeaders.CoffHeader.TimeDateStamp)
+                    throw new InvalidOperationException("Loaded game build differs from the recovered disk profile.");
+            }
             long context = session.Pointer(session.Base + Profile.Context);
             session.Player = session.Pointer(context + Profile.Player);
-            session.PlayerId = BitConverter.ToUInt32(session.Read(session.Player + 0x768, 4));
+            session.PlayerId = BitConverter.ToUInt32(session.Read(session.Player + Profile.ActorId, 4));
             session.codeBaseline = Profile.Signatures.Select(s => Profile.At(session.Disk, s.Rva, s.Mask.Length)).ToArray();
             session.ValidatePlayer();
             return session;
@@ -112,7 +119,7 @@ sealed class GameSession : IMemory, IDisposable
         if (Exited) throw new InvalidOperationException("Oyun oturumu kapandı.");
         long context = Pointer(Base + Profile.Context);
         if (Pointer(context + Profile.Player) != Player || Pointer(Player) != Base + Profile.Vtable ||
-            Read(Player + 0x7E1, 1)[0] != 1 || PlayerId == 0 || BitConverter.ToUInt32(Read(Player + 0x768, 4)) != PlayerId)
+            Read(Player + Profile.ActorType, 1)[0] != 1 || PlayerId == 0 || BitConverter.ToUInt32(Read(Player + Profile.ActorId, 4)) != PlayerId)
             throw new InvalidOperationException("Oyuncu değişti veya doğrulanamadı.");
         long col = Pointer(Base + Profile.Vtable - 8);
         byte[] locator = Read(col, 24);
@@ -137,7 +144,7 @@ sealed class GameSession : IMemory, IDisposable
         long player = BitConverter.ToInt64(Read(context + Profile.Player, 8));
         if (player != Player) return false;
         return BitConverter.ToInt64(Read(Player, 8)) == Base + Profile.Vtable &&
-            Read(Player + 0x7E1, 1)[0] == 1 && BitConverter.ToUInt32(Read(Player + 0x768, 4)) == PlayerId;
+            Read(Player + Profile.ActorType, 1)[0] == 1 && BitConverter.ToUInt32(Read(Player + Profile.ActorId, 4)) == PlayerId;
     }
     public void ValidateCode(IReadOnlyList<OwnedCell> owned)
     {

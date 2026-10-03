@@ -5,7 +5,8 @@
 #include <vector>
 
 namespace pc {
-bool ValidateExitImage(std::span<const unsigned char> bytes) {
+bool ValidateExitImage(std::span<const unsigned char> bytes,const RecoveredProfile* profile) {
+    if(profile)return ValidateRecoveredCounter(*profile,bytes);
     auto copy = [&](size_t offset, void* data, size_t length) {
         if (offset > bytes.size() || length > bytes.size() - offset) return false;
         std::memcpy(data, bytes.data() + offset, length); return true;
@@ -39,8 +40,9 @@ bool ValidateExitImage(std::span<const unsigned char> bytes) {
     }
     return hits == 1 && expected;
 }
-bool ValidateExitCode(const Read& read, uintptr_t base) {
-    if (!ValidateLive(read, base)) return false;
+bool ValidateExitCode(const Read& read, uintptr_t base,const RecoveredProfile* profile) {
+    if (!ValidateLive(read, base,profile)) return false;
+    if(profile){for(const auto& guard:profile->guards){std::vector<unsigned char> actual(guard.bytes.size());if(!read(base+guard.rva,actual.data(),actual.size())||actual!=guard.bytes)return false;}return true;}
     for (const auto& guard : exit_profile::guards) {
         std::vector<unsigned char> actual(guard.bytes.size());
         if (!read(base + guard.rva, actual.data(), actual.size()) ||
@@ -48,17 +50,19 @@ bool ValidateExitCode(const Read& read, uintptr_t base) {
     }
     return true;
 }
-std::optional<ExitPlan> PrepareExit(const Read& read, uintptr_t base) {
-    if (!ValidateExitCode(read, base)) return {};
+std::optional<ExitPlan> PrepareExit(const Read& read, uintptr_t base,const RecoveredProfile* profile) {
+    const auto resolvedRoot=profile?profile->rootRva:pc::rootRva;const auto resolvedCount=profile?profile->countOffset:pc::countOffset;
+    const auto delta=profile?profile->rootDelta:exit_profile::rootDelta;
+    if (!ValidateExitCode(read, base,profile)) return {};
     uintptr_t context = 0, rootVtable = 0, contextVtable = 0, rootVirtual = 0, after = 0;
-    if (!read(base + rootRva, &context, sizeof(context)) || context < exit_profile::rootDelta ||
-        context % 8 || !ValidPointer(context, countOffset + 8)) return {};
-    const uintptr_t root = context - exit_profile::rootDelta;
-    if (!ValidPointer(root, exit_profile::rootDelta + countOffset + 8) ||
-        !read(root, &rootVtable, sizeof(rootVtable)) || rootVtable != base + exit_profile::rootVtableRva ||
-        !read(context, &contextVtable, sizeof(contextVtable)) || contextVtable != base + exit_profile::contextVtableRva ||
-        !read(rootVtable + 0x2F0, &rootVirtual, sizeof(rootVirtual)) || rootVirtual != base + exit_profile::rootVirtualRva ||
-        !read(base + rootRva, &after, sizeof(after)) || after != context) return {};
-    return ExitPlan{context, root, base + exit_profile::functionRva};
+    if (!read(base + resolvedRoot, &context, sizeof(context)) || context < delta ||
+        context % 8 || !ValidPointer(context, resolvedCount + 8)) return {};
+    const uintptr_t root = context - delta;
+    if (!ValidPointer(root, delta + resolvedCount + 8) ||
+        !read(root, &rootVtable, sizeof(rootVtable)) || rootVtable != base + (profile?profile->rootVtable:exit_profile::rootVtableRva) ||
+        !read(context, &contextVtable, sizeof(contextVtable)) || contextVtable != base + (profile?profile->contextVtable:exit_profile::contextVtableRva) ||
+        !read(rootVtable + (profile?profile->rootSlot:0x2F0), &rootVirtual, sizeof(rootVirtual)) || rootVirtual != base + (profile?profile->rootVirtual:exit_profile::rootVirtualRva) ||
+        !read(base + resolvedRoot, &after, sizeof(after)) || after != context) return {};
+    return ExitPlan{context, root, base + (profile?profile->exitRva:exit_profile::functionRva)};
 }
 }

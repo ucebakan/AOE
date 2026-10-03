@@ -123,16 +123,17 @@ sealed class Session : ITarget
         try
         {
             if(p<0x10000 || p>0x7FFFFFFF0000 || (p&7)!=0 || Pointer(p)!=Base+Profile.CtclientcharVtableRva)return false;
-            var coords=Read(p+0xB0,12);for(int i=0;i<3;i++)if(!float.IsFinite(BitConverter.ToSingle(coords,i*4)))return false;
+            var coords=Read(p+Profile.CoordinateOffset,12);for(int i=0;i<3;i++)if(!float.IsFinite(BitConverter.ToSingle(coords,i*4)))return false;
             Read(p+Profile.SpeedFieldOffset,4);Read(p+Profile.JumpFieldOffset,4);return true;
         }catch{return false;}
     }
     void ResolvePlayer()
     {
-        if (Profile.Sha256 == UnityTools.Controls.KnownPlayerPath.Sha)
+        if (Profile.RootRva != 0)
         {
             (Owner, Player) = UnityTools.Controls.KnownPlayerPath.Resolve(Base, Read,
-                Profile.CtclientgameVtableRva, Profile.CtclientcharVtableRva, Profile.OwnerToPlayerOffset);
+                Profile.CtclientgameVtableRva, Profile.CtclientcharVtableRva, Profile.OwnerToPlayerOffset,
+                Profile.Signatures["root"].Rva, Profile.RootRva);
             Health(); Files.Log("Player resolved through validated module-relative path; no heap scan."); return;
         }
         var found=new HashSet<(long owner,long p)>();long address=0;int skipped=0;
@@ -167,7 +168,7 @@ sealed class Session : ITarget
     {
         lock(sync)
         {
-            if(!Alive || Pointer(Owner)!=Base+Profile.CtclientgameVtableRva)throw new IOException("Owner/session invalid.");
+            if(!Alive || (Profile.RootRva!=0 && Pointer(Base+Profile.RootRva)!=Owner) || Pointer(Owner)!=Base+Profile.CtclientgameVtableRva)throw new IOException("Owner/session invalid.");
             long p=Pointer(Owner+Profile.OwnerToPlayerOffset);if(!ValidPlayer(p))throw new IOException("Local player invalid.");
             if(p!=Player){Files.Log($"Player changed 0x{Player:X}->0x{p:X}");Player=p;}
         }

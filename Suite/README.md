@@ -1,10 +1,14 @@
-# 4UnityTools · Control Center 0.5
+# 4UnityTools · Control Center 0.6.0
 
 Genel bakıştaki düğmeler gerçek işlevleri çalıştırır. Player XYZ, Speed / Jump,
 Invisible / Aggro, MobTP ve AOE aynı uygulamada yönetilir. PlayerCounter eski
 görünümüyle ayrı, küçük, taşınabilir ve üstte kalan pencere olarak açılır.
 
-Hazır uygulama: [Windows x64 ZIP](releases/0.5.0/4UnityTools-0.5.0-win-x64.zip). ZIP içindeki `4UnityTools.exe` doğrudan çalıştırılır. SHA-256 değerleri aynı klasördeki `SHA256SUMS.txt` dosyasındadır.
+Hazır uygulama: [Windows x64 ZIP](releases/0.6.0/4UnityTools-0.6.0-win-x64.zip). ZIP içindeki `4UnityTools.exe` doğrudan çalıştırılır. SHA-256 değerleri aynı klasördeki `SHA256SUMS.txt` dosyasındadır.
+
+0.6.0 oyun patchinden sonra yolları yeni SHA için otomatik tarayıp profil üretir.
+Alan offsetleri ve metot bağlantıları koddan türetilir. Ayrıntılar ve test
+kapsamı: [Patch Recovery](PATCH-RECOVERY.md).
 Dosya kendi .NET çalışma zamanını içerir; kurulum gerekmez.
 İlk açılışta genel bakış ve kullanım bilgisi görünür. Üst araç barından bir araç
 seçildiğinde mevcut kontrolleri içerik alanına yerleşir. Sekme değişimi araçları
@@ -114,3 +118,9 @@ Tarama yalnız okur: arm/toggle, teleport, overlay, hotkey veya crash journal ge
 Aynı SHA için kayıtlı AOB/offset profilleri yerel kod kontrolleriyle yüklenir. PID, module base ve heap pointer saklanmaz. Mevcut bilinen SHA'da XYZ ve Speed/Jump doğrulanmış global root yolunu kullanır; eski heap taraması tekrarlanmaz. Bilinmeyen build'de sabit yol kanıtlanamadığında heap çözümlemesi gerekebilir. Multikill yeni SHA'da tekil semantik tarama yapar, sonraki bağlantılarda kayıtlı konumu sınırlı semantik kontrolle doğrular.
 
 Tarama kabul edilmişse ve araç panelleri henüz yüklenmemişse yeni oyun oturumu 10 saniyelik aralıklarla fark edilir. Oyun yüklenirken bekleyen canlı kontroller en fazla iki dakika yeniden denenir; sonra Tarama / durum ile yeniden denenebilir. Yüklenmiş araçlar kendi bağlantı kontrollerini kullanır. Fonksiyonlar bu akışta kendiliğinden açılmaz. AOE'nin oturuma özel manuel doğrulaması SHA aynı olsa da atlanmaz.
+
+## 0.5.1: Sıralı SafeMode kapanışı
+
+Geri almalar tek kuyrukta yürür: Multikill → XYZ → PlayerCounter → MobTP → Speed/Jump → Invisible/Aggro → AOE. Araç kontrolleri ve periyodik sorguları önce duraklatılır; alt durum alanı o an kapanan aracı gösterir. Tamamlanan bir geri alma hata döndürürse diğer araçlara sırayla devam edilir. Hâlâ çalışan bir geri alma 15 saniyede bitmezse sonraki araç başlatılmaz; SafeMode aynı tamamlanmamış işlemi bekleyip tekrar kontrol eder. Sayı 0 olsa da çözülmemiş geri alma varken engel kalkmaz.
+
+AOE kapanışı debugger temizliğini ister ve asenkron tamamlanmasını izler. Pencere ancak iş parçacığının tüm kaynakları bırakması sonrasında yok edilir; arayüz üzerinde bloklayan join beklenmez. Üç kaldırılan kontrol Auto Attach to TClient.exe, Auto Arm after attach, Advanced / Diagnostics'tir. Birleşik build bu kontrolleri oluşturmaz ve kayıtlı otomatik attach/arm seçeneklerini kullanmaz.

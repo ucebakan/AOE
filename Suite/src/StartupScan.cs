@@ -105,6 +105,7 @@ sealed class LiveStartupProbe(ToolWorkspace workspace, FeatureActions actions) :
                         return Ready(feature, profile, session.Pid);
                     }
                 case Feature.Aoe:
+                    AoeProfileRecovery.Ensure();
                     string sha = Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(Multikill.Profile.GamePath)));
                     foreach (string path in Directory.EnumerateFiles(Path.Combine(Program.DataRoot, "AOE", "profiles"), "*.json"))
                     {

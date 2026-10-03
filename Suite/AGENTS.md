@@ -19,3 +19,6 @@
 
 - Açılışta “Tarama başlasın mı?” penceresi sun; kabul edilirse XYZ, Speed, Jump, Invisible, Aggro, MobTP, AOE, Counter, Multikill sırasıyla yalnız yolları doğrulasın. Tarama işlev açamaz, arm edemez, hotkey kaydedemez veya bekleyen patch geri almasını çalıştıramaz. Manuel doğrulama sırayı engellemez.
 - Aynı SHA için kalıcı profili yerel imza/semantik kontrollerle yeniden kullan. SHA değişirse eski RVA’yı kullanma. PID, modül tabanı ve heap pointer’larını diske profil olarak kaydetme; yeni oturumda canlı yolu yeniden çöz. Bilinen build XYZ ve Speed/Jump için doğrulanmış global root yolunu kullanır; diğer build’lerde güvenilir yol yoksa heap çözümlemesi gerekebilir.
+
+- SafeMode/kapanış geri almaları aynı anda başlatılmaz: Multikill, XYZ, PlayerCounter, MobTP, Speed/Jump, Invisible/Aggro, AOE sırasıyla kapanır. Bitmemiş veya zaman aşımına uğramış geri alma varken sonraki aracı başlatma. AOE debugger temizliği bitene kadar pencereyi yok edip UI thread üzerinde join bekleme.
+- Birleşik AOE Manager içinde Auto Attach, Auto Arm After Attach ve Advanced / Diagnostics kontrolleri bulunmaz; eski kayıtlı otomatik tercihler çalışamaz.

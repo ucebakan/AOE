@@ -10,6 +10,7 @@
 __pycache__/
 
 # Release archives are tracked; extracted copies and intermediate EXEs stay local.
+/4UnityTools.exe
 /InvisibleAggro/releases/*/4UnityInvisibleAggro-*-win-x64/
 /MobTP/releases/*/MobTP-*-win-x64/
 /PlayerXYZ/releases/*/PlayerXYZ-*-win-x64/

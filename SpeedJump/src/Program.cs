@@ -48,7 +48,7 @@ sealed partial class MainForm : Form
         status.SetBounds(22,128,376,54);status.ForeColor=Color.FromArgb(190,197,211);status.AutoEllipsis=true;
         Controls.AddRange([title,speed,jump,status]);speed.Click+=async(_,_)=>await Work(()=>engine.Toggle(false));jump.Click+=async(_,_)=>await Work(()=>engine.Toggle(true));
         timer.Tick+=async(_,_)=>await Work(engine.Poll);
-        if(!preview){Shown+=async(_,_)=>{await Work(engine.Poll);timer.Start();};FormClosing+=ClosingAsync;}
+        if(!preview){Shown+=async(_,_)=>{await Work(engine.Poll);if (Enabled) timer.Start();};FormClosing+=ClosingAsync;}
         PaintState();
     }
     async Task Work(Action action)
@@ -69,7 +69,7 @@ sealed partial class MainForm : Form
         if(allowClose)return;e.Cancel=true;if(closing)return;closing=true;timer.Stop();speed.Enabled=jump.Enabled=false;
         while(busy)await Task.Delay(50);
         try{status.Text="Özellikler kapatılıyor…";await Task.Run(engine.Dispose);allowClose=true;Close();}
-        catch(Exception ex){closing=false;status.Text="Kapatılamadı: "+ex.Message;timer.Start();}
+        catch(Exception ex){closing=false;status.Text="Kapatılamadı: "+ex.Message;if (Enabled) timer.Start();}
     }
     protected override void Dispose(bool disposing){if(disposing)timer.Dispose();base.Dispose(disposing);}
 }

@@ -13,7 +13,8 @@ static class Program
         Application.EnableVisualStyles();
         Application.SetCompatibleTextRenderingDefault(false);
         Application.SetDefaultFont(new Font("Segoe UI", 9));
-        bool testing = args.Contains("--self-test") || args.Contains("--ui-test");
+        bool recoveryTesting=args.Contains("--recovery-test");
+        bool testing = args.Contains("--self-test") || args.Contains("--ui-test") || recoveryTesting;
         if (testing) DataRoot = Path.Combine(Path.GetTempPath(), "4UnityTools-tests", Environment.ProcessId.ToString());
         using var mutex = new Mutex(true, @"Local\4UnityTools.Suite" + (testing ? ".test." + Environment.ProcessId : ""), out bool first);
         if (!first && args.Contains("--elevated")) { try { first = mutex.WaitOne(TimeSpan.FromSeconds(15)); } catch (AbandonedMutexException) { first = true; } }
@@ -23,6 +24,7 @@ static class Program
             ExtractResources();
             PlayerXYZ.Files.Root = Path.Combine(DataRoot, "PlayerXYZ");
             SpeedJump.Files.Root = Path.Combine(DataRoot, "SpeedJump");
+            if(recoveryTesting)return RecoveryTests.Run(args.LastOrDefault() is string report&&!report.StartsWith("--")?report:Path.Combine(DataRoot,"recovery-tests.json"));
             if (testing) return SuiteTests.Run(args.LastOrDefault() is string output && !output.StartsWith("--") ? output : Path.Combine(DataRoot, "evidence"));
             Application.Run(new SuiteForm());
             return 0;

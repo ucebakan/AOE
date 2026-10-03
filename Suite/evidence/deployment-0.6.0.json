@@ -1,0 +1,12 @@
+{
+  "version": "0.6.0+493bd1daad20d70cf835ac6c79a78c05b37788dc",
+  "installed": "C:\\Users\\Public\\Documents\\4UnityTools\\4UnityTools.exe",
+  "backup": "C:\\Users\\Public\\Documents\\4UnityTools\\Suite\\build\\backups\\4UnityTools-78814E07F0AC2D3620659DD9AB220ED1C908D9C044B56482EB58AD15365997E5.exe",
+  "old_sha256": "78814E07F0AC2D3620659DD9AB220ED1C908D9C044B56482EB58AD15365997E5",
+  "new_sha256": "751177489F914C9DA6B0207703F613C5B70336AC2A8CEE82050103A617542E72",
+  "game_sha256": "98FAFD5A7616A4A33959713093B46E425C883B6D00CC1475EEB82BC50F78C77A",
+  "recovery_checks": 10,
+  "suite_checks": 197,
+  "uac": "requireAdministrator",
+  "live_game_writes": 0
+}

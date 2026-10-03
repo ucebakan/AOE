@@ -58,6 +58,7 @@ public:
     Tracer()=default;
     ~Tracer();
     bool attach(const BuildProfile& profile,std::string& error,TraceMode mode=TraceMode::Queue); // invoked by Attach UI; never automatic on startup
+    bool detachComplete() const { return workerFinished_.load(std::memory_order_acquire); }
     void detach(); // request; poll state until fully restored/detached before closing UI
     bool startCapture(Label label,double seconds,std::string& error);
     bool armBudgetWrite(std::string& error);
@@ -93,6 +94,7 @@ private:
     void finishCaptureLocked(const std::string& reason,bool complete,int64_t end);
     mutable std::mutex mutex_;
     std::thread worker_;
+    std::atomic<bool> workerFinished_{true};
     std::atomic<bool> detachRequested_{false},stopCaptureRequested_{false},invalidateLiveValidationOnDetach_{false},preserveLiveValidationOnDetach_{false};
     std::atomic<int> tickRequest_{0},initialRequest_{0},inspectorRequest_{0},visualRequest_{0};
     Status status_;

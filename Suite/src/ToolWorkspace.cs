@@ -50,29 +50,62 @@ sealed class ToolWorkspace : IDisposable
         if (Aoe is { IsDisposed: false, ToolWindow: not 0 } && Pages.TryGetValue(5, out var page))
             Aoe.Fit(Math.Max(300, page.ClientSize.Width - SystemInformation.VerticalScrollBarWidth - 2), viewport.DeviceDpi);
     }
-    internal async Task<int?> CloseAsync()
+    Task<int?>? shutdown;
+    internal Task<int?> CloseAsync(Action<int>? progress = null)
     {
-        int? blocked = null;
-        // Start every cleanup even when another module refuses to close.
-        try { if (Aoe is not null && !Aoe.TryClose()) blocked = 5; else Remove(5); }
-        catch { blocked = 5; }
-        Counter.Dispose();
-        var pending = Forms.ToArray().Select(async item =>
+        if (shutdown is { IsCompleted: false }) return shutdown;
+        return shutdown = ShutdownSequence.RunAsync(CloseOneAsync, progress);
+    }
+    internal void Quiesce()
+    {
+        foreach (var page in Pages.Values) page.Enabled = false;
+        foreach (var form in Forms.Values)
         {
-            try
+            switch (form)
             {
-                if (!item.Value.IsDisposed)
-                {
-                    item.Value.Close(); var deadline = DateTime.UtcNow.AddSeconds(15);
-                    while (!item.Value.IsDisposed && DateTime.UtcNow < deadline) await Task.Delay(40);
-                    if (!item.Value.IsDisposed) return (int?)item.Key;
-                }
-                Remove(item.Key); return null;
+                case Multikill.MainForm f: f.SuiteQuiesce(); break;
+                case PlayerXYZ.MainForm f: f.SuiteQuiesce(); break;
+                case SpeedJump.MainForm f: f.SuiteQuiesce(); break;
+                case InvisibleAggro.MainForm f: f.SuiteQuiesce(); break;
+                case MobTP.MainForm f: f.SuiteQuiesce(); break;
             }
-            catch { return (int?)item.Key; }
-        }).ToArray();
-        var failures = await Task.WhenAll(pending);
-        return blocked ?? failures.FirstOrDefault(f => f.HasValue);
+        }
+        Aoe?.StopForSafety();
+    }
+    static bool IsClosing(Form form) => form switch
+    {
+        Multikill.MainForm f => f.SuiteClosing,
+        PlayerXYZ.MainForm f => f.SuiteClosing,
+        SpeedJump.MainForm f => f.SuiteClosing,
+        InvisibleAggro.MainForm f => f.SuiteClosing,
+        MobTP.MainForm f => f.SuiteClosing,
+        _ => false
+    };
+    async Task<ShutdownResult> CloseOneAsync(int index)
+    {
+        var deadline = DateTime.UtcNow.AddSeconds(15);
+        if (index == 6) { Counter.Dispose(); return ShutdownResult.Complete; }
+        if (index == 5)
+        {
+            if (Aoe is null) return ShutdownResult.Complete;
+            do
+            {
+                var result = Aoe.CloseStep();
+                if (result == ShutdownResult.Complete) { Remove(5); return result; }
+                if (result == ShutdownResult.Failed) return result;
+                await Task.Delay(40);
+            } while (DateTime.UtcNow < deadline);
+            return ShutdownResult.Pending;
+        }
+        if (!Forms.TryGetValue(index, out var form)) return ShutdownResult.Complete;
+        if (!form.IsDisposed && !IsClosing(form)) form.Close();
+        while (!form.IsDisposed)
+        {
+            if (!IsClosing(form)) { Quiesce(); return ShutdownResult.Failed; }
+            if (DateTime.UtcNow >= deadline) return ShutdownResult.Pending;
+            await Task.Delay(40);
+        }
+        Remove(index); return ShutdownResult.Complete;
     }
     void Remove(int index) { Forms.Remove(index); if (Pages.Remove(index, out var page)) page.Dispose(); if (index == 5) Aoe = null; }
     public void Dispose() { Counter.Dispose(); }

@@ -4,6 +4,8 @@ namespace MobTP;
 
 sealed partial class MainForm
 {
+    internal bool SuiteClosing => closing;
+    internal void SuiteQuiesce() { timer.Stop(); Enabled = false; }
     internal bool SuiteReady => last?.Player is not null && !closing && !moving;
     internal string SuiteMessage => result.Text;
     internal string SuiteValidation => last?.Status ?? state.Text;
@@ -13,7 +15,7 @@ sealed partial class MainForm
         if(closing)return;
         await gate.WaitAsync();gate.Release();
         if(hotkey is null&&settings.Hotkey is not null)AssignKey(settings.Hotkey);
-        await RefreshWorld();timer.Start();
+        await RefreshWorld();if (Enabled) timer.Start();
     }
     internal Task SuiteTeleportAsync() => Teleport();
     internal void ConfigureSuiteLayout()

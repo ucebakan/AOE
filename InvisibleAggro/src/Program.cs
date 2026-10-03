@@ -77,7 +77,7 @@ sealed partial class MainForm : Form
         timer.Tick += async (_, _) => await Work(engine.Poll);
         if (!preview)
         {
-            Shown += async (_, _) => { await Work(engine.Poll); timer.Start(); };
+            Shown += async (_, _) => { await Work(engine.Poll); if (Enabled) timer.Start(); };
             FormClosing += OnClosing;
         }
         PaintState();
@@ -121,7 +121,7 @@ sealed partial class MainForm : Form
         {
             closing = false; status.Text = "Kapatılamadı: " + ex.Message;
             invisible.Enabled = aggro.Enabled = true;
-            timer.Start();
+            if (Enabled) timer.Start();
         }
     }
 }

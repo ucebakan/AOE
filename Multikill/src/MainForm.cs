@@ -30,8 +30,10 @@ sealed class MainForm : Form
         toggle.Click += async (_, _) => await SuiteToggleAsync();
         recover.Click += async (_, _) => await Work(() => { engine.Rescan(); });
         timer.Tick += async (_, _) => { if (!busy && !closing && (engine.Ready || engine.Active)) await Work(engine.Poll); };
-        Shown += (_, _) => timer.Start(); FormClosing += OnClosing; UpdateState();
+        Shown += (_, _) => { if (Enabled) timer.Start(); }; FormClosing += OnClosing; UpdateState();
     }
+    internal bool SuiteClosing => closing;
+    internal void SuiteQuiesce() { timer.Stop(); Enabled = false; }
     internal bool SuiteReady => engine.Ready && !busy && !closing;
     internal bool SuiteActive => engine.Active;
     internal string SuiteMessage => state.Text;
@@ -56,7 +58,7 @@ sealed class MainForm : Form
         if (allowClose) return; e.Cancel = true; if (closing) return; closing = true; timer.Stop(); UpdateState();
         while (busy) await Task.Delay(30);
         try { await Task.Run(engine.Dispose); allowClose = true; Close(); }
-        catch (Exception ex) { state.Text = "Geri alma bekliyor: " + ex.Message; closing = false; timer.Start(); UpdateState(); }
+        catch (Exception ex) { state.Text = "Geri alma bekliyor: " + ex.Message; closing = false; if (Enabled) timer.Start(); UpdateState(); }
     }
     protected override void Dispose(bool disposing) { if (disposing) timer.Dispose(); base.Dispose(disposing); }
 }

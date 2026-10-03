@@ -12,7 +12,7 @@ struct Handle {
     ~Handle() { if (value && value != INVALID_HANDLE_VALUE) CloseHandle(value); }
     bool Valid() const { return value && value != INVALID_HANDLE_VALUE; }
 };
-bool KnownFile(HANDLE file) {
+bool KnownFile(HANDLE file, std::string* found=nullptr, const char* expected=knownSha) {
     BCRYPT_ALG_HANDLE algorithm = nullptr;
     BCRYPT_HASH_HANDLE hash = nullptr;
     if (BCryptOpenAlgorithmProvider(&algorithm, BCRYPT_SHA256_ALGORITHM, nullptr, 0) < 0) return false;
@@ -30,41 +30,54 @@ bool KnownFile(HANDLE file) {
     BCryptCloseAlgorithmProvider(algorithm, 0);
     std::string hex;
     for (auto b : digest) { hex += "0123456789ABCDEF"[b >> 4]; hex += "0123456789ABCDEF"[b & 15]; }
-    return good && hex == knownSha;
+    if(found){*found=hex;return good;}return good && hex == expected;
 }
-bool KnownExitFile(HANDLE file) {
+bool KnownExitFile(HANDLE file,const RecoveredProfile* profile=nullptr) {
     LARGE_INTEGER size{}, zero{};
     if (!GetFileSizeEx(file, &size) || size.QuadPart <= 0 || size.QuadPart > 64 * 1024 * 1024 ||
         !SetFilePointerEx(file, zero, nullptr, FILE_BEGIN)) return false;
     std::vector<unsigned char> bytes(static_cast<size_t>(size.QuadPart));
     DWORD got = 0;
     return ReadFile(file, bytes.data(), static_cast<DWORD>(bytes.size()), &got, nullptr) &&
-        got == bytes.size() && ValidateExitImage(bytes);
+        got == bytes.size() && ValidateExitImage(bytes,profile);
 }
 }
 bool ValidPointer(uintptr_t p, size_t size) {
     constexpr uintptr_t limit = 0x00007FFFFFFF0000ULL;
     return size && p >= 0x10000 && p < limit && size <= limit - p;
 }
-bool ValidateLive(const Read& read, uintptr_t base) {
-    if (!ValidPointer(base, imageSize)) return false;
+bool ValidateLive(const Read& read, uintptr_t base,const RecoveredProfile* profile) {
+    const auto size=profile?profile->imageSize:imageSize;
+    if (!ValidPointer(base, size)) return false;
     IMAGE_DOS_HEADER dos{};
     if (!read(base, &dos, sizeof(dos)) || dos.e_magic != IMAGE_DOS_SIGNATURE || dos.e_lfanew < 64 || dos.e_lfanew > 4096) return false;
     IMAGE_NT_HEADERS64 pe{};
     if (!read(base + dos.e_lfanew, &pe, sizeof(pe)) || pe.Signature != IMAGE_NT_SIGNATURE ||
-        pe.FileHeader.Machine != IMAGE_FILE_MACHINE_AMD64 || pe.FileHeader.TimeDateStamp != timestamp ||
-        pe.OptionalHeader.Magic != IMAGE_NT_OPTIONAL_HDR64_MAGIC || pe.OptionalHeader.SizeOfImage != imageSize) return false;
+        pe.FileHeader.Machine != IMAGE_FILE_MACHINE_AMD64 || pe.FileHeader.TimeDateStamp != (profile?profile->timestamp:timestamp) ||
+        pe.OptionalHeader.Magic != IMAGE_NT_OPTIONAL_HDR64_MAGIC || pe.OptionalHeader.SizeOfImage != size) return false;
+    if(profile){
+        if(profile->guards.size()!=11)return false;
+        for(auto index:{0,2}){
+            const auto& guard=profile->guards[index];
+            if(guard.rva>=size||guard.bytes.size()>size-guard.rva)return false;
+            std::vector<unsigned char> actual(guard.bytes.size());
+            if(!read(base+guard.rva,actual.data(),actual.size())||actual!=guard.bytes)return false;
+        }
+        return true;
+    }
     std::array<unsigned char, getter.size()> actual{};
-    return read(base + getterRva, actual.data(), actual.size()) && actual == getter;
+    return read(base+getterRva,actual.data(),actual.size())&&actual==getter;
 }
-std::optional<uint64_t> ReadCount(const Read& read, uintptr_t base) {
-    if (!ValidPointer(base, rootRva + sizeof(uintptr_t))) return {};
+std::optional<uint64_t> ReadCount(const Read& read, uintptr_t base,const RecoveredProfile* profile) {
+    const auto resolvedRoot=profile?profile->rootRva:pc::rootRva;const auto resolvedCount=profile?profile->countOffset:pc::countOffset;
+    if (!ValidPointer(base, resolvedRoot + sizeof(uintptr_t))) return {};
     uintptr_t context = 0, after = 0;
     uint64_t count = 0;
-    if (!read(base + rootRva, &context, sizeof(context)) || context % 8 != 0 ||
-        !ValidPointer(context, countOffset + sizeof(count)) ||
-        !read(context + countOffset, &count, sizeof(count)) ||
-        !read(base + rootRva, &after, sizeof(after)) || after != context) return {};
+    if (!read(base + resolvedRoot, &context, sizeof(context)) || context % 8 != 0 ||
+        !ValidPointer(context, resolvedCount + sizeof(count)) ||
+        !read(context + resolvedCount, &count, sizeof(count)) ||
+        !read(base + resolvedRoot, &after, sizeof(after)) || after != context) return {};
+    if(profile){uintptr_t table=0;if(!read(context,&table,8)||table!=base+profile->contextVtable)return {};}
     return count;
 }
 bool ProcessReader::ReadMemory(uintptr_t address, void* data, size_t size) const {
@@ -76,7 +89,7 @@ void ProcessReader::Close() {
     if (exitThread_) CloseHandle(exitThread_);
     exitThread_ = nullptr; exitProfileValid_ = false; exitBlocked_ = false; lastExit_ = 0;
     if (process_) CloseHandle(process_);
-    process_ = nullptr; base_ = 0;
+    process_ = nullptr; base_ = 0; profile_.reset();
 }
 bool ProcessReader::IsAlive() const {
     DWORD code = 0;
@@ -107,19 +120,26 @@ bool ProcessReader::Open() {
     if (!process_) return false;
     // Keep the file locked against replacement while hashing and validating the loaded image.
     Handle file(CreateFileW(targetPath, GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr));
-    if (!file.Valid() || !KnownFile(file.value)) {
+    std::string sha;
+    if (!file.Valid() || !KnownFile(file.value,&sha)) {
         error_ = L"Unsupported game build: profile rejected"; Close(); return false;
     }
-    exitProfileValid_ = KnownExitFile(file.value);
+    if(sha!=knownSha){
+        LARGE_INTEGER size{},zero{};DWORD got=0;
+        if(!GetFileSizeEx(file.value,&size)||size.QuadPart<=0||size.QuadPart>64*1024*1024||!SetFilePointerEx(file.value,zero,nullptr,FILE_BEGIN)){Close();return false;}
+        std::vector<unsigned char> disk(size_t(size.QuadPart));
+        if(!ReadFile(file.value,disk.data(),DWORD(disk.size()),&got,nullptr)||got!=disk.size()||!(profile_=RecoverCounterProfile(disk,sha))){error_=L"Counter automatic recovery unresolved/ambiguous";Close();return false;}
+    }
+    exitProfileValid_ = KnownExitFile(file.value,profile_.get());
     Handle modules(CreateToolhelp32Snapshot(TH32CS_SNAPMODULE | TH32CS_SNAPMODULE32, selected));
     MODULEENTRY32W module{sizeof(module)};
     if (modules.Valid() && Module32FirstW(modules.value, &module)) do {
-        if (!_wcsicmp(module.szModule, L"TClient.exe") && !_wcsicmp(module.szExePath, targetPath) && module.modBaseSize == imageSize) {
+        if (!_wcsicmp(module.szModule, L"TClient.exe") && !_wcsicmp(module.szExePath, targetPath) && module.modBaseSize == (profile_?profile_->imageSize:imageSize)) {
             base_ = reinterpret_cast<uintptr_t>(module.modBaseAddr); break;
         }
     } while (Module32NextW(modules.value, &module));
     Read read = [this](uintptr_t p, void* d, size_t n) { return ReadMemory(p, d, n); };
-    if (!base_ || !IsAlive() || !ValidateLive(read, base_)) {
+    if (!base_ || !IsAlive() || !ValidateLive(read, base_,profile_.get())) {
         error_ = L"Loaded image/profile mismatch"; Close(); return false;
     }
     error_.clear(); return true;
@@ -128,8 +148,8 @@ std::optional<uint64_t> ProcessReader::Poll() {
     if (!IsAlive()) { error_ = L"Game unavailable"; Close(); return {}; }
     Read read = [this](uintptr_t p, void* d, size_t n) { return ReadMemory(p, d, n); };
     // Recheck every sample so changes to the protected resolver immediately disable the display.
-    if (!ValidateLive(read, base_)) { error_ = L"Live resolver/profile mismatch"; return {}; }
-    auto count = ReadCount(read, base_);
+    if (!ValidateLive(read, base_,profile_.get())) { error_ = L"Live resolver/profile mismatch"; return {}; }
+    auto count = ReadCount(read, base_,profile_.get());
     if (!IsAlive()) { Close(); count.reset(); }
     error_ = count ? L"" : L"Counter unavailable";
     return count;
@@ -148,7 +168,7 @@ bool ProcessReader::CanExit() {
         if (exitBlocked_) return false;
     }
     if (lastExit_ && GetTickCount64() - lastExit_ < 5000) return false;
-    return PrepareExit([this](uintptr_t p, void* d, size_t n) { return ReadMemory(p,d,n); }, base_).has_value();
+    return PrepareExit([this](uintptr_t p, void* d, size_t n) { return ReadMemory(p,d,n); }, base_,profile_.get()).has_value();
 }
 bool ProcessReader::RequestExit() {
     if (!CanExit()) { exitError_ = L"Exit hazır değil: oyun, profil veya canlı kod kontrolü başarısız; ya da önceki çağrı sürüyor."; return false; }
@@ -162,7 +182,7 @@ bool ProcessReader::RequestExit() {
         exitError_ = L"Oyun oturumu değişti; Exit iptal edildi."; return false;
     }
     Handle file(CreateFileW(targetPath, GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr));
-    if (!file.Valid() || !KnownFile(file.value) || !KnownExitFile(file.value)) {
+    if (!file.Valid() || !KnownFile(file.value,nullptr,profile_?profile_->sha.c_str():knownSha) || !KnownExitFile(file.value,profile_.get())) {
         exitError_ = L"Oyun build/SHA/AOB profili uyuşmuyor; Exit engellendi."; return false;
     }
     Read read = [&](uintptr_t p, void* d, size_t n) {
@@ -179,7 +199,7 @@ bool ProcessReader::RequestExit() {
     }
     // Final context read before dispatch; never retain a heap address across clicks.
     uintptr_t context = 0;
-    if (!read(base_+rootRva,&context,sizeof(context)) || context != plan->context) {
+    if (!read(base_+(profile_?profile_->rootRva:rootRva),&context,sizeof(context)) || context != plan->context) {
         exitError_ = L"Context değişti; Exit iptal edildi."; return false;
     }
     // This native function returns zero and takes only this/RCX. Windows' x64 thread

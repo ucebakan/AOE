@@ -1,0 +1,55 @@
+[PASS] unique_match
+[PASS] zero_matches
+[PASS] multiple_matches_are_retained
+[PASS] overlapping_matches_are_retained
+[PASS] first_and_last_possible_offsets
+[PASS] empty_input_has_no_matches
+[PASS] pattern_larger_than_input
+[PASS] hex_case_and_whitespace
+[PASS] single_and_double_question_mark_tokens
+[PASS] wildcard_rel32_accepts_moved_call
+[PASS] masked visual reader locator unique match
+[PASS] visual reader zero match fails closed
+[PASS] duplicate visual reader remains ambiguous
+[PASS] visual reader derives displacement and base register
+[PASS] exact_opcode_survives_rel32_masking
+[PASS] template_constant_is_not_a_wildcard
+[PASS] empty_and_whitespace_patterns_fail_closed
+[PASS] all_wildcard_patterns_fail_closed
+[PASS] malformed_tokens_fail_closed
+[PASS] call_positive_rel32
+[PASS] call_negative_rel32
+[PASS] call_zero_displacement
+[PASS] call_target_at_image_start
+[PASS] call_target_at_last_image_byte
+[PASS] call_instruction_ends_at_image_boundary
+[PASS] call_ignores_trailing_instruction_bytes
+[PASS] call_truncated_bytes_rejected
+[PASS] non_call_opcode_rejected
+[PASS] call_target_before_image_rejected
+[PASS] call_target_at_or_beyond_image_end_rejected
+[PASS] call_instruction_outside_image_rejected
+[PASS] call_rva_overflow_rejected
+[PASS] unresolved_locator_blocks_profile_before_file_access
+[PASS] sha_mismatch_blocks_profile_before_file_access
+[PASS] missing_signatures_block_ready_profile
+[PASS] missing_required_signature_blocks_ready_profile
+[PASS] invalid_signature_blocks_ready_profile
+[PASS] tampered_locator_rva_blocks_ready_profile
+[PASS] tampered_profile_prep_and_return_relationships_rejected
+[PASS] disabled_initial_nx_blocks_ready_profile
+[PASS] missing_fingerprint_blocks_ready_profile
+[PASS] wrong_call_fingerprint_target_blocks_ready_profile
+[PASS] known-profile visual RVA mismatch is rejected before file access
+[PASS] null_live_handle_fails_before_process_access
+[PASS] current_image_locator_and_canonical_profile_match
+[PASS] recovered_profile_field_and_fingerprint_tampering_rejected
+[PASS] same_sha_aoe_profile_uses_local_semantics_without_full_scan
+[PASS] corrupt_aoe_cache_replaced_atomically
+[PASS] mutated_dos_header_rejected
+[PASS] truncated_file_backed_section_rejected
+[PASS] changed_stable_prep_opcode_has_zero_lifecycle_matches
+[PASS] moved_rel32_to_wrong_executable_worker_rejected
+[PASS] duplicate_semantically_valid_lifecycle_is_ambiguous
+[PASS] source_image_unchanged_by_all_mutations
+AOE_LOCATOR_TESTS passed=54 failed=0 total=54

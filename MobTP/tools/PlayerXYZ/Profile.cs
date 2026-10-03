@@ -15,6 +15,7 @@ sealed class BuildProfile
     public int PeTimestamp {get;set;}
     public int CtclientgameVtableRva {get;set;}
     public int CtclientcharVtableRva {get;set;}
+    public int RootRva {get;set;}
     public int OwnerToPlayerOffset {get;set;}
     public int[] CoordinateA {get;set;}=[];
     public int[] CoordinateB {get;set;}=[];
@@ -149,6 +150,7 @@ static class Profiles
         int a=p.Signatures["coords_a"].Rva,c=p.Signatures["coords_b"].Rva;
         p.CoordinateA=[unchecked((sbyte)bin.At(a+4,1)[0]),unchecked((sbyte)bin.At(a+10,1)[0]),unchecked((sbyte)bin.At(a+16,1)[0])];
         p.CoordinateB=[bin.I32(c+10),bin.I32(c+30),bin.I32(c+57)];
+        p.RootRva=p.Signatures["root"].Rva+7+bin.I32(p.Signatures["root"].Rva+3);
         p.OwnerToPlayerOffset=bin.I32(p.Signatures["owner"].Rva+21);
         Validate(bin,p); return p;
     }
@@ -167,10 +169,14 @@ static class Profiles
         if(aa[0]<bb[0]+12 && bb[0]<aa[0]+12)throw new IOException("Coordinate groups overlap.");
         if(p.OwnerToPlayerOffset!=b.I32(o+21)||p.OwnerToPlayerOffset!=b.I32(o+37)||p.OwnerToPlayerOffset<0x100||p.OwnerToPlayerOffset>0x10000)throw new IOException("Owner displacement mismatch.");
         b.ValidateRtti(p.CtclientcharVtableRva,".?AVCTClientChar@@");b.ValidateRtti(p.CtclientgameVtableRva,".?AVCTClientGame@@");
-        int vectorSetter=checked((int)(b.I64(p.CtclientcharVtableRva+0x450)-b.ImageBase));
-        int pairSetter=checked((int)(b.I64(p.CtclientcharVtableRva+0xB0)-b.ImageBase));
-        int update=checked((int)(b.I64(p.CtclientcharVtableRva+0x4B8)-b.ImageBase));
-        if(!(vectorSetter<a&&a-vectorSetter<0x200)||!(pairSetter<c&&c-pairSetter<0x300)||b.RelativeCall(o+25)!=update)throw new IOException("Class method linkage changed.");
+        using var recovery=new UnityTools.Controls.RecoveryImage(b.Data);
+        int vectorSlot=recovery.MethodSlot(p.CtclientcharVtableRva,a), pairSlot=recovery.MethodSlot(p.CtclientcharVtableRva,c);
+        int update=recovery.Call(o+25);
+        int updateSlot=recovery.MethodSlot(p.CtclientcharVtableRva,update);
+        if(vectorSlot==pairSlot || pairSlot==updateSlot || recovery.Function(update).Start!=update ||
+            b.I32(c+16)+8!=b.I32(c+36) || b.I32(c+16)<0 || b.I32(c+36)>vectorSlot ||
+            p.RootRva!=p.Signatures["root"].Rva+7+b.I32(p.Signatures["root"].Rva+3) || p.RootRva<0 || p.RootRva>=p.ImageSize-8 || b.Executable(p.RootRva,8))
+            throw new IOException("Class method / root linkage changed.");
         if(b.Sha==KnownSha && (p.CtclientgameVtableRva!=0xCDC970 || p.CtclientcharVtableRva!=0xCDBCC0 || !aa.SequenceEqual(new[]{0x70,0x74,0x78}) || !bb.SequenceEqual(new[]{0xB0,0xB4,0xB8}) || p.OwnerToPlayerOffset!=0x2710))throw new IOException("Current anchors mismatch.");
     }
 }

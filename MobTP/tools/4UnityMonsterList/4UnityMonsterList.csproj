@@ -16,4 +16,5 @@
     <EmbeddedResource Include="../PlayerXYZ/signatures.json" LogicalName="PlayerXYZ.signatures.json" />
     <EmbeddedResource Include="../../dist/PlayerXYZ/profiles/9CD77CD0C305359A3048D60C3C2FD837B907E2E61BBF8B828BFCC8E5270E5C28.json" LogicalName="PlayerXYZ.current-profile.json" />
   </ItemGroup>
+  <ItemGroup><ProjectReference Include="../../../Suite/Controls/UnityTools.Controls.csproj" /></ItemGroup>
 </Project>

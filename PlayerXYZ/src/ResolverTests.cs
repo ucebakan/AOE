@@ -13,7 +13,7 @@ static class ResolverTests
         {
             using var b=new Binary(@"C:\Games\4Unity\TClient.exe");var p=Profiles.Load(b);
             Check(p.CoordinateA.SequenceEqual(new[]{0x70,0x74,0x78})&&p.CoordinateB.SequenceEqual(new[]{0xB0,0xB4,0xB8}),"current XYZ offsets derived");
-            Check(p.Signatures.Count==3,"three unique signatures");
+            Check(p.Signatures.Count==4,"four unique signatures");
             int n=Profiles.ScanCount;Profiles.Load(b);Check(Profiles.ScanCount==n,"known SHA no AOB scan");
             p.CoordinateA[0]++;Reject(()=>Profiles.Validate(b,p),"corrupt profile rejected");p.CoordinateA[0]--;
             var data=b.Data.ToArray();
@@ -25,7 +25,7 @@ static class ResolverTests
             using(var changed=new Binary(data))
             {
                 var q=Profiles.Resolve(changed);
-                Check(q.Sha256!=b.Sha&&q.CoordinateA[0]==0x74&&q.CoordinateB[0]==0xC0&&q.OwnerToPlayerOffset==0x2718,"synthetic new SHA extracts changed offsets");
+                Check(q.Sha256!=b.Sha&&q.CoordinateA[0]==0x74&&q.CoordinateB[0]==0xC0&&q.OwnerToPlayerOffset==p.OwnerToPlayerOffset+8,"synthetic new SHA extracts changed offsets");
             }
             data[Raw(a+10)]++;
             using(var broken=new Binary(data))Reject(()=>Profiles.Resolve(broken),"inconsistent XYZ triplet rejected");

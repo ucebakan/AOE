@@ -1,0 +1,246 @@
+[PASS] packet signatures match SHA-256 standard vectors
+[PASS] SafeRead validates inaccessible and cross-region ranges
+[PASS] synthetic capture labels and identity
+[PASS] nine periodic sends require caller, pattern and timing
+[PASS] nine-slot burst is not a one-second sequence
+[PASS] idle comparison suppresses shared one-second keepalive
+[PASS] incompatible target session is excluded
+[PASS] equal captured prefixes do not imply equal full packets
+[PASS] empty and singleton input remains finite
+[PASS] JSON exports raw and grouped research evidence
+[PASS] duration defaults and whole-second 5-30 validation
+[PASS] real seven-timestamp regression is periodic AOE-only and truncated
+[PASS] changing every byte still permits a timing candidate
+[PASS] full eight-event series is retained without inventing an initial event
+[PASS] marker-aligned nine events are consistent with a 1+8 hypothesis
+[PASS] different-size initial event requires unique matching fingerprint and marker
+[PASS] multiple cast markers preserve signed first and nearest relative time
+[PASS] population standard deviation and three tolerance bands
+[PASS] boundary assessment distinguishes room after sequence and missing earlier event
+[PASS] shared periodic background and unknown IDLE cannot become strong candidates
+[PASS] deeper fingerprints separate producers sharing A12B1E and packet size
+[PASS] byte stability mask reports constants distinct values entropy and idle matches
+[PASS] nine tightly spaced 78-byte events are never periodic
+[PASS] v2 export retains v1 fields and adds research evidence
+[PASS] producer argument widths and entry-stack offsets
+[PASS] producer float bit patterns survive NaN infinity and signed zero
+[PASS] producer invalid stack and vector addresses remain diagnostic
+[PASS] producer vector shape validates bounds alignment and sanity
+[PASS] producer vector reads at most 64 pointers and 16 bytes per record
+[PASS] producer field stability retains sequence exact changes and missing data
+[PASS] producer nine event timing and unexpected caller grouping
+[PASS] producer additive JSON retains old fields and nonfinite raw bits
+[PASS] record init mode resolves exact 0x57E35 RVA
+[PASS] record init preserves ECX and decodes primary linked and record fields
+[PASS] record init pointer read failures remain diagnostic
+[PASS] record init classifications are independent
+[PASS] record init JSON includes values validity classifications and summary
+[PASS] budget mode resolves dynamic base plus 0x854049 RVA
+[PASS] budget strict linkedWord0 filter
+[PASS] budget strict record64 filter
+[PASS] budget strict record98 filter
+[PASS] budget strict old34 threshold and floor division
+[PASS] budget arm permits exactly one write claim
+[PASS] budget success records breakpoint removal
+[PASS] failed pointer read produces zero write claims
+[PASS] budget probe reads exact matching layout
+[PASS] process session change invalidates arm
+[PASS] budget JSON serializes successful write
+[PASS] budget JSON serializes compact no-match result
+[PASS] ARM creates persistent TickPatchExperimentState without Capture
+[PASS] tick interval converts both 1000 immediates to 100 with 3/3 readback
+[PASS] tick subtraction converts -1000 to -100
+[PASS] all three validated scheduler patches are required
+[PASS] byte validation failure causes zero writes
+[PASS] second patch failure restores every original instruction
+[PASS] one patched readback mismatch rejects ACTIVE and restores originals
+[PASS] exact patched bytes persist after verified apply
+[PASS] restore requires 3/3 exact original-byte readback
+[PASS] one restore readback mismatch rejects RESTORED verified state
+[PASS] producer counters classify 0209 020A and other
+[PASS] producer 020A timestamps calculate inter-event deltas
+[PASS] experiment survives zero producer events
+[PASS] standalone tick JSON exports without Capture state
+[PASS] tick transaction never modifies record plus 34
+[PASS] process restart invalidates persistent state safely
+[PASS] GUI status requires verified patch and restore readbacks
+[PASS] Initial Nx preserves proven RVAs and dynamic base resolution
+[PASS] count range removes the former 100 cap and accepts the positive Win32 range
+[PASS] only operation 0x0209 starts replay state
+[PASS] first return requires same thread and matching RSP
+[PASS] all required nonvolatile registers are validated
+[PASS] N=1 completes one initial call with zero redirects
+[PASS] N=2 completes two initial calls with one redirect
+[PASS] N=5 completes five initial calls with four redirects
+[PASS] N=100 completes without off-by-one or extra redirect
+[PASS] configured count is frozen after ARM
+[PASS] abort stops all later redirects
+[PASS] failed SetThreadContext commit aborts with zero performed redirect
+[PASS] producer counters and timestamp series are independent
+[PASS] standalone Initial Nx JSON exports configured and observed counts
+[PASS] process restart invalidates pointers and requires new arm
+[PASS] completed 2x reconfigures a fresh Auto Arm 10x experiment
+[PASS] Auto Arm off prepares new target without arming
+[PASS] continuous ON queues the same N after every successful cast
+[PASS] armed unstarted 2x can be replaced safely with armed 5x
+[PASS] active 10x remains frozen while 20x queues for next cast
+[PASS] configuration changes preserve live and profile validation
+[PASS] new process session clears lifecycle results but preserves configuration
+[PASS] completed and aborted state cannot leak into a fresh experiment
+[PASS] last experiment diagnostics remain stable after next arm
+[PASS] lifecycle layer does not alter proven replay implementation
+[PASS] caller mode resolves exact 0x7BB160 RVA and 12 second default
+[PASS] caller trace resolves dynamic module bases
+[PASS] entry snapshot decodes true return address from RSP and return RVA
+[PASS] operationWord0 decodes from R9 and classifies 0209
+[PASS] operationWord0 classifies 020A
+[PASS] return 0x85404E is known 853B10 path
+[PASS] invalid R9 fails safely without classification
+[PASS] invalid return address fails safely
+[PASS] 020A events group by return RVA
+[PASS] caller grouping detects approximately 1000 ms periodic timing
+[PASS] known path periodic summary stays descriptive
+[PASS] static direct calls to 7BB160 are the disassembled approved-build set
+[PASS] caller trace JSON serializes events groups and direct callsites
+[PASS] Target Differential Inspector mode is isolated from Initial Nx replay
+[PASS] prepare releases only the active Initial Nx conflict
+[PASS] operation classification only captures an initial 0x0209
+[PASS] START makes Capture A markable
+[PASS] MARK A disables another mark while waiting for 0x0209
+[PASS] first 0x0209 captures A and enables MARK B
+[PASS] 0x020A after A stays separate and does not disable MARK B
+[PASS] A B C marker pairing preserves independent initial events
+[PASS] cancel current mark returns the slot to empty and preserves completed captures
+[PASS] operation record snapshot is bounded to 0x30 bytes
+[PASS] operation +0 +4 +8 preserve raw dwords and decode float32
+[PASS] non-finite operation coordinates are invalid
+[PASS] player and selected target unavailability do not reject an initial capture
+[PASS] player and monster position paths use their separately verified layouts
+[PASS] initial 0x0209 captures independent selected-target identity
+[PASS] player comparison remains available when selected target is unknown
+[PASS] player and proven target produce both distances and ambiguous classification
+[PASS] MARK-time and initial-0209 snapshots stay distinct across movement
+[PASS] A B C retain independent spatial snapshots and single capture never proves provenance
+[PASS] field comparison highlights a changing A B C scalar
+[PASS] invalid operation and frame pointers fail safely
+[PASS] parsed input accepts semantic ID type data without a 0x0209 word
+[PASS] resolved A B C operation fields remain candidate only
+[PASS] entity+0x660 exact record decoding and actor lookup
+[PASS] capture is bounded to the proven 32-entry maximum
+[PASS] only RDX+0x660 is accepted; generic R12 scanning is gone
+[PASS] failed actor lookup is safe and explicit
+[PASS] A through D target-switch captures are grouped and changed fields are shown
+[PASS] STOP export contains all completed A B C captures
+[PASS] process restart invalidation clears runtime identity, slots, and all A B C streams
+[PASS] Target Differential Inspector implementation contains no write or RIP redirect primitive
+[PASS] in-session inspector breakpoint transition has no gameplay write or RIP redirect
+[PASS] direct selected actor pointer capture
+[PASS] category 2 validation
+[PASS] category 1 candidate rejection
+[PASS] invalid unreadable pointer rejection
+[PASS] ID type resolver success
+[PASS] resolver failure does not create false target
+[PASS] A B C different actor identities prove direct pointer
+[PASS] same actor repeatedly does not prove switching
+[PASS] deselected null state
+[PASS] monster XYZ validates actor link relationship
+[PASS] invalid actor world link rejected
+[PASS] selected target JSON export
+[PASS] one capture cannot become proven
+[PASS] Initial Nx conflict remains mutually exclusive
+[PASS] Differential Inspector operation decoding remains compatible
+[PASS] provenance implementation contains no process write or RIP redirect
+[PASS] hardware breakpoint diagnostic includes all slots
+[PASS] writer event captures RBX and R8
+[PASS] effective destination is RBX plus 0x2318
+[PASS] pre-store and expected stored values remain distinct
+[PASS] post-store is never claimed without observation
+[PASS] global storage uses module base plus profile RVA
+[PASS] RBX global equality is detected
+[PASS] R8 category 2 actor and XYZ validate
+[PASS] monster XYZ rejects a link owned by another actor
+[PASS] R8 category 1 actor classifies as character
+[PASS] null R8 remains safe
+[PASS] unreadable RBX destination is explicit
+[PASS] invalid global pointer is not accepted
+[PASS] selection normal attack and AOE phases are retained
+[PASS] event buffer is bounded to 100
+[PASS] clear events preserves running phase
+[PASS] default mode uses exactly one breakpoint
+[PASS] empty session remains unproven
+[PASS] multiple selection monsters become candidate only
+[PASS] runtime JSON exports explicit observation semantics
+[PASS] disarmed 0x0209 and 0x020A feed canonical live observation
+[PASS] Inspector shared-call observations bridge into same-session evidence
+[PASS] same identity and Inspector stop preserve validation evidence
+[PASS] Research to Play selection does not clear same-session evidence
+[PASS] PID creation SHA and profile identity changes clear evidence
+[PASS] one initial operation is insufficient for replay-critical validation
+[PASS] full 1 plus 9 call-return validation enables only the next cast
+[PASS] periodic returns are required and producer counters stay distinct
+[PASS] canonical operation decoder is used by tracer and Inspector
+[PASS] live validation and Target Inspector contain no gameplay write or RIP redirect
+[PASS] visual reader candidate requires same-thread prep and established AOE operation
+[PASS] periodic 020A resolves an already active AOE visual
+[PASS] unrelated skill does not resolve TSkill
+[PASS] session identity change invalidates cached TSkill
+[PASS] hide writes one uint32 zero and captures no constant original
+[PASS] restore uses dynamically captured original value
+[PASS] restore accepts original already exposed for downstream damage
+[PASS] restore refuses field changed by another owner
+[PASS] zero original is rejected before ownership
+[PASS] manager output is separate from golden project
+[PASS] settings create save and load safely
+[PASS] missing and corrupt settings fall back to safe defaults
+[PASS] settings accept large Initial Calls after removing the former 100 cap
+[PASS] profile JSON loads and selects only matching SHA
+[PASS] all three SHA profiles coexist and select independently
+[PASS] current profile carries recovered per-build layout and differential anchors
+[PASS] Initial Nx static capability is present and new build requires live validation
+[PASS] current profile resolves fresh Inspector addresses without arming replay
+[PASS] current profile fingerprints match the recovered TClient image
+[PASS] unknown build cannot auto attach or arm
+[PASS] profile resolves RVAs from each live module base
+[PASS] PID creation time and module base changes invalidate session
+[PASS] fresh restart creates fresh resolved session
+[PASS] session invalidation destroys every process debugger and replay field
+[PASS] restart increments generation and reloads same SHA profile
+[PASS] fresh debugger and breakpoint state gates runtime armed display
+[PASS] auto arm configuration survives runtime invalidation
+[PASS] failed new-session validation reports exact reason and rejects stale state
+[PASS] auto flow attaches then arms only after validation
+[PASS] startup setting uses only the named per-user Run value
+[PASS] profile and settings persist no runtime pointers or identities
+[PASS] three required manager tabs exist
+[PASS] layout calculations fit normal minimum and maximized pages
+[PASS] layout restore is deterministic and minimum client is enforced
+[PASS] tab display page layouts use an adjusted client rectangle
+[PASS] tab and diagnostics visibility remains deterministic across transitions
+[PASS] research Target Inspector layout fits minimum and maximized pages
+[PASS] Target Inspector start requires attached valid session rather than detached state
+[PASS] armed Initial Nx exposes prepare action and explicit reason
+[PASS] prepared inspector enables start and suppresses Auto Arm race
+[PASS] breakpoint transition failures are visible and recoverable
+[PASS] buffered parent paint preserves native child invalidation
+[PASS] page controls do not clip against the overlapping tab sibling
+[PASS] Research UI keeps READ ONLY label, sequential marker controls, and Auto Arm session gate
+[PASS] Selected Target Provenance UI remains read only and labels the failed live candidate
+[PASS] Target Writer UI is read only, phase labelled, bounded, and mutually exclusive
+[PASS] Target Writer path contains no gameplay write or RIP redirect
+[PASS] Initial Calls remains editable and configures a separate next experiment
+[PASS] Initial Nx ARM control is an explicit continuous ON OFF latch
+[PASS] diagnostics snapshot contains stable copy fields and resolved addresses
+[PASS] diagnostics cache avoids duplicate and interactive updates
+[PASS] diagnostics freeze retains latest and does not mutate runtime session
+[PASS] golden executable hash is unchanged during manager tests
+[PASS] duration bounds manual stop and multiple cast markers on the actual engine
+[PASS] 13 second timed capture reports elapsed remaining and exact requested end
+[PASS] producer mode uses the hardware entry breakpoint and preserves cleanup
+[PASS] hardware trace covers existing and newly created threads
+[PASS] idle detach and repeated attach preserve target execution
+[PASS] destructor performs normal cleanup while capture is active
+[PASS] detach during concurrent sends drains owned exceptions
+[PASS] normal target exit ends capture and debugger ownership
+[PASS] occupied hardware slots fail safely without overwriting state
+[PASS] immediate attachment cancellation leaves target running
+245 test groups passed. No TClient attachment was performed.

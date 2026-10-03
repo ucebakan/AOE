@@ -96,14 +96,14 @@ static class SelfTests
             var restarted = new PatchSet(m); restarted.Import(JsonSerializer.Deserialize<List<OwnedCell>>(saved)!); restarted.Apply([], true);
             Assert(m.Cells[1][0] == 0x88 && m.Cells[2][0] == 0xC6 && m.Cells[3][0] == 0 && m.Cells[4][0] == 85, "recovery failed");
         });
-        Test("Current TClient SHA and all five unique signatures", () =>
+        Test("Current TClient SHA and all eight unique signatures", () =>
         {
             byte[] disk = Profile.VerifyDisk();
             Assert(Profile.FindSites(disk).SequenceEqual(Profile.Signatures.Select(s => s.Rva)), "unique sites");
             Assert(Profile.At(disk, Profile.Writer1, 6).SequenceEqual(Profile.Original1), "writer 1");
             Assert(Profile.At(disk, Profile.Writer2, 7).SequenceEqual(Profile.Original2), "writer 2");
-            Assert(Profile.At(disk, 0x86DE04, 7).SequenceEqual(Convert.FromHexString("80BFE207000000")), "stealth 1");
-            Assert(Profile.At(disk, 0x7A09B7, 7).SequenceEqual(Convert.FromHexString("413887E2070000")), "stealth 2");
+            Assert(BitConverter.ToInt32(Profile.At(disk, Profile.Signatures[2].Rva+2, 4))==Profile.Stealth, "stealth 1");
+            Assert(BitConverter.ToInt32(Profile.At(disk, Profile.Signatures[3].Rva+16, 4))==Profile.Stealth, "stealth 2");
             long col = BitConverter.ToInt64(Profile.At(disk, Profile.Vtable - 8, 8)) - 0x140000000;
             long descriptor = BitConverter.ToUInt32(Profile.At(disk, col + 12, 4));
             string name = System.Text.Encoding.ASCII.GetString(Profile.At(disk, descriptor + 16, 32)).Split('\0')[0];
@@ -117,7 +117,7 @@ static class SelfTests
             for (int i = 0; i < 20; i++) Assert(ReferenceEquals(first, Profile.VerifyDisk()), "disk cache missed");
             Assert(Profile.ScanCount == before, "unexpected full scan");
         });
-        Test("Unknown SHA requires approval; approved profile persists and reloads without scanning", () =>
+        Test("Unknown SHA automatically scans; live-validated profile persists and reloads", () =>
         {
             string original = Profile.GamePath, directory = Profile.DirectoryPath;
             string temp = Path.Combine(Path.GetTempPath(), "InvisibleAggro-test-" + Guid.NewGuid());
@@ -137,10 +137,8 @@ static class SelfTests
                 Profile.DirectoryPath = Path.Combine(temp, "profiles");
                 File.WriteAllBytes(Profile.GamePath, image.Concat(new byte[] { 0x42 }).ToArray());
                 int before = Profile.ScanCount;
-                bool blocked = false;
-                try { Profile.VerifyDisk(force: true); } catch (InvalidOperationException) { blocked = true; }
-                Assert(blocked && Profile.NeedsApproval && Profile.ScanCount == before, "automatic scanning or unknown build accepted");
-                Profile.ScanApproved();
+                Profile.VerifyDisk(force: true);
+                Assert(Profile.NeedsApproval && Profile.ScanCount == before+1, "unknown build did not scan automatically");
                 Assert(Profile.Writer1 == previousRva + 0x300 + 20, "moved writer was not resolved");
                 Assert(Profile.ScanCount == before + 1 && !Directory.Exists(Profile.DirectoryPath), "candidate prematurely persisted");
                 Profile.Commit(); // Simulates the live-validation gate, without a process or any memory writes.
@@ -148,9 +146,8 @@ static class SelfTests
                 Assert(Profile.Writer1 == previousRva + 0x300 + 20, "moved address not persisted");
                 Assert(!Profile.NeedsApproval && Profile.ScanCount == before + 1, "saved SHA was rescanned");
                 File.WriteAllText(Path.Combine(Profile.DirectoryPath, Profile.ActiveSha + ".json"), "{}");
-                blocked = false;
-                try { Profile.VerifyDisk(force: true); } catch (InvalidOperationException) { blocked = true; }
-                Assert(blocked && Profile.NeedsApproval && Profile.ScanCount == before + 1, "corrupt profile accepted");
+                Profile.VerifyDisk(force: true);
+                Assert(Profile.NeedsApproval && Profile.ScanCount == before + 2, "corrupt profile did not recover");
             }
             finally
             {

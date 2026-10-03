@@ -75,7 +75,7 @@ bool VerifyTarget(uint32_t pid,const std::filesystem::path& path,uint64_t rva,bo
     process=nullptr;target={};TargetInfo info;info.pid=pid;info.traceRva=rva;if(!InspectImage(path,rva,info.image,error)){target=info;return false;}
     if(!fixture&&(!profile||profile->targetSha256!=info.image.sha256||ProfileTraceRva(*profile,TraceMode::Initial2x)==0)){target=info;error="Target SHA-256 has no matching validated runtime profile. Attachment refused.";return false;}
     AoeLocatorResult aoeEvidence;
-    if(!fixture&&profile->runtime.aoeLocatorRequired&&(!LocateAoeImage(path,aoeEvidence,error)||!ValidateAoeProfile(*profile,aoeEvidence,error))){target=info;return false;}
+    if(!fixture&&profile->runtime.aoeLocatorRequired&&(!LocateAoeImage(path,aoeEvidence,error,profile)||!ValidateAoeProfile(*profile,aoeEvidence,error))){target=info;return false;}
     DWORD access=PROCESS_QUERY_INFORMATION|PROCESS_VM_READ;if(allowWrite)access|=PROCESS_VM_WRITE|PROCESS_VM_OPERATION;
     HANDLE h=OpenProcess(access,FALSE,pid);if(!h){error=WinError(allowWrite?"OpenProcess(query/read/write) PID "+std::to_string(pid):"OpenProcess(query/read) PID "+std::to_string(pid),GetLastError());target=info;return false;}
     auto fail=[&](const std::string& message){error=message;target=info;CloseHandle(h);return false;};

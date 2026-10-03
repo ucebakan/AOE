@@ -49,11 +49,13 @@ sealed class NativeTool : Panel
     }
     void ResizeTool() { if (ToolWindow != 0) MoveWindow(ToolWindow, 0, 0, ClientSize.Width, ClientSize.Height, true); }
     internal void StopForSafety() { if (ToolWindow != 0) stop(ToolWindow); }
-    internal bool TryClose()
+    internal bool TryClose() => CloseStep() == ShutdownResult.Complete;
+    internal ShutdownResult CloseStep()
     {
-        if (ToolWindow == 0) return true;
-        if (close(ToolWindow) == 0) return false;
-        ToolWindow = 0; return true;
+        if (ToolWindow == 0) return ShutdownResult.Complete;
+        int result = close(ToolWindow);
+        if (result <= 0) return result < 0 ? ShutdownResult.Pending : ShutdownResult.Failed;
+        ToolWindow = 0; return ShutdownResult.Complete;
     }
     protected override void Dispose(bool disposing) { if (disposing && ToolWindow != 0) TryClose(); base.Dispose(disposing); }
     [DllImport("user32.dll")] static extern bool MoveWindow(nint h, int x, int y, int w, int height, bool repaint);

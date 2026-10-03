@@ -4,10 +4,12 @@ namespace SpeedJump;
 
 sealed partial class MainForm
 {
+    internal bool SuiteClosing => closing;
+    internal void SuiteQuiesce() { timer.Stop(); Enabled = false; }
     internal bool SuiteReady => engine.View.Ready && !busy && !closing;
     internal bool SuiteActive(bool isJump) => isJump ? engine.View.Jump : engine.View.Speed;
     internal string SuiteMessage => engine.View.Message;
-    internal async Task SuiteRefreshAsync() { while (busy && !closing) await Task.Delay(30); if (!closing) { await Work(engine.Poll); timer.Start(); } }
+    internal async Task SuiteRefreshAsync() { while (busy && !closing) await Task.Delay(30); if (!closing) { await Work(engine.Poll); if (Enabled) timer.Start(); } }
     internal Task SuiteToggleAsync(bool isJump) => Work(() => engine.Toggle(isJump));
     internal void ConfigureSuiteLayout()
     {

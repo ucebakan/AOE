@@ -1,0 +1,101 @@
+{
+  "status": "PASS",
+  "sha": "98FAFD5A7616A4A33959713093B46E425C883B6D00CC1475EEB82BC50F78C77A",
+  "failed": 0,
+  "checks": [
+    {
+      "name": "XYZ automatic recovery and SHA cache",
+      "status": "PASS",
+      "detail": {
+        "RootRva": 16080168,
+        "OwnerToPlayerOffset": 10080,
+        "CoordinateA": [
+          112,
+          116,
+          120
+        ],
+        "CoordinateB": [
+          176,
+          180,
+          184
+        ],
+        "CtclientcharVtableRva": 14281512
+      }
+    },
+    {
+      "name": "Speed/Jump automatic recovery and SHA cache",
+      "status": "PASS",
+      "detail": {
+        "RootRva": 16080168,
+        "OwnerToPlayerOffset": 10080,
+        "SpeedFieldOffset": 4764,
+        "JumpFieldOffset": 2280,
+        "JumpWriterRva": 2100889
+      }
+    },
+    {
+      "name": "Recovered root rebuilds current pointers under ASLR",
+      "status": "PASS",
+      "detail": "Both bases rebuilt; missing root and changed live getter rejected"
+    },
+    {
+      "name": "Invisible/Aggro automatic fields and exact writer bytes",
+      "status": "PASS",
+      "detail": {
+        "Context": 16080168,
+        "Player": 10080,
+        "ActorId": 1904,
+        "ActorType": 2025,
+        "Stealth": 2026,
+        "Visual": 1150
+      }
+    },
+    {
+      "name": "MobTP automatic recovery and SHA cache",
+      "status": "PASS",
+      "detail": {
+        "RootRva": 16080168,
+        "ActorIdOffset": 1904,
+        "ActorTypeOffset": 2025,
+        "HomeOffset": 5000,
+        "ActorSize": 5072
+      }
+    },
+    {
+      "name": "AOE automatic profile, loader and live gate",
+      "status": "PASS",
+      "detail": "C:\\Users\\xaofx\\AppData\\Local\\Temp\\4UnityTools-tests\\11368\\AOE\\profiles\\98FAFD5A7616A4A33959713093B46E425C883B6D00CC1475EEB82BC50F78C77A.json"
+    },
+    {
+      "name": "Counter/Exit automatic disk recovery",
+      "status": "PASS",
+      "detail": "Counter\u002BExit resolved: root=f55d28 count=1188 exit=334fb0"
+    },
+    {
+      "name": "Multikill semantic recovery",
+      "status": "PASS",
+      "detail": {
+        "Sha256": "98FAFD5A7616A4A33959713093B46E425C883B6D00CC1475EEB82BC50F78C77A",
+        "ImageSize": 17178624,
+        "Timestamp": 1791031139,
+        "SignatureRva": 1645214,
+        "PatchOffset": 16,
+        "Aob": "0FC6D2000F51CAF3410F1046480F2FC10F86780100008BBF7007000085FF0F846A010000488B442460482B44245848C1F8034883F8400F8352010000B908000000E82CD29D004C8BF88938C6400402",
+        "Original": "0F8678010000",
+        "Patched": "0F8478010000"
+      }
+    },
+    {
+      "name": "Changed SHA extracts new fields; inconsistent layout rejected",
+      "status": "PASS",
+      "detail": "Changed offsets recovered; inconsistent triplet and root rejected"
+    },
+    {
+      "name": "Missing and duplicate anchor rejection",
+      "status": "PASS",
+      "detail": "Missing and ambiguous roots rejected"
+    }
+  ],
+  "game_memory_writes": 0,
+  "feature_activation": 0
+}

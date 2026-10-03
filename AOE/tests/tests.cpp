@@ -147,7 +147,9 @@ void Attach(aoe::Tracer& tracer,const Fixture& fixture) {
     Require(status.target.verified,"fixture runtime identity verified");
 }
 void Detach(aoe::Tracer& tracer) {
+    Require(!tracer.detachComplete(), "attached tracer worker must not report complete");
     tracer.detach();
+    Require(Until([&]{return tracer.detachComplete();}), "detach completion waits for worker cleanup/resources");
     Require(Until([&]{const auto p=tracer.status().phase;return p==aoe::Phase::Detached||p==aoe::Phase::Failed||p==aoe::Phase::CleanupBlocked;}),"detach timeout");
     const auto status=tracer.status();
     Require(status.phase==aoe::Phase::Detached,"detach failed: "+status.message+" "+status.lastError);

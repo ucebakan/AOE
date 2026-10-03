@@ -19,6 +19,7 @@ struct AoeLocatorResult {
     uint64_t preferredBase=0;
     std::vector<AoeSignatureResult> signatures;
     bool ready=false;
+    bool cacheUsed=false;
     std::string error;
     // Exact disk bytes from all validated semantic neighborhoods, for read-only
     // live comparison. No wildcard bytes are ignored by the runtime safety gate.
@@ -27,11 +28,14 @@ struct AoeLocatorResult {
     VisualReaderCandidate visualReader;
     bool visualReady=false;
     std::string visualError;
+    uint64_t prepDistance=29;
+    RuntimeLayout recovered;
 };
 std::vector<size_t> MatchAoePattern(const std::vector<uint8_t>& bytes,const std::string& pattern);
 bool DecodeAoeCall(const std::vector<uint8_t>& bytes,uint64_t instructionRva,uint64_t imageSize,uint64_t& target);
 std::vector<VisualReaderCandidate> DecodeVisualReaderSequences(const std::vector<uint8_t>& bytes,uint64_t baseRva,uint64_t imageSize);
-bool LocateAoeImage(const std::filesystem::path& path,AoeLocatorResult& result,std::string& error);
+bool LocateAoeImage(const std::filesystem::path& path,AoeLocatorResult& result,std::string& error,const BuildProfile* cached=nullptr);
 bool ValidateAoeProfile(const BuildProfile& profile,const AoeLocatorResult& result,std::string& error);
 bool ValidateAoeLive(HANDLE process,const TargetInfo& target,const AoeLocatorResult& result,std::string& error);
+bool RecoverAndSaveAoeProfile(const std::filesystem::path& image,const std::filesystem::path& directory,BuildProfile& profile,std::filesystem::path& selected,std::string& error);
 }

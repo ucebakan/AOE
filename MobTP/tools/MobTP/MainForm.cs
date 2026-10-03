@@ -55,7 +55,7 @@ sealed partial class MainForm : Form
         clear.Click+=(_,_)=>{hotkey?.Dispose();hotkey=null;settings=settings with{Hotkey=null};keyStatus.Text="Kısayol: atanmamış";try{settings.Save();}catch(Exception ex){result.Text=ex.Message;}};
         retry.Click+=async(_,_)=>{ProfileStore.Retry();await RefreshWorld();};
         spread.ValueChanged+=(_,_)=>{settings=settings with{Spread=spread.Value};if(last is not null)Render(last);if(!preview)try{settings.Save();}catch(Exception ex){result.Text=ex.Message;}};
-        if(!preview)Shown+=async(_,_)=>{if(settings.Hotkey is not null)AssignKey(settings.Hotkey);await RefreshWorld();timer.Start();};
+        if(!preview)Shown+=async(_,_)=>{if(settings.Hotkey is not null)AssignKey(settings.Hotkey);await RefreshWorld();if (Enabled) timer.Start();};
         FormClosing+=async(_,e)=>{
             if(allowClose)return;e.Cancel=true;if(closing)return;
             closing=true;timer.Stop();cancellation.Cancel();hotkey?.Dispose();
