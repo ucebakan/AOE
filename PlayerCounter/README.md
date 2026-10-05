@@ -1,5 +1,10 @@
 # PlayerCounter 1.1 — Counter + Exit
 
+The shared source in Suite 0.8.1 fixes `RequestExit()` dropping the recovered
+profile at the final live plan. Readiness and dispatch now use the same current
+profile; omitting the plan's profile argument is a compile error. Prior
+standalone release binaries are unchanged. See [Suite fix](../Suite/COUNTER-EXIT-0.8.1.md).
+
 Native Windows x64, C++20/Win32 status badge. The deliverable is `PlayerCounter/releases/1.1.0/PlayerCounter.exe`; it needs no .NET or separate Visual C++ runtime installation (static CRT).
 
 Close the previous badge, launch this EXE and accept the Windows administrator permission prompt. It automatically searches for the unique `C:\Games\4Unity\TClient.exe` process. Drag the counter with the left mouse button. The red **Exit** button requests a return to character selection; it does not close PlayerCounter. Right-click the counter and select **PlayerCounter'ı kapat** to close the badge. There is no console, title bar, or taskbar button. The badge stays above other ordinary desktop windows; exclusive fullscreen games may cover desktop windows.

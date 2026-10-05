@@ -56,7 +56,11 @@ struct Handle {
 
 std::filesystem::path ExePath() {
     std::wstring buffer(32768,L'\0');
-    const DWORD count=GetModuleFileNameW(nullptr,buffer.data(),static_cast<DWORD>(buffer.size()));
+    HMODULE module=nullptr;
+#ifdef AOE_TEST_LIBRARY
+    Require(GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS|GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,reinterpret_cast<LPCWSTR>(&ExePath),&module)!=FALSE,"test library module");
+#endif
+    const DWORD count=GetModuleFileNameW(module,buffer.data(),static_cast<DWORD>(buffer.size()));
     Require(count>0&&count<buffer.size(),"test executable path");
     buffer.resize(count); return buffer;
 }
@@ -266,6 +270,31 @@ void AnalyzerTests(const std::filesystem::path& artifacts) {
 }
 
 void TracerTests(const std::filesystem::path& fixtureImage,const std::filesystem::path& artifacts) {
+    Check("concurrent Initial hits survive visual setup cancellation and reconfiguration",[&]{
+        for(unsigned round=0;round<6;++round){
+            Fixture fixture(fixtureImage,artifacts);
+            const DWORD first=DWORD(fixture.metadata.at("thread1")),second=DWORD(fixture.metadata.at("thread2"));
+            const auto originalFirst=ReadDebugState(first),originalSecond=ReadDebugState(second);
+            const auto originalCode=ReadCode(fixture);
+            aoe::RuntimeLayout layout;layout.initialNxAvailable=true;layout.liveValidationRequired=false;
+            layout.initialPrepRva=fixture.metadata.at("trace_rva");layout.initialCallRva=fixture.metadata.at("dormant_rva");layout.initialReturnRva=layout.initialCallRva+1;layout.producerRva=layout.initialCallRva+2;
+            layout.visualSuppressionAvailable=true;layout.visualReaderRva=layout.initialCallRva+3;layout.visualLookupRva=layout.initialCallRva;layout.visualFieldOffset=0x8C;layout.visualBaseRegister=aoe::X64RegisterId::Rdx;
+            uint8_t byte=0;SIZE_T read=0;Require(ReadProcessMemory(fixture.process.value,reinterpret_cast<const void*>(fixture.metadata.at("base")+layout.visualReaderRva),&byte,1,&read)&&read==1,"fixture reader fingerprint");layout.visualReaderBytes={byte};
+            aoe::Tracer tracer;std::string error;Require(tracer.attachInitialFixture(uint32_t(fixture.metadata.at("pid")),fixture.image,layout,error),error);
+            Require(Until([&]{auto s=tracer.status();return s.phase==aoe::Phase::Attached&&s.initialBreakpointsReady;}),"Initial fixture attached");
+            SetEvent(fixture.start.value);
+            Require(tracer.requestVisualCapture(error),error);
+            Require(Until([&]{auto s=tracer.status();return s.visual.readerCoverageActive&&s.visual.captureBreakpointActive;}),"reader capture enabled while core events run");
+            Require(tracer.cancelVisualCapture(error),error);
+            Require(Until([&]{return !tracer.status().visual.captureBreakpointActive;}),"capture cancellation completed");
+            Require(tracer.requestVisualCapture(error),error);
+            Require(Until([&]{return tracer.status().visual.captureBreakpointActive;}),"same reader reused without clearing core DR6");
+            Require(WaitForSingleObject(fixture.done.value,10000)==WAIT_OBJECT_0,"concurrent fixture finished all calls");
+            Require(Until([&]{return tracer.status().totalHits==60;}),"all sixty Initial prep events retained");
+            auto status=tracer.status();Require(status.phase==aoe::Phase::Attached&&status.initialBreakpointsReady&&status.visual.readerCoverageActive&&status.lastError.empty(),"both functions retain debugger ownership without detach");
+            Detach(tracer);Require(ReadDebugState(first)==originalFirst&&ReadDebugState(second)==originalSecond,"transition cleanup restores exact original DR state");Require(ReadCode(fixture)==originalCode,"transition writes no code bytes");fixture.Finish();
+        }
+    });
     Check("duration bounds manual stop and multiple cast markers on the actual engine",[&] {
         Fixture fixture(fixtureImage,artifacts);aoe::Tracer tracer;Attach(tracer,fixture);std::string error;aoe::Marker one,two;
         Require(!tracer.markAoeCast(one,error),"marker outside capture rejected");

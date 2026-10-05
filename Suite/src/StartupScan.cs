@@ -12,7 +12,7 @@ interface IStartupProbe { Task<ScanResult> ProbeAsync(Feature feature); }
 sealed class StartupScan
 {
     internal static readonly Feature[] Order = [Feature.Coordinates, Feature.Speed, Feature.Jump, Feature.Invisible,
-        Feature.Aggro, Feature.MobTP, Feature.Aoe, Feature.Counter, Feature.Multikill];
+        Feature.Aggro, Feature.MobTP, Feature.Aoe, Feature.Counter, Feature.Multikill, Feature.Salesman, Feature.Collection];
     internal bool Busy { get; private set; }
     internal Dictionary<Feature, ScanResult> Results { get; } = new();
     internal async Task RunAsync(IStartupProbe probe, Action<ScanResult> progress, CancellationToken token)
@@ -57,7 +57,7 @@ sealed class LiveStartupProbe(ToolWorkspace workspace, FeatureActions actions) :
                 "Yüklü araç: " + state.Message);
         }
         if (page is 2 or 3 && shared.TryGetValue(page, out var previous)) return previous with { Feature = feature };
-        var result = feature == Feature.Counter ? await CounterAsync() : await Task.Run(() => Probe(feature));
+        var result = feature == Feature.Counter ? await CounterAsync() : feature == Feature.Salesman ? await SalesmanAsync() : feature == Feature.Collection ? await CollectionAsync() : await Task.Run(() => Probe(feature));
         if (page is 2 or 3) shared[page] = result;
         return result;
     }
@@ -125,6 +125,16 @@ sealed class LiveStartupProbe(ToolWorkspace workspace, FeatureActions actions) :
             (profile.Length > 0 ? profile + " · Canlı doğrulama bekliyor: " : "") + ex.Message); }
     }
     static string Source(bool cached) => cached ? "SHA profili yüklendi; tam tarama yapılmadı" : "Yeni profil tarandı ve kaydedildi";
+    static async Task<ScanResult> SalesmanAsync()
+    {
+        try { return new(Feature.Salesman, ScanStatus.Ready, await Salesman.Controller.ProbeAsync()); }
+        catch (Exception ex) { return new(Feature.Salesman, ScanStatus.Waiting, ex.Message); }
+    }
+    static async Task<ScanResult> CollectionAsync()
+    {
+        try { return new(Feature.Collection, ScanStatus.Ready, await Collection.Controller.ProbeAsync()); }
+        catch (Exception ex) { return new(Feature.Collection, ScanStatus.Waiting, ex.Message); }
+    }
     static ScanResult Ready(Feature feature, string source, int pid) => new(feature, ScanStatus.Ready, $"{source} · PID {pid} · canlı yol doğrulandı. İşlev kapalı.");
     static async Task<ScanResult> CounterAsync()
     {

@@ -11,6 +11,7 @@ sealed partial class MainForm : Form
     readonly TextBox result=new(){Multiline=true,ReadOnly=true,Dock=DockStyle.Fill,ScrollBars=ScrollBars.Vertical,Text="Düğme, Home sınırına uyan mobları çevrene taşır."};
     readonly Button tp=new(){Text="UYGUN MOBLARI YANIMA GETİR",AutoSize=true,Height=45,Padding=new(12),Enabled=false};
     readonly NumericUpDown spread=new(){Minimum=1,Maximum=10,DecimalPlaces=1,Increment=0.5m,Value=2,Width=75};
+    readonly NumericUpDown homeRange=new(){Name="HomeRange",Minimum=0.1m,Maximum=decimal.MaxValue,DecimalPlaces=1,Increment=1,Value=50,Width=110};
     readonly CheckBox show=new(){Text="Arka plandaki mob listesini göster",AutoSize=true};
     readonly ComboBox distanceOrder=new UnityTools.Controls.ReadableComboBox(){DropDownStyle=ComboBoxStyle.DropDownList,Width=170};
     readonly TextBox keyBox=new(){ReadOnly=true,Width=180,Text="Tıklayıp tuşa basın"};
@@ -28,13 +29,13 @@ sealed partial class MainForm : Form
     public MainForm(bool preview=false)
     {
         Text="MobTP 2.1 · 4Unity";ClientSize=new(1030,700);MinimumSize=new(1000,650);StartPosition=FormStartPosition.CenterScreen;DoubleBuffered=true;
-        if(!preview){settings=UserSettings.Load();spread.Value=settings.Spread;}
+        if(!preview){settings=UserSettings.Load();spread.Value=settings.Spread;homeRange.Value=settings.HomeRange;}
         var layout=new TableLayoutPanel{Dock=DockStyle.Fill,ColumnCount=1,RowCount=8,Padding=new(16)};
         foreach(float height in new[]{36f,32f,60f,65f,45f,75f,30f})layout.RowStyles.Add(new(SizeType.Absolute,height));
         layout.RowStyles.Add(new(SizeType.Percent,100));Controls.Add(layout);
         layout.Controls.Add(state,0,0);layout.Controls.Add(player,0,1);layout.Controls.Add(count,0,2);
         var buttons=new FlowLayoutPanel{Dock=DockStyle.Fill};
-        buttons.Controls.AddRange([tp,new Label{Text="Çevre mesafesi",AutoSize=true,Margin=new(20,20,3,0)},spread,new Label{Text="Home sınırı: 50 XZ",AutoSize=true,Margin=new(16,20,3,0)}]);
+        buttons.Controls.AddRange([tp,new Label{Text="Çevre mesafesi",AutoSize=true,Margin=new(20,20,3,0)},spread,new Label{Text="Home range (XZ)",AutoSize=true,Margin=new(16,20,3,0)},homeRange]);
         var keys=new FlowLayoutPanel{Dock=DockStyle.Fill};var assign=new Button{Text="Tuşu ata",AutoSize=true};var clear=new Button{Text="Kaldır",AutoSize=true};var retry=new Button{Text="Profili yeniden kontrol et",AutoSize=true};
         keys.Controls.AddRange([keyBox,assign,clear,keyStatus,retry]);
         layout.Controls.Add(buttons,0,3);layout.Controls.Add(keys,0,4);layout.Controls.Add(result,0,5);var listOptions=new FlowLayoutPanel{Dock=DockStyle.Fill};
@@ -55,6 +56,7 @@ sealed partial class MainForm : Form
         clear.Click+=(_,_)=>{hotkey?.Dispose();hotkey=null;settings=settings with{Hotkey=null};keyStatus.Text="Kısayol: atanmamış";try{settings.Save();}catch(Exception ex){result.Text=ex.Message;}};
         retry.Click+=async(_,_)=>{ProfileStore.Retry();await RefreshWorld();};
         spread.ValueChanged+=(_,_)=>{settings=settings with{Spread=spread.Value};if(last is not null)Render(last);if(!preview)try{settings.Save();}catch(Exception ex){result.Text=ex.Message;}};
+        homeRange.ValueChanged+=(_,_)=>{settings=settings with{HomeRange=homeRange.Value};if(last is not null)Render(last);if(!preview)try{settings.Save();}catch(Exception ex){result.Text=ex.Message;}};
         if(!preview)Shown+=async(_,_)=>{if(settings.Hotkey is not null)AssignKey(settings.Hotkey);await RefreshWorld();if (Enabled) timer.Start();};
         FormClosing+=async(_,e)=>{
             if(allowClose)return;e.Cancel=true;if(closing)return;
@@ -85,25 +87,26 @@ sealed partial class MainForm : Form
     async Task Teleport(int? hotkeyPid=null)
     {
         if (UnityTools.Controls.OperationGate.Blocked) return;
-        if(moving||closing)return;moving=true;tp.Enabled=false;spread.Enabled=false;
+        if(moving||closing)return;moving=true;tp.Enabled=false;spread.Enabled=false;homeRange.Enabled=false;
         double radius=(double)spread.Value;
+        double selectedHomeRange=(double)homeRange.Value;
         await gate.WaitAsync();
         try
         {
             if(closing)return;
             result.Text="Güncel moblar doğrulanıyor ve uygun olanlar taşınıyor…";
-            var outcome=await Task.Run(()=>Engine.Teleport(radius,cancellation.Token,hotkeyPid));
+            var outcome=await Task.Run(()=>Engine.Teleport(radius,selectedHomeRange,cancellation.Token,hotkeyPid));
             if(!closing)result.Text=outcome.Message+Environment.NewLine+"Kayıt: "+outcome.Log;
         }
         catch(Exception ex){if(!closing)result.Text=ex.Message;}
-        finally{gate.Release();moving=false;if(!closing){spread.Enabled=true;await RefreshWorld();}}
+        finally{gate.Release();moving=false;if(!closing){spread.Enabled=true;homeRange.Enabled=true;await RefreshWorld();}}
     }
     internal void Render(World w)
     {
         last=w;state.Text=w.Status+" · "+w.Time.ToString("HH:mm:ss");
         player.Text=w.Player is null?"Oyuncu XYZ: —":$"Oyuncu XYZ: {w.Player.X:F3} / {w.Player.Y:F3} / {w.Player.Z:F3}";
-        var plan=Placement.Plan(w,(double)spread.Value);int eligible=plan.Count(p=>p.Eligible);
-        count.Text=$"Yüklenen mob: {w.Mobs.Count}     Home ≤ 50: {plan.Length}\r\nTeleport koşullarını sağlayan: {eligible}";
+        var plan=Placement.Plan(w,(double)spread.Value,(double)homeRange.Value);int eligible=plan.Count(p=>p.Eligible);
+        count.Text=$"Yüklenen mob: {w.Mobs.Count}     Home ≤ {homeRange.Value:0.#}: {plan.Length}\r\nTeleport koşullarını sağlayan: {eligible}";
         tp.Enabled=!moving&&w.Player is not null&&eligible>0;
         int top=grid.FirstDisplayedScrollingRowIndex;
         var ids=w.Mobs.Select(m=>m.Mob.ActorPtr).ToHashSet();

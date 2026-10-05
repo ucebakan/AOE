@@ -32,7 +32,9 @@ std::optional<uint64_t> ReadCount(const Read& read, uintptr_t base,const Recover
 struct ExitPlan { uintptr_t context, root, function; };
 bool ValidateExitImage(std::span<const unsigned char> image,const RecoveredProfile* profile=nullptr);
 bool ValidateExitCode(const Read& read, uintptr_t base,const RecoveredProfile* profile=nullptr);
-std::optional<ExitPlan> PrepareExit(const Read& read, uintptr_t base,const RecoveredProfile* profile=nullptr);
+// The action path must explicitly choose the recovered profile. An omitted
+// argument must never silently select pre-update fixed RVAs.
+std::optional<ExitPlan> PrepareExit(const Read& read, uintptr_t base,const RecoveredProfile* profile);
 enum class Tone { Missing, Normal, Alert };
 inline Tone Color(std::optional<uint64_t> count) { return !count ? Tone::Missing : *count >= 5 ? Tone::Alert : Tone::Normal; }
 

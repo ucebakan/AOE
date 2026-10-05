@@ -88,6 +88,7 @@ public:
     std::vector<std::shared_ptr<Capture>> takeCompleted();
     // Fixture-only seam; exact image/session/RVA verification still applies. Never calls game input.
     bool attachFixture(uint32_t pid,const std::filesystem::path& image,uint64_t rva,std::string& error,TraceMode mode=TraceMode::Queue);
+    bool attachInitialFixture(uint32_t pid,const std::filesystem::path& image,const RuntimeLayout& runtime,std::string& error);
 private:
     bool begin(uint32_t pid,std::filesystem::path path,uint64_t rva,bool fixture,std::string& error,TraceMode mode,BuildProfile profile={});
     void run(uint32_t pid,std::filesystem::path path,uint64_t rva,bool fixture,TraceMode mode,BuildProfile profile);
@@ -96,7 +97,7 @@ private:
     std::thread worker_;
     std::atomic<bool> workerFinished_{true};
     std::atomic<bool> detachRequested_{false},stopCaptureRequested_{false},invalidateLiveValidationOnDetach_{false},preserveLiveValidationOnDetach_{false};
-    std::atomic<int> tickRequest_{0},initialRequest_{0},inspectorRequest_{0},visualRequest_{0};
+    std::atomic<int> tickRequest_{0},initialRequest_{0},inspectorRequest_{0},visualRequest_{0},visualSuppressionRequest_{0};
     Status status_;
     LiveValidationState liveValidation_;
     std::shared_ptr<Capture> capture_;

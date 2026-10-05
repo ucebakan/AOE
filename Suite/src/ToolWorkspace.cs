@@ -28,6 +28,8 @@ sealed class ToolWorkspace : IDisposable
                 case 2: var speed = new SpeedJump.MainForm(preview); speed.ConfigureSuiteLayout(); form = speed; break;
                 case 3: var invisible = new InvisibleAggro.MainForm(preview); invisible.ConfigureSuiteLayout(); form = invisible; break;
                 case 8: form = new Multikill.MainForm(preview); break;
+                case 9: form = new Salesman.SalesmanForm(preview); break;
+                case 10: form = new Collection.CollectionForm(preview); break;
                 case 4: var mob = new MobTP.MainForm(preview); mob.ConfigureSuiteLayout(); form = mob; break;
                 default: throw new ArgumentOutOfRangeException(nameof(index));
             }
@@ -64,6 +66,8 @@ sealed class ToolWorkspace : IDisposable
             switch (form)
             {
                 case Multikill.MainForm f: f.SuiteQuiesce(); break;
+                case Salesman.SalesmanForm f: f.SuiteQuiesce(); break;
+                case Collection.CollectionForm f: f.SuiteQuiesce(); break;
                 case PlayerXYZ.MainForm f: f.SuiteQuiesce(); break;
                 case SpeedJump.MainForm f: f.SuiteQuiesce(); break;
                 case InvisibleAggro.MainForm f: f.SuiteQuiesce(); break;
@@ -98,6 +102,16 @@ sealed class ToolWorkspace : IDisposable
             return ShutdownResult.Pending;
         }
         if (!Forms.TryGetValue(index, out var form)) return ShutdownResult.Complete;
+        if (form is Salesman.SalesmanForm salesman)
+        {
+            if (!await salesman.SuiteStopAsync()) return ShutdownResult.Failed;
+            salesman.Close(); Remove(index); return ShutdownResult.Complete;
+        }
+        if (form is Collection.CollectionForm collection)
+        {
+            if (!await collection.SuiteStopAsync()) return ShutdownResult.Pending;
+            collection.Close(); Remove(index); return ShutdownResult.Complete;
+        }
         if (!form.IsDisposed && !IsClosing(form)) form.Close();
         while (!form.IsDisposed)
         {

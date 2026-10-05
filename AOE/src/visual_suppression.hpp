@@ -8,7 +8,7 @@ const char* VisualRuntimePhaseName(VisualRuntimePhase phase);
 
 struct VisualRuntimeState {
     VisualRuntimePhase phase=VisualRuntimePhase::NotLocated;
-    bool locatorReady=false,captureBreakpointActive=false,resolved=false,suppressionRequested=false,downstreamOriginalActive=false;
+    bool locatorReady=false,captureBreakpointActive=false,readerCoverageActive=false,resolved=false,suppressionRequested=false,downstreamOriginalActive=false,restoreRequired=false;
     uint32_t pid=0,pendingThreadId=0,downstreamThreadId=0;
     uint64_t creationTime=0,moduleBase=0,readerRva=0,lookupRva=0,fieldOffset=0;
     X64RegisterId baseRegister=X64RegisterId::Invalid;
@@ -38,6 +38,17 @@ struct VisualMemoryIo {
     std::function<bool(uint64_t,uint32_t&,std::string&)> read;
     std::function<bool(uint64_t,uint32_t,std::string&)> write;
 };
+struct InitialVisualBreakpointPlan {
+    uint64_t fourthRva=0;
+    size_t requiredSlots=3;
+    bool keepAfterInitialTerminal=false;
+    bool observesProducer=true;
+};
+InitialVisualBreakpointPlan PlanInitialVisualBreakpoints(const VisualRuntimeState& visual,const RuntimeLayout& layout);
+// Called by the debugger worker while the target's threads are stopped.
+bool ApplyVisualSuppression(VisualRuntimeState& visual,const VisualMemoryIo& io,std::string& error);
+bool BeginVisualDamageWindow(VisualRuntimeState& visual,uint32_t threadId,const VisualMemoryIo& io,std::string& error);
+bool EndVisualDamageWindow(VisualRuntimeState& visual,uint32_t threadId,bool redirect,const VisualMemoryIo& io,std::string& error);
 bool SetVisualHidden(VisualSessionCache& cache,const VisualSessionIdentity& current,bool hidden,const VisualMemoryIo& io,std::string& error);
 bool SetVisualHiddenExternal(VisualSessionCache& cache,const VisualSessionIdentity& current,bool hidden,std::string& error);
 }

@@ -6,7 +6,7 @@ $cmakePath = if ($cmakeCommand) { $cmakeCommand.Source } else { 'C:\Program File
 if (-not (Test-Path -LiteralPath $cmakePath)) { throw 'Visual Studio C++ x64 Build Tools and CMake are required.' }
 & $cmakePath -S "$taskRoot/native" -B "$taskRoot/build/native" -G 'Visual Studio 18 2026' -A x64
 if ($LASTEXITCODE) { throw 'Native configure failed.' }
-& $cmakePath --build "$taskRoot/build/native" --config Release --target UnityAoe UnityCounter --parallel
+& $cmakePath --build "$taskRoot/build/native" --config Release --target UnityAoe UnityCounter UnitySalesman UnityCollection --parallel
 if ($LASTEXITCODE) { throw 'Native modules failed to build.' }
 dotnet publish "$taskRoot/src/4UnityTools.csproj" -c Release -o "$taskRoot/build/publish" -p:DebugType=None -p:SelfContained=true
 if ($LASTEXITCODE) { throw 'Suite publish failed.' }
@@ -18,9 +18,9 @@ if (-not $SkipTests) {
     $test = Start-Process -FilePath $dotnetPath -ArgumentList @("`"$testDll`"", '--self-test', "`"$taskRoot/evidence`"") -WindowStyle Hidden -PassThru
     if (-not $test.WaitForExit(120000)) { throw 'Suite UI tests did not finish within 120 seconds.' }
     if ($test.ExitCode -ne 0) { throw "Suite tests failed ($($test.ExitCode)); inspect evidence/suite-tests.json." }
-    $recovery = Start-Process -FilePath $dotnetPath -ArgumentList @("`"$testDll`"", '--recovery-test', "`"$taskRoot/evidence/recovery-tests-2026-10-03.json`"") -WindowStyle Hidden -PassThru
+    $recovery = Start-Process -FilePath $dotnetPath -ArgumentList @("`"$testDll`"", '--recovery-test', "`"$taskRoot/evidence/recovery-tests.json`"") -WindowStyle Hidden -PassThru
     if (-not $recovery.WaitForExit(120000)) { throw 'Patch recovery tests timed out.' }
-    if ($recovery.ExitCode -ne 0) { throw 'Patch recovery tests failed; inspect evidence/recovery-tests-2026-10-03.json.' }
+    if ($recovery.ExitCode -ne 0) { throw 'Patch recovery tests failed; inspect evidence/recovery-tests.json.' }
 }
 [xml]$suiteProject = Get-Content -LiteralPath "$taskRoot/src/4UnityTools.csproj"
 $release = Join-Path $taskRoot ("releases/" + $suiteProject.Project.PropertyGroup.Version)

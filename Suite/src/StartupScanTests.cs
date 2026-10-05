@@ -8,13 +8,13 @@ static class StartupScanTests
     {
         var scan = new StartupScan(); var probe = new Probe(); var updates = new List<ScanResult>();
         await scan.RunAsync(probe, updates.Add, CancellationToken.None);
-        check(probe.Calls.SequenceEqual(StartupScan.Order) && probe.Peak == 1, "startup resolves all nine functions sequentially");
+        check(probe.Calls.SequenceEqual(StartupScan.Order) && probe.Peak == 1, "startup resolves all eleven functions including Collection sequentially");
         check(scan.Results[Feature.Aoe].Status == ScanStatus.Manual && scan.Results[Feature.Multikill].Status == ScanStatus.Ready, "manual AOE does not block following functions");
         check(scan.Results[Feature.Jump].Status == ScanStatus.Failed && probe.Calls.Contains(Feature.Invisible), "failed path does not stop scan queue");
-        check(!probe.Calls.Contains(Feature.SafeMode) && updates.Count == 18, "startup scan excludes activation and SafeMode toggle");
+        check(!probe.Calls.Contains(Feature.SafeMode) && updates.Count == StartupScan.Order.Length * 2, "startup scan excludes activation and SafeMode toggle");
         using var cancel = new CancellationTokenSource(); probe = new(); scan = new();
         await scan.RunAsync(probe, result => { if (result.Status == ScanStatus.Ready) cancel.Cancel(); }, cancel.Token);
-        check(probe.Calls.Count == 1 && scan.Results.Values.Count(r => r.Status == ScanStatus.Cancelled) == 8, "cancel prevents subsequent probes");
+        check(probe.Calls.Count == 1 && scan.Results.Values.Count(r => r.Status == ScanStatus.Cancelled) == StartupScan.Order.Length - 1, "cancel prevents subsequent probes");
         var hold = new TaskCompletionSource(); probe = new() { Hold = hold }; scan = new();
         var running = scan.RunAsync(probe, _ => { }, CancellationToken.None);
         await scan.RunAsync(probe, _ => { }, CancellationToken.None);

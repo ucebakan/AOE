@@ -85,12 +85,14 @@ sealed class PatchEngine : IDisposable
         {
             OperationGate.Check(); session.ValidateIdentity(); Profile.ValidateLive(session.ReadSite(), false, Build);
             session.WriteOpcode(0x84, j.Protection); Profile.ValidateLive(session.ReadSite(), true, Build);
+            OwnedCodePatchRegistry.Register(this, ValidateOwnedPatch);
             Message = "Multikill JE açık · branch doğrulandı";
         }
         catch { faulted = true; try { Restore(); } catch { } throw; }
     }
     public void Restore()
     {
+        OwnedCodePatchRegistry.Remove(this);
         if (owned is null) return;
         if (session is null) throw new IOException("Kurtarma oturumu yok.");
         if (!session.Exited)
@@ -107,7 +109,18 @@ sealed class PatchEngine : IDisposable
         if (session is null) return;
         if (session.Exited) { Restore(); session.Dispose(); session = null; Message = "Oyun kapandı; yeni oturumu doğrula."; return; }
         try { session.ValidateIdentity(); Profile.ValidateLive(session.ReadSite(), Active, Build); }
-        catch { faulted = true; throw; }
+        catch { faulted = true; OwnedCodePatchRegistry.Remove(this); throw; }
+    }
+    bool ValidateOwnedPatch(OwnedCodePatchQuery query)
+    {
+        var s = session; var j = owned; var lease = owner;
+        if (faulted || s is null || j is null || s.Exited || lease is null || lease.SafeFileHandle.IsClosed ||
+            query.Pid != j.Pid || query.Created != j.Created || query.ModuleBase != j.Base || query.Sha != j.Sha || query.Rva != j.Rva ||
+            !query.Original.SequenceEqual(Convert.FromHexString(j.Original)) || !query.Patched.SequenceEqual(Convert.FromHexString(j.Patched))) return false;
+        ValidateJournal(j, s.Build);
+        if (JsonSerializer.Deserialize<PatchJournal>(File.ReadAllText(journalPath)) != j) return false;
+        s.ValidateIdentity(); Profile.ValidateLive(s.ReadSite(), true, s.Build);
+        return ReferenceEquals(owned, j) && ReferenceEquals(session, s) && !faulted && !lease.SafeFileHandle.IsClosed;
     }
     public void Dispose() { Restore(); session?.Dispose(); session = null; owner?.Dispose(); owner = null; }
 }

@@ -1,10 +1,52 @@
-# 4UnityTools · Control Center 0.6.0
+# 4UnityTools · Control Center 0.8.1
+
+0.8.1, PlayerCounter **Exit** tıklamasının oyun patchinden sonra eski profili
+kullanıp reddedilmesini düzeltir. Hazır olma ve tıklama aynı güncel profil ile
+doğrulanır. [Exit düzeltmesi](COUNTER-EXIT-0.8.1.md).
+
+0.8.0, genel bakışa **Collection** aç/kapat düğmesini ekler. Yeni ölen mobların
+loot'unu hedef seçmeden, araç mesafe sınırı olmadan hızlı gruplar halinde
+toplar. SHA/profil, AOB ve semantik patch recovery, açılış taraması, SafeMode
+ve sıralı kapanış ile bütünleşiktir. [Collection ayrıntıları](COLLECTION-0.8.0.md).
+
+0.7.4, Salesman'da değişmeyen kaynak dosyasının tekrar tekrar hash edilmesini
+kaldırır ve doğrulama sürelerini kaydeder. [Hızlandırma ayrıntıları](SALESMAN-SPEED-0.7.4.md).
+
+0.7.3, MobTP'de bir mobun konum geri okuması farklı olduğunda kalan mobların hiç
+işlenmemesini düzeltir. Y farkı ve XZ sonucu ayrı raporlanır; kimlik ve kısmi yazım
+hataları işlemi durdurur. [Düzeltme ayrıntıları](MOBTP-BATCH-0.7.3.md).
+
+0.7.1, MobTP'nin sabit 50 Home sınırını kaldırır. MobTP ayarlarında **Home range (XZ)**
+alanına kendi mesafeni girebilirsin. Değer kaydedilir; liste, teleport ve kısayol
+aynı mesafeyi kullanır. [MobTP ayrıntıları](MOBTP-RANGE-0.7.1.md).
+
+0.7.0, genel bakışa **Salesman** butonunu ekler. Tuş ataması kullanmadan satış
+penceresini doğrudan açar; SELL TRASH'a oyun içinde sen basarsın. SHA/profil,
+tekil AOB + metot bağlantısı recovery, salt okunur açılış taraması ve SafeMode /
+kapanışta geri alma ile bütünleşiktir. [Salesman ayrıntıları](SALESMAN-0.7.0.md).
+
+Yeni uygulama: [4UnityTools 0.8.1 ZIP](releases/0.8.1/4UnityTools-0.8.1-win-x64.zip).
+Önce açık eski 4UnityTools'u kapat, ardından yeni EXE'yi aç.
 
 Genel bakıştaki düğmeler gerçek işlevleri çalıştırır. Player XYZ, Speed / Jump,
 Invisible / Aggro, MobTP ve AOE aynı uygulamada yönetilir. PlayerCounter eski
 görünümüyle ayrı, küçük, taşınabilir ve üstte kalan pencere olarak açılır.
 
-Hazır uygulama: [Windows x64 ZIP](releases/0.6.0/4UnityTools-0.6.0-win-x64.zip). ZIP içindeki `4UnityTools.exe` doğrudan çalıştırılır. SHA-256 değerleri aynı klasördeki `SHA256SUMS.txt` dosyasındadır.
+ZIP içindeki `4UnityTools.exe` doğrudan çalıştırılır. SHA-256 değerleri aynı klasördeki `SHA256SUMS.txt` dosyasındadır. Önceki sürüm: [0.7.0 ZIP](releases/0.7.0/4UnityTools-0.7.0-win-x64.zip).
+
+0.6.3, Hide + Initial birlikteyken görsel reader geçişinin bekleyen DR6
+bitlerini silmesini düzeltir. Core breakpoint'ler yerinde korunur; reader
+slotu oturum boyunca tutulur. Ayrıntılar: [Detach düzeltmesi](AOE-DETACH-0.6.3.md).
+
+0.6.2, Hide AOE Visual'in Initial Nx tur geçişlerinde bekleyen görsel izleme noktasını
+ve sonrasında gerekli prep/call/return kapsamını korur. Gizleme geçişi debugger
+worker'da uygulanır; aktif çağrı tamamlanmadan hasar girdisi sıfırlanmaz.
+Ayrıntılar: [Hide AOE Visual düzeltmesi](AOE-VISUAL-0.6.2.md).
+
+0.6.1, aynı uygulamanın Multikill'i açıkken AOE attach'in reddedilmesini düzeltir.
+Yalnız güncel SHA, PID, oluşturulma zamanı, modül tabanı, kayıt ve canlı kodla
+doğrulanan Multikill sahibinin tek opcode değişikliği kabul edilir. Başka
+değişiklikler reddedilir; AOE canlı cast doğrulaması ve geri alma yolu korunur.
 
 0.6.0 oyun patchinden sonra yolları yeni SHA için otomatik tarayıp profil üretir.
 Alan offsetleri ve metot bağlantıları koddan türetilir. Ayrıntılar ve test
@@ -13,7 +55,7 @@ Dosya kendi .NET çalışma zamanını içerir; kurulum gerekmez.
 İlk açılışta genel bakış ve kullanım bilgisi görünür. Üst araç barından bir araç
 seçildiğinde mevcut kontrolleri içerik alanına yerleşir. Sekme değişimi araçları
 kapatmaz; girilen değerler, açık özellikler ve atanmış kısayollar korunur.
-Genel bakışta Speed, Jump, Invisible, Aggro, AOE ve PlayerCounter açılıp kapatılır.
+Genel bakışta Speed, Jump, Invisible, Aggro, AOE, PlayerCounter ve Collection açılıp kapatılır.
 XYZ ve MobTP düğmeleri tek seferlik işlem yapar. Ayarlar ayrı bağlantıdan açılır.
 Doğrulama eksikse kısa bilgi penceresi ilgili sayfaya yönlendirir; işlem kuyruğa
 alınmaz ve doğrulamadan sonra düğmeye yeniden basılması gerekir.

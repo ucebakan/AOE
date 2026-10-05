@@ -6,7 +6,7 @@ enum ShutdownResult { Complete, Failed, Pending }
 // A completed failure may be retried later while the remaining tools are stopped.
 static class ShutdownSequence
 {
-    internal static readonly int[] Order = [8, 1, 6, 4, 2, 3, 5];
+    internal static readonly int[] Order = [10, 8, 9, 1, 6, 4, 2, 3, 5];
     internal static async Task<int?> RunAsync(Func<int, Task<ShutdownResult>> close, Action<int>? progress = null)
     {
         int? failed = null;

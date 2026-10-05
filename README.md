@@ -3,7 +3,12 @@
 ## Birleşik uygulama
 
 [4UnityTools Control Center](Suite/) genel bakış düğmeleriyle araçları yönetir; PlayerCounter ayrı küçük pencere olarak açılır.
-[Windows x64 ZIP · tek EXE](Suite/releases/0.6.0/4UnityTools-0.6.0-win-x64.zip) · Derleme: `.\Suite\build.ps1`.
+[Windows x64 ZIP · tek EXE](Suite/releases/0.8.1/4UnityTools-0.8.1-win-x64.zip) · Derleme: `.\Suite\build.ps1`.
+0.8.1, PlayerCounter Exit tıklamasını güncel SHA profiline bağlar; eski sabit profile dönüş hatası giderildi.
+0.8.0 sürümünde [Collection](Suite/COLLECTION-0.8.0.md) düğmesi hedef seçmeden otomatik grup toplamayı açıp kapatır; SHA/AOB recovery ve SafeMode ile bütünleşiktir.
+0.7.3 sürümünde MobTP, geçerli bir mobdaki geri okuma farkını ayrı raporlayıp kalan mobları işlemeye devam eder.
+0.7.1 sürümünde MobTP'nin **Home range (XZ)** mesafesi kullanıcı tarafından girilir ve kaydedilir; sabit 50 sınırı kaldırıldı.
+0.7.0 sürümünde [Salesman](Suite/SALESMAN-0.7.0.md) butonu satış penceresini tuş ataması olmadan doğrudan açar.
 Antrasit/lavanta arayüz, üst bilgi ve araç barı, sekmeler arasında korunan durum
 ve Player XYZ alanlarında sayı doğrulaması içerir.
 

@@ -20,7 +20,7 @@ sealed class ScanDialog : Form
         layout.RowStyles.Add(new(SizeType.AutoSize)); layout.RowStyles.Add(new(SizeType.Percent, 100)); layout.RowStyles.Add(new(SizeType.AutoSize));
         var header = new ContentStack { Padding = Padding.Empty };
         header.AddRow(status);
-        header.AddRow(Responsive.Text("1–9 sırayla kontrol edilir. Aynı SHA için kayıtlı profil kullanılır; canlı pointer’lar yeniden çözülür. Hiçbir işlev açılmaz. AOE doğrulaması manuel kalabilir."));
+        header.AddRow(Responsive.Text($"1–{StartupScan.Order.Length} sırayla kontrol edilir. Aynı SHA için kayıtlı profil kullanılır; canlı pointer’lar yeniden çözülür. Hiçbir işlev açılmaz. AOE doğrulaması manuel kalabilir."));
         header.AddRow(progress); layout.Controls.Add(header, 0, 0);
         var scroll = new Panel { Dock = DockStyle.Fill, AutoScroll = true };
         var stack = new ContentStack { Padding = new(0, 0, 12, 0) }; scroll.Controls.Add(stack); layout.Controls.Add(scroll, 0, 1);
@@ -49,7 +49,7 @@ sealed class ScanDialog : Form
     {
         string state = result.Status switch { ScanStatus.Ready => "Doğrulandı", ScanStatus.Manual => "Manuel doğrulama", ScanStatus.Waiting => "Oyun / doğrulama bekliyor", ScanStatus.Failed => "Bulunamadı", ScanStatus.Scanning => "Kontrol ediliyor", ScanStatus.Cancelled => "İptal", _ => "Bekliyor" };
         rows[result.Feature].Text = $"{Array.IndexOf(StartupScan.Order, result.Feature) + 1}. {FeatureName(result.Feature)} · {state}\n{result.Message}";
-        if (result.Status != ScanStatus.Scanning && progress.Value < 9) progress.Value++;
+        if (result.Status != ScanStatus.Scanning && progress.Value < StartupScan.Order.Length) progress.Value++;
     }
     static string FeatureName(Feature feature) => feature == Feature.Coordinates ? "Player XYZ" : feature == Feature.MobTP ? "MobTP" : FeatureActions.Name(feature);
     protected override void Dispose(bool disposing) { if (disposing) cancel.Dispose(); base.Dispose(disposing); }
@@ -59,12 +59,12 @@ sealed class ScanProgress : Control
 {
     int value;
     [System.ComponentModel.DesignerSerializationVisibility(System.ComponentModel.DesignerSerializationVisibility.Hidden)]
-    internal int Value { get => value; set { this.value = Math.Clamp(value, 0, 9); Invalidate(); } }
+    internal int Value { get => value; set { this.value = Math.Clamp(value, 0, StartupScan.Order.Length); Invalidate(); } }
     internal ScanProgress() { DoubleBuffered = true; }
     protected override void OnPaint(PaintEventArgs e)
     {
         e.Graphics.Clear(Palette.Elevated);
         using var brush = new SolidBrush(Palette.Accent);
-        e.Graphics.FillRectangle(brush, 0, 0, Width * value / 9, Height);
+        e.Graphics.FillRectangle(brush, 0, 0, Width * value / StartupScan.Order.Length, Height);
     }
 }

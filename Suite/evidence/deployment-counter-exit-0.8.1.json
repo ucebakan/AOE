@@ -1,0 +1,12 @@
+{
+  "ui_layout_changed": false,
+  "version": "0.8.1",
+  "root_updated": true,
+  "uiAccess": false,
+  "counter_exit_fixture": "PASS",
+  "uac": "requireAdministrator",
+  "sha256": "BE1C02AC8BE20BF1E255B03DA6D8ACEE24972F4AB6B5B3A24B77D1D5B306B32B",
+  "live_exit_dispatched": false,
+  "live_readiness": "PASS",
+  "recovery": "PASS"
+}

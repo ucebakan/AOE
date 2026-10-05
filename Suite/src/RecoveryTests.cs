@@ -31,7 +31,11 @@ static class RecoveryTests
         Test("MobTP automatic recovery and SHA cache",()=>{using var b=new global::PlayerXYZ.Binary(disk);var bundle=MobTP.ProfileStore.Load(Multikill.Profile.GamePath);int scans=MobTP.ProfileStore.ScanCount;MobTP.ProfileStore.Load(Multikill.Profile.GamePath);Require(scans==MobTP.ProfileStore.ScanCount,"Same SHA rescanned");var p=bundle.Profile;return new{p.RootRva,p.ActorIdOffset,p.ActorTypeOffset,p.HomeOffset,p.ActorSize};});
         Test("AOE automatic profile, loader and live gate",()=>{AoeProfileRecovery.Ensure();var path=Path.Combine(Program.DataRoot,"AOE","profiles",sha+".json");using var json=JsonDocument.Parse(File.ReadAllText(path));Require(json.RootElement.GetProperty("liveValidationRequired").GetBoolean(),"Live validation removed");AoeProfileRecovery.Ensure();return path;});
         Test("Counter/Exit automatic disk recovery",()=>{byte[] message=new byte[2048];int ok=NativeModules.Function<Counter>("UnityCounter.dll","ResolveCounterDisk")(sha,message,message.Length);string detail=Encoding.UTF8.GetString(message).TrimEnd('\0');Require(ok==1,detail);return detail;});
+        Test("Counter/Exit click uses current recovered profile",()=>{byte[] message=new byte[2048];int ok=NativeModules.Function<Counter>("UnityCounter.dll","RunCounterExitFixtures")(sha,message,message.Length);string detail=Encoding.UTF8.GetString(message).TrimEnd('\0');Require(ok==1,detail);return detail;});
         Test("Multikill semantic recovery",()=>Multikill.BuildRecovery.Resolve(disk));
+        Test("Salesman direct opening and patch recovery",()=>Salesman.Tests.Run());
+        Test("Collection grouped automation and patch recovery",()=>Collection.Tests.Run());
+        Test("AOE/Multikill same-session ownership and native bridge",()=>Multikill.CompatibilityTests.Run(AoePatchCompatibility.TestProof));
         Test("Changed SHA extracts new fields; inconsistent layout rejected",()=>{
             using var b=new PlayerXYZ.Binary(disk);var p=PlayerXYZ.Profiles.Resolve(b);var data=disk.ToArray();
             int Raw(int rva){var s=b.Pe.PEHeaders.SectionHeaders.Single(s=>rva>=s.VirtualAddress&&rva<s.VirtualAddress+s.SizeOfRawData);return s.PointerToRawData+rva-s.VirtualAddress;}

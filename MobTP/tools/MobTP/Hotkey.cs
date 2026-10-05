@@ -9,12 +9,12 @@ record KeyBinding(int Key,uint Modifiers)
     public override string ToString()=>(Modifiers.HasFlag(2)?"Ctrl+":"")+(Modifiers.HasFlag(1)?"Alt+":"")+(Modifiers.HasFlag(4)?"Shift+":"")+((Keys)Key).ToString();
 }
 static class ModBits { public static bool HasFlag(this uint value,uint mask)=>(value&mask)!=0; }
-record UserSettings(KeyBinding? Hotkey=null,decimal Spread=2,bool DistanceDescending=false)
+record UserSettings(KeyBinding? Hotkey=null,decimal Spread=2,bool DistanceDescending=false,decimal HomeRange=50)
 {
     static string PathName=>Path.Combine(ProfileStore.Root,"settings.json");
     public static UserSettings Load()
     {
-        try{var s=JsonSerializer.Deserialize<UserSettings>(File.ReadAllText(PathName));return s is not null&&s.Spread>=1&&s.Spread<=10&&(s.Hotkey is null||s.Hotkey.Valid)?s:new();}catch{return new();}
+        try{var s=JsonSerializer.Deserialize<UserSettings>(File.ReadAllText(PathName));return s is not null&&s.Spread>=1&&s.Spread<=10&&(s.Hotkey is null||s.Hotkey.Valid)?s with{HomeRange=s.HomeRange>=0.1m?s.HomeRange:50}:new();}catch{return new();}
     }
     public void Save(){Directory.CreateDirectory(ProfileStore.Root);File.WriteAllText(PathName+".tmp",JsonSerializer.Serialize(this));File.Move(PathName+".tmp",PathName,true);}
 }

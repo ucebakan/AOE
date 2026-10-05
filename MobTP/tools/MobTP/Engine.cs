@@ -9,19 +9,23 @@ namespace MobTP;
 record MobView(Monster Mob,Identity Identity,Position A,Position B,Position? Home,double? PlayerHomeXZ);
 record World(DateTimeOffset Time,Snapshot? Source,PlayerInfo? Player,List<MobView> Mobs,string Status);
 record WriteResult(bool Success,int Bytes,int Error);
-record MoveResult(string Status,WriteResult? BWrite=null,WriteResult? AWrite=null,Position? ReadA=null,Position? ReadB=null);
+record MoveResult(string Status,WriteResult? BWrite=null,WriteResult? AWrite=null,Position? ReadA=null,Position? ReadB=null)
+{
+    public bool StopsBatch=>Status is not ("READBACK_MATCH" or "READBACK_XZ_MATCH_Y_CHANGED" or "READBACK_POSITION_CHANGED" or "STALE_BEFORE_WRITE");
+}
 record PlannedMob(MobView Mob,Position Target,bool Eligible);
 
 static class Placement
 {
-    public static PlannedMob[] Plan(World world,double spread)
+    public static PlannedMob[] Plan(World world,double spread,double homeRange)
     {
+        if(!ValidHomeRange(homeRange))throw new ArgumentOutOfRangeException(nameof(homeRange));
         if(world.Player is null)return [];
         var player=Player(world.Player);
-        var candidates=world.Mobs.Where(m=>Usable(m.Home)&&MobCapture.Distance(player,m.Home,true)<=HomeRadius).OrderBy(m=>m.Mob.EntityId).ToArray();
-        return candidates.Select((m,i)=>{var t=Ring(player,i,candidates.Length,spread);return new PlannedMob(m,t,InBase(player,m.Home,t));}).ToArray();
+        var candidates=world.Mobs.Where(m=>Usable(m.Home)&&MobCapture.Distance(player,m.Home,true)<=homeRange).OrderBy(m=>m.Mob.EntityId).ToArray();
+        return candidates.Select((m,i)=>{var t=Ring(player,i,candidates.Length,spread);return new PlannedMob(m,t,InBase(player,m.Home,t,homeRange));}).ToArray();
     }
-    public const double HomeRadius=50;
+    public static bool ValidHomeRange(double value)=>double.IsFinite(value)&&value>0;
     public static bool Usable(Position? p)=>p is not null && p!=new Position(0,0,0) && float.IsFinite(p.X)&&float.IsFinite(p.Y)&&float.IsFinite(p.Z)&&Math.Abs(p.X)<1e6&&Math.Abs(p.Y)<1e6&&Math.Abs(p.Z)<1e6;
     public static Position Player(PlayerInfo p)=>new(p.X,p.Y,p.Z);
     public static Position Ring(Position player,int index,int count,double spread)
@@ -30,8 +34,8 @@ static class Placement
         double angle=2*Math.PI*index/count;
         return new((float)(player.X+spread*Math.Cos(angle)),player.Y,(float)(player.Z+spread*Math.Sin(angle)));
     }
-    public static bool InBase(Position? player,Position? home,Position? target)=>Usable(player)&&Usable(home)&&Usable(target)&&
-        MobCapture.Distance(player,home,true)<=HomeRadius&&MobCapture.Distance(target,home,true)<=HomeRadius&&MobCapture.Distance(player,target,true)>=0.9;
+    public static bool InBase(Position? player,Position? home,Position? target,double homeRange)=>ValidHomeRange(homeRange)&&Usable(player)&&Usable(home)&&Usable(target)&&
+        MobCapture.Distance(player,home,true)<=homeRange&&MobCapture.Distance(target,home,true)<=homeRange&&MobCapture.Distance(player,target,true)>=0.9;
     public static MoveResult Move(Position target,Func<bool> guard,Func<int,Position,WriteResult> write,Func<int,Position?> read)
     {
         if(!Usable(target)||!guard())return new("STALE_BEFORE_WRITE");
@@ -42,8 +46,12 @@ static class Placement
         if(!a.Success||a.Bytes!=12)return new("A_WRITE_FAILED_BATCH_STOP",b,a);
         if(!guard())return new("CHANGED_AFTER_WRITES_BATCH_STOP",b,a);
         var ra=read(0x70);var rb=read(0xB0);
-        bool match=ra is not null&&rb is not null&&MobCapture.Distance(ra,target)<=0.01&&MobCapture.Distance(rb,target)<=0.01;
-        return new(match?"READBACK_MATCH":"READBACK_MISMATCH_BATCH_STOP",b,a,ra,rb);
+        if(!Usable(ra)||!Usable(rb))return new("READBACK_UNAVAILABLE_BATCH_STOP",b,a,ra,rb);
+        // Reads are separate operations too; reject an actor/session change during readback.
+        if(!guard())return new("CHANGED_DURING_READBACK_BATCH_STOP",b,a,ra,rb);
+        bool match=MobCapture.Distance(ra,target)<=0.01&&MobCapture.Distance(rb,target)<=0.01;
+        bool xzMatch=MobCapture.Distance(ra,target,true)<=0.01&&MobCapture.Distance(rb,target,true)<=0.01;
+        return new(match?"READBACK_MATCH":xzMatch?"READBACK_XZ_MATCH_Y_CHANGED":"READBACK_POSITION_CHANGED",b,a,ra,rb);
     }
 }
 
@@ -204,33 +212,34 @@ static class Engine
         }
         catch(Exception ex){return new(DateTimeOffset.Now,null,null,[],ex.Message);}
     }
-    public static (string Message,string Log) Teleport(double spread,CancellationToken cancel,int? hotkeyPid=null)
+    public static (string Message,string Log) Teleport(double spread,double homeRange,CancellationToken cancel,int? hotkeyPid=null)
     {
         Directory.CreateDirectory(LogRoot);string path=Path.Combine(LogRoot,$"tp-{DateTime.UtcNow:yyyyMMdd-HHmmss-fff}-{Guid.NewGuid():N}.jsonl");
         using var log=new StreamWriter(path){AutoFlush=true};
         void Save(object value)=>log.WriteLine(JsonSerializer.Serialize(value));
-        int matched=0,skipped=0;string finish="BATCH_FINISHED";
+        int matched=0,heightChanged=0,positionChanged=0,skipped=0,attempted=0,processed=0,eligibleCount=0;string finish="BATCH_FINISHED";
         try
         {
             // Fresh read-only snapshot; no cached map members enter a batch.
             var world=Capture();if(world.Source is null||world.Player is null)throw new IOException(world.Status);
             if(hotkeyPid is not null&&(world.Source.Pid!=hotkeyPid||!HotkeyRegistration.GameForeground(hotkeyPid)))throw new IOException("Oyun odağı değişti; kısayol işlemi iptal edildi.");
             var player=world.Player;var origin=Placement.Player(player);
-            var plan=Placement.Plan(world,spread);var eligible=plan.Where(p=>p.Eligible).ToArray();
-            Save(new{kind="batch",world.Time,pid=world.Source.Pid,world.Source.Sha256,player,home_radius=50,spread,count=eligible.Length,home_count=plan.Length,registry_count=world.Mobs.Count,trigger=hotkeyPid is null?"button":"game_hotkey",policy="Resolved B then A; Home untouched; fresh guards; readback is not server acceptance"});
-            if(eligible.Length==0){Save(new{kind="summary",matched=0,skipped=0,status="NO_ELIGIBLE_MOBS"});return("Home sınırı içinde uygun mob yok.",path);}
+            var plan=Placement.Plan(world,spread,homeRange);var eligible=plan.Where(p=>p.Eligible).ToArray();
+            eligibleCount=eligible.Length;
+            Save(new{kind="batch",world.Time,pid=world.Source.Pid,world.Source.Sha256,player,home_radius=homeRange,spread,count=eligible.Length,home_count=plan.Length,registry_count=world.Mobs.Count,trigger=hotkeyPid is null?"button":"game_hotkey",policy="Resolved B then A; Home untouched; fresh guards; readback is not server acceptance"});
+            if(eligible.Length==0){Save(new{kind="summary",matched=0,heightChanged,positionChanged,skipped=0,attempted,not_attempted=0,status="NO_ELIGIBLE_MOBS"});return("Home sınırı içinde uygun mob yok.",path);}
             cancel.ThrowIfCancellationRequested();
             using var session=new Session(world.Source,true);
             Save(new{kind="resolved_layout",session.Profile.RootRva,session.Profile.RegistryOffset,session.Profile.HomeOffset,session.Profile.ActorIdOffset,session.Profile.ActorTypeOffset,session.Profile.Player.CoordinateA,session.Profile.Player.CoordinateB});
             for(int i=0;i<eligible.Length;i++)
             {
-                cancel.ThrowIfCancellationRequested();var old=eligible[i].Mob;
+                cancel.ThrowIfCancellationRequested();processed++;var old=eligible[i].Mob;
                 var freshPlayer=session.Player();
                 if(freshPlayer is null||freshPlayer.ActorPtr!=player.ActorPtr||freshPlayer.EntityId!=player.EntityId||MobCapture.Distance(origin,Placement.Player(freshPlayer))>0.25)throw new IOException("Oyuncu/harita değişti; işlem durdu.");
                 var current=session.Inspect(old.Mob,freshPlayer);
                 if(current is null||current.Identity!=old.Identity){Save(new{kind="skip",id=old.Mob.EntityId,status="STALE_MEMBER"});skipped++;continue;}
                 var target=eligible[i].Target;
-                if(!Placement.InBase(Placement.Player(freshPlayer),current.Home,target)){Save(new{kind="skip",id=old.Mob.EntityId,status="OUTSIDE_BASE_OR_HOME_UNAVAILABLE",current.Home,target});skipped++;continue;}
+                if(!Placement.InBase(Placement.Player(freshPlayer),current.Home,target,homeRange)){Save(new{kind="skip",id=old.Mob.EntityId,status="OUTSIDE_BASE_OR_HOME_UNAVAILABLE",current.Home,target});skipped++;continue;}
                 var identity=session.Identity(old.Mob);var expected=identity.Pin();
                 if(expected!=old.Identity){skipped++;continue;}
                 bool Guard()
@@ -238,18 +247,22 @@ static class Engine
                     if(UnityTools.Controls.OperationGate.Blocked||cancel.IsCancellationRequested||hotkeyPid is not null&&!HotkeyRegistration.GameForeground(hotkeyPid)||!session.Alive())return false;
                     var id=identity.Check();if(!id.Membership||id.Identity!=expected)return false;
                     var p=session.Player();var h=session.XYZ(old.Mob.ActorPtr,session.Profile.HomeOffset);
-                    return p is not null&&p.ActorPtr==player.ActorPtr&&p.EntityId==player.EntityId&&MobCapture.Distance(origin,Placement.Player(p))<=0.25&&h==current.Home&&Placement.InBase(Placement.Player(p),h,target);
+                    return p is not null&&p.ActorPtr==player.ActorPtr&&p.EntityId==player.EntityId&&MobCapture.Distance(origin,Placement.Player(p))<=0.25&&h==current.Home&&Placement.InBase(Placement.Player(p),h,target,homeRange);
                 }
                 Save(new{kind="intent",id=old.Mob.EntityId,old.Identity,current.A,current.B,current.Home,target});
+                attempted++;
                 var result=Placement.Move(target,Guard,(offset,value)=>session.Write(old.Mob.ActorPtr,offset,value),offset=>session.ReadCoordinate(old.Mob.ActorPtr,offset));
                 Save(new{kind="result",id=old.Mob.EntityId,result});
                 if(result.Status=="READBACK_MATCH")matched++;
-                else if(result.BWrite is not null){finish=result.Status;break;}
+                else if(result.Status=="READBACK_XZ_MATCH_Y_CHANGED")heightChanged++;
+                else if(result.Status=="READBACK_POSITION_CHANGED")positionChanged++;
+                else if(result.StopsBatch){finish=result.Status;break;}
                 else skipped++;
             }
         }
         catch(Exception ex){finish=ex is OperationCanceledException?"İşlem iptal edildi":ex.Message;Save(new{kind="error",message=finish});}
-        Save(new{kind="summary",matched,skipped,status=finish});
-        return($"{matched} mob yazımı okuma ile eşleşti · {skipped} atlandı. {(finish=="BATCH_FINISHED"?"":finish)}",path);
+        int notAttempted=Math.Max(0,eligibleCount-processed);
+        Save(new{kind="summary",matched,heightChanged,positionChanged,skipped,attempted,not_attempted=notAttempted,status=finish});
+        return($"{matched} mob XYZ eşleşti · {heightChanged} mob XZ eşleşti, Y değişti · {positionChanged} mob konumu geri okumada değişti · {skipped} atlandı · {notAttempted} işlenmedi. {(finish=="BATCH_FINISHED"?"":finish)}",path);
     }
 }

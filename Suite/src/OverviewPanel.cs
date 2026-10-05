@@ -55,6 +55,7 @@ sealed class FeatureCard : UserControl
             item.Value.BackColor = value.Active ? Color.FromArgb(80, 65, 137) : Palette.Elevated;
             item.Value.Enabled = !actions.Busy && (Coordinates is null || Coordinates.Valid);
             if (item.Key == Feature.SafeMode) { messages.Add(value.Message); continue; }
+            if (item.Key == Feature.Salesman) { messages.Add(value.Active ? "Satış penceresi açık" : value.Ready ? "Salesman hazır" : "Profil / bağlantı gerekli"); continue; }
             messages.Add(FeatureActions.OneShot(item.Key) ? (value.Ready ? "Tek seferlik işlem hazır" : "Ayar / bağlantı gerekli") : $"{label}: {(value.Active ? "Açık" : "Kapalı")}");
         }
         string summary = string.Join("  ·  ", messages); if (state.Text != summary) state.Text = summary;
@@ -81,6 +82,8 @@ sealed class OverviewPanel : Panel
         for (int i = 0; i < 6; i++) { int index = i + 1; Cards.Add(new FeatureCard(index, SuiteForm.Names[index], descriptions[i], groups[i], execute, () => settings(index), index == 1 ? draft : null)); }
         Cards.Add(new FeatureCard(7, "SafeMode", "Oyuncu sayısı 1 veya üzerine çıkınca etkin işlemleri geri al.", [Feature.SafeMode], execute, () => settings(7)));
         Cards.Add(new FeatureCard(8, "Multikill", "Doğrulanmış JBE → JE işlevini aç veya kapat.", [Feature.Multikill], execute, () => settings(8)));
+        Cards.Add(new FeatureCard(9, "Salesman", "NPC'ye gitmeden satış penceresini tek tıkla aç.", [Feature.Salesman], execute, () => settings(9)));
+        Cards.Add(new FeatureCard(10, "Collection", "Hedef seçmeden yeni ölen mobların loot'unu otomatik topla.", [Feature.Collection], execute, () => settings(10)));
         var saved = order.Load(Cards.Select(c => c.Id)); var byId = Cards.ToDictionary(c => c.Id); Cards.Clear(); Cards.AddRange(saved.Select(id => byId[id]));
         foreach (var card in Cards) ConfigureMovement(card);
         Disposed += (_, _) => movementTip.Dispose();

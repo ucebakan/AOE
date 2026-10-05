@@ -1,6 +1,7 @@
 #include "aoe_locator.hpp"
 #include "tracer.hpp"
 #include <algorithm>
+#include <atomic>
 #include <cstring>
 #include <fstream>
 #include <functional>
@@ -201,11 +202,41 @@ bool ValidateAoeProfile(const BuildProfile& profile,const AoeLocatorResult& resu
     }catch(const std::exception&e){error=e.what();return false;}
     error.clear();return true;
 }
+namespace { std::atomic<OwnedPatchValidator> ownedPatchValidator{nullptr}; }
+void ConfigureOwnedPatchValidator(OwnedPatchValidator validator){ownedPatchValidator.store(validator);}
+int CheckOwnedPatchProof(uint32_t pid,uint64_t created,uint64_t base,const char* sha,uint64_t rva,const uint8_t* original,const uint8_t* patched,size_t count){
+    auto validator=ownedPatchValidator.load();
+    if(!validator||!pid||!created||!base||!rva||!sha||!original||!patched||count!=6||original[0]!=0x0F||original[1]!=0x86||patched[0]!=0x0F||patched[1]!=0x84||!std::equal(original+2,original+6,patched+2))return 0;
+    return validator(pid,created,base,sha,rva,original,patched,count)==1?1:0;
+}
+bool MatchAoeLiveEvidence(const TargetInfo& target,const AoeLocatorResult& result,uint64_t rva,
+    const std::vector<uint8_t>& expected,const std::vector<uint8_t>& actual,const std::vector<uint8_t>& liveBranch,OwnedPatchValidator validator){
+    if(!target.verified||!result.ready||target.image.sha256!=result.image.sha256||target.size!=result.image.imageSize||target.size<15||rva>=target.size||expected.empty()||expected.size()>target.size-rva||actual.size()!=expected.size())return false;
+    if(actual==expected)return true;
+    // The independently located type-2 radius JBE is the one instruction that
+    // Multikill owns. Admit its exact JE only with a same-session owner proof.
+    auto* radius=Find(result,"AcquisitionRadiusGuard");if(!validator||!radius||!radius->valid||radius->rva>target.size-15)return false;
+    const uint64_t patch=radius->rva+9,changed=patch+1;
+    if(changed<rva||changed-rva>=expected.size()||liveBranch.size()!=6||liveBranch[0]!=0x0F||liveBranch[1]!=0x84)return false;
+    std::vector<uint8_t> original;
+    for(const auto& [site,bytes]:result.liveEvidence)if(site<=patch&&patch-site<=bytes.size()&&6<=bytes.size()-(patch-site)){original.assign(bytes.begin()+size_t(patch-site),bytes.begin()+size_t(patch-site)+6);break;}
+    if(original.size()!=6||original[0]!=0x0F||original[1]!=0x86)return false;
+    auto patched=original;patched[1]=0x84;if(liveBranch!=patched)return false;
+    auto normalized=actual;const size_t offset=size_t(changed-rva);
+    if(expected[offset]!=0x86||actual[offset]!=0x84)return false;
+    normalized[offset]=0x86;if(normalized!=expected)return false;
+    return validator(target.pid,target.creationTime,target.base,target.image.sha256.c_str(),patch,original.data(),patched.data(),6)==1;
+}
 bool ValidateAoeLive(HANDLE process,const TargetInfo& target,const AoeLocatorResult& result,std::string& error){
     if(!process||!target.verified||!result.ready||result.liveEvidence.empty()||target.image.sha256!=result.image.sha256||target.size!=result.image.imageSize){error="Invalid AOE live session/build identity";return false;}
     FILETIME created{},exit{},kernel{},user{};if(GetProcessId(process)!=target.pid||!GetProcessTimes(process,&created,&exit,&kernel,&user)||(uint64_t(created.dwHighDateTime)<<32|created.dwLowDateTime)!=target.creationTime){error="AOE process creation identity changed";return false;}
     DWORD code=0;if(!GetExitCodeProcess(process,&code)||code!=STILL_ACTIVE){error="AOE target process is not active";return false;}
-    for(const auto&[rva,expected]:result.liveEvidence){uint64_t address=0;if(!ResolveTraceAddress(target.base,target.size,rva,address)||expected.size()>target.size-rva){error="Live AOE evidence is out of module bounds";return false;}std::vector<uint8_t> actual(expected.size());uint32_t e=0;if(!SafeRead(process,address,actual.data(),actual.size(),e)){error=WinError("Read live AOE evidence at "+Hex(address),e);return false;}if(actual!=expected){error="Live AOE original-byte mismatch at "+Hex(rva)+" expected="+BytesHex(expected)+" actual="+BytesHex(actual);return false;}}
+    for(const auto&[rva,expected]:result.liveEvidence){uint64_t address=0;if(!ResolveTraceAddress(target.base,target.size,rva,address)||expected.size()>target.size-rva){error="Live AOE evidence is out of module bounds";return false;}std::vector<uint8_t> actual(expected.size());uint32_t e=0;if(!SafeRead(process,address,actual.data(),actual.size(),e)){error=WinError("Read live AOE evidence at "+Hex(address),e);return false;}if(actual!=expected){
+        std::vector<uint8_t> branch(6);auto* radius=Find(result,"AcquisitionRadiusGuard");
+        bool readBranch=radius&&radius->valid&&radius->rva<=target.size-15&&SafeRead(process,target.base+radius->rva+9,branch.data(),branch.size(),e);
+        if(!readBranch||!MatchAoeLiveEvidence(target,result,rva,expected,actual,branch,ownedPatchValidator.load())){error="Live AOE original-byte mismatch at "+Hex(rva)+" expected="+BytesHex(expected)+" actual="+BytesHex(actual)+"; only a verified same-session Multikill owner may authorize its JE";return false;}
+        Log("owned_multikill_evidence_verified","pid="+std::to_string(target.pid)+" rva="+Hex(radius->rva+9));
+    }}
     error.clear();return true;
 }
 #include "aoe_recovery.inc"

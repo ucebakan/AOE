@@ -70,12 +70,15 @@ static class SuiteTests
                     dialog.Close();
                 }
                 await Task.Delay(100); Save(shell, Path.Combine(output, "00-home.png"));
-                Check(shell.Overview.Cards.SelectMany(c => c.Actions).Count() == 10, "overview exposes ten actual action buttons");
+                Check(shell.Overview.Cards.SelectMany(c => c.Actions).Count() == 12, "overview exposes twelve actual action buttons including Collection");
                 shell.Overview.Cards[1].Actions[Feature.Speed].PerformClick(); await Task.Delay(150);
                 Check(notifications == 1 && shell.SelectedPage == 2, "overview action shows validation notice and opens correct page");
                 Check(!shell.Actions.Read(Feature.Speed).Active, "failed validation never displays an active toggle");
+                shell.SelectPage(0); var collectionCard = shell.Overview.Cards.Single(c => c.Id == 10); shell.Overview.ScrollControlIntoView(collectionCard);
+                collectionCard.Actions[Feature.Collection].PerformClick(); await Task.Delay(100);
+                Check(shell.SelectedPage == 10 && !shell.Actions.Read(Feature.Collection).Active, "Collection overview button validates before activation and opens its settings on failure");
                 using (var nativeReader = new NativeCountReader()) Check(true, "independent SafeMode native reader lifecycle available without overlay");
-                foreach (int i in new[] { 1, 2, 3, 4, 5, 8 })
+                foreach (int i in new[] { 1, 2, 3, 4, 5, 8, 9, 10 })
                 {
                     shell.SelectPage(i); await Task.Delay(80); Check(shell.SelectedPage == i, "navigation " + SuiteForm.Names[i]);
                     if (i != 5) Check(!shell.Workspace.Forms[i].TopLevel && shell.Workspace.Forms[i].Parent != null, "managed module remains embedded " + i);
@@ -94,6 +97,20 @@ static class SuiteTests
                 Check(inputs.Length == 3, "three numeric coordinate fields retained"); inputs[0].Text = "-125,5";
                 shell.SelectPage(0); shell.SelectPage(1); Check(inputs[0].Text == "-125,5", "coordinates retained across overview switches");
 
+                shell.SelectPage(4); var mob = (MobTP.MainForm)shell.Workspace.Forms[4];
+                var homeRange = Descendants(mob).OfType<NumericUpDown>().Single(c => c.Name == "HomeRange");
+                Check(homeRange.Value == 50 && homeRange.Maximum > 50, "MobTP default Home range remains editable above 50");
+                MobTP.Tests.RenderRangeFixture(mob);
+                var tpButton = Descendants(mob).OfType<Button>().Single(b => b.Text == "UYGUN MOBLARI YANIMA GETİR");
+                Check(!tpButton.Enabled, "MobTP preview excludes Home beyond selected 50");
+                homeRange.Value = 100;
+                Check(tpButton.Enabled && Descendants(mob).OfType<Label>().Any(l => l.Text.Contains("Home ≤ 100: 1")), "MobTP custom range refreshes count and eligibility immediately");
+                shell.SelectPage(0); shell.SelectPage(4);
+                Check(homeRange.Value == 100, "MobTP custom range retained across overview switches");
+                Save(shell, Path.Combine(output, "04-panel.png"));
+                homeRange.Value = 10; Check(!tpButton.Enabled, "MobTP smaller range refreshes eligibility immediately");
+                homeRange.Value = 100;
+
                 await DashboardTests.Run(shell, Check, output);
                 shell.SelectPage(0); await shell.ExecuteFeatureAsync(Feature.Counter); nint overlay = shell.Workspace.Counter.Window;
                 Check(overlay != 0 && NativeModules.GetParent(overlay) == 0, "counter is an independent top-level window");
@@ -108,7 +125,7 @@ static class SuiteTests
                 foreach (var size in new[] { new Size(640, 600), new Size(820, 720), new Size(1240, 900), new Size(1600, 1000) })
                 {
                     shell.Size = size;
-                    foreach (int i in new[] { 0, 1, 2, 3, 4, 5, 8 }) { shell.SelectPage(i); await Task.Delay(45); Check(LayoutValid(shell, out string error), $"layout {size.Width}x{size.Height} page {i}: {error}"); }
+                    foreach (int i in new[] { 0, 1, 2, 3, 4, 5, 8, 9, 10 }) { shell.SelectPage(i); await Task.Delay(45); Check(LayoutValid(shell, out string error), $"layout {size.Width}x{size.Height} page {i}: {error}"); }
                     shell.SelectPage(0); Save(shell, Path.Combine(output, $"layout-{size.Width}.png"));
                 }
                 shell.WindowState = FormWindowState.Maximized; await Task.Delay(80); Check(LayoutValid(shell, out _), "maximized layout");
@@ -135,7 +152,7 @@ static class SuiteTests
                 {
                     shell.Scale(new SizeF(scale / previousScale, scale / previousScale)); previousScale = scale;
                     shell.Size = new(1240, 900);
-                    foreach (int page in new[] { 0, 1, 2, 3, 4, 8 }) { shell.SelectPage(page); await Task.Delay(40); Check(LayoutValid(shell, out string scaleError), $"managed {scale:P0} resize simulation page {page}: " + scaleError); }
+                    foreach (int page in new[] { 0, 1, 2, 3, 4, 8, 9, 10 }) { shell.SelectPage(page); await Task.Delay(40); Check(LayoutValid(shell, out string scaleError), $"managed {scale:P0} resize simulation page {page}: " + scaleError); }
                     shell.SelectPage(0); Save(shell, Path.Combine(output, $"layout-scale-{(int)(scale*100)}.png"));
                 }
                 await shell.ExecuteFeatureAsync(Feature.Counter);

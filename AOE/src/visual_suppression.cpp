@@ -5,13 +5,44 @@
 namespace aoe {
 namespace {
 uint64_t FileTimeValue(const FILETIME& value){return(uint64_t(value.dwHighDateTime)<<32)|value.dwLowDateTime;}
+bool WriteOwnedVisualValue(VisualRuntimeState& s,uint32_t value,const VisualMemoryIo& io,std::string& error){
+    if(!s.resolved||!s.visualField||!s.originalValue||!io.read||!io.write){error="Visual ownership or memory I/O is unavailable.";return false;}
+    uint32_t actual=0;if(!io.read(s.visualField,actual,error))return false;
+    if(actual!=0&&actual!=s.originalValue){error="Visual field changed outside our captured zero/original ownership; write refused.";return false;}
+    if(actual==0&&!s.restoreRequired){error="Visual field was zeroed without our ownership; write refused.";return false;}
+    if(actual!=value){if(value==0)s.restoreRequired=true;if(!io.write(s.visualField,value,error))return false;uint32_t check=0;if(!io.read(s.visualField,check,error)||check!=value){if(error.empty())error="Visual field write readback mismatch.";return false;}}
+    if(value==s.originalValue)s.restoreRequired=false;
+    error.clear();return true;
+}
+}
+InitialVisualBreakpointPlan PlanInitialVisualBreakpoints(const VisualRuntimeState& s,const RuntimeLayout& layout){
+    const bool reader=s.captureBreakpointActive||s.readerCoverageActive;
+    return{reader?layout.visualReaderRva:layout.producerRva,reader?size_t(4):size_t(3),reader||s.suppressionRequested||s.downstreamOriginalActive,!reader};
+}
+bool ApplyVisualSuppression(VisualRuntimeState& s,const VisualMemoryIo& io,std::string& error){
+    // A newly correlated call can still be in its worker or Nx replay. Do not
+    // hide its damage input from the UI timer between call and final return.
+    if(s.suppressionRequested&&s.downstreamOriginalActive){error.clear();return true;}
+    if(!WriteOwnedVisualValue(s,s.suppressionRequested?0:s.originalValue,io,error)){s.error=error;return false;}
+    s.phase=s.suppressionRequested?VisualRuntimePhase::VisualHidden:VisualRuntimePhase::VisualNormal;s.error.clear();return true;
+}
+bool BeginVisualDamageWindow(VisualRuntimeState& s,uint32_t tid,const VisualMemoryIo& io,std::string& error){
+    if(!s.resolved||!s.suppressionRequested){error.clear();return true;}
+    if(s.downstreamOriginalActive){if(s.downstreamThreadId==tid){error.clear();return true;}error="Concurrent visual damage window ownership changed.";s.error=error;return false;}
+    if(!WriteOwnedVisualValue(s,s.originalValue,io,error)){s.error=error;return false;}
+    s.downstreamOriginalActive=true;s.downstreamThreadId=tid;error.clear();return true;
+}
+bool EndVisualDamageWindow(VisualRuntimeState& s,uint32_t tid,bool redirect,const VisualMemoryIo& io,std::string& error){
+    if(!s.downstreamOriginalActive||s.downstreamThreadId!=tid||redirect){error.clear();return true;}
+    if(s.suppressionRequested&&!WriteOwnedVisualValue(s,0,io,error)){s.error=error;return false;}
+    s.downstreamOriginalActive=false;s.downstreamThreadId=0;s.phase=s.suppressionRequested?VisualRuntimePhase::VisualHidden:VisualRuntimePhase::VisualNormal;s.error.clear();error.clear();return true;
 }
 const char* VisualRuntimePhaseName(VisualRuntimePhase phase){switch(phase){case VisualRuntimePhase::LocatorReady:return "LOCATOR READY";case VisualRuntimePhase::WaitingForAoeCast:return "WAITING FOR AOE CAST";case VisualRuntimePhase::TSkillResolved:return "TSKILL RESOLVED";case VisualRuntimePhase::VisualHidden:return "VISUAL HIDDEN";case VisualRuntimePhase::VisualNormal:return "VISUAL NORMAL";case VisualRuntimePhase::RestoreFailed:return "RESTORE FAILED";case VisualRuntimePhase::SessionChanged:return "SESSION CHANGED";default:return "NOT LOCATED";}}
-void InitializeVisualRuntime(VisualRuntimeState& s,const TargetInfo& target){s={};const auto&r=target.runtime;s.pid=target.pid;s.creationTime=target.creationTime;s.moduleBase=target.base;s.targetSha256=target.image.sha256;s.readerRva=r.visualReaderRva;s.lookupRva=r.visualLookupRva;s.fieldOffset=r.visualFieldOffset;s.baseRegister=r.visualBaseRegister;std::string reason;s.locatorReady=target.verified&&RuntimeLayoutSupportsVisualSuppression(r,reason);s.phase=s.locatorReady?VisualRuntimePhase::LocatorReady:VisualRuntimePhase::NotLocated;s.error=s.locatorReady?std::string{}:reason;}
+void InitializeVisualRuntime(VisualRuntimeState& s,const TargetInfo& target){s={};const auto&r=target.runtime;s.pid=target.pid;s.creationTime=target.creationTime;s.moduleBase=target.base;s.targetSha256=target.image.sha256;s.readerRva=r.visualReaderRva;s.lookupRva=r.visualLookupRva;s.fieldOffset=r.visualFieldOffset;s.baseRegister=r.visualBaseRegister;std::string reason;s.locatorReady=target.verified&&RuntimeLayoutSupportsVisualSuppression(r,reason);s.readerCoverageActive=s.locatorReady;s.phase=s.locatorReady?VisualRuntimePhase::LocatorReady:VisualRuntimePhase::NotLocated;s.error=s.locatorReady?std::string{}:reason;}
 bool ObserveVisualReader(VisualRuntimeState& s,uint32_t threadId,uint64_t tSkill,uint32_t currentValue,std::string& error){if(!s.locatorReady||!s.captureBreakpointActive){error="Visual reader capture is not active.";return false;}if(!tSkill||tSkill>UINT64_MAX-s.fieldOffset){error="Visual reader produced an invalid TSkill pointer.";return false;}if(currentValue==0){error="Visual field is already zero; original value ownership cannot be established.";return false;}s.pendingThreadId=threadId;s.pendingTSkill=tSkill;s.pendingVisualField=tSkill+s.fieldOffset;s.pendingOriginalValue=currentValue;s.pendingSeenPrep=false;s.phase=VisualRuntimePhase::WaitingForAoeCast;s.error.clear();error.clear();return true;}
 void ObserveVisualPreparation(VisualRuntimeState& s,uint32_t threadId){if(s.captureBreakpointActive&&s.pendingTSkill&&s.pendingThreadId==threadId)s.pendingSeenPrep=true;}
 bool ConfirmVisualAoeCall(VisualRuntimeState& s,uint32_t threadId,bool readable,uint16_t word){if(!s.captureBreakpointActive||!s.pendingTSkill||s.pendingThreadId!=threadId)return false;const bool establishedAoeOperation=readable&&(word==0x0209||word==0x020A);if(!establishedAoeOperation){s.pendingThreadId=0;s.pendingTSkill=0;s.pendingVisualField=0;s.pendingOriginalValue=0;s.pendingSeenPrep=false;return false;}if(!s.pendingSeenPrep)return false;s.tSkill=s.pendingTSkill;s.visualField=s.pendingVisualField;s.originalValue=s.pendingOriginalValue;s.resolved=true;s.captureBreakpointActive=false;s.phase=VisualRuntimePhase::TSkillResolved;s.error.clear();s.pendingThreadId=0;s.pendingTSkill=0;s.pendingVisualField=0;s.pendingOriginalValue=0;s.pendingSeenPrep=false;return true;}
-void InvalidateVisualRuntime(VisualRuntimeState& s,VisualRuntimePhase phase,const std::string& reason){s.resolved=false;s.captureBreakpointActive=false;s.suppressionRequested=false;s.downstreamOriginalActive=false;s.downstreamThreadId=0;s.pendingThreadId=0;s.pendingTSkill=0;s.pendingVisualField=0;s.pendingOriginalValue=0;s.pendingSeenPrep=false;s.tSkill=0;s.visualField=0;s.originalValue=0;s.phase=phase;s.error=reason;}
+void InvalidateVisualRuntime(VisualRuntimeState& s,VisualRuntimePhase phase,const std::string& reason){s.resolved=false;s.captureBreakpointActive=false;s.readerCoverageActive=false;s.suppressionRequested=false;s.downstreamOriginalActive=false;s.restoreRequired=false;s.downstreamThreadId=0;s.pendingThreadId=0;s.pendingTSkill=0;s.pendingVisualField=0;s.pendingOriginalValue=0;s.pendingSeenPrep=false;s.tSkill=0;s.visualField=0;s.originalValue=0;s.phase=phase;s.error=reason;}
 bool SameVisualSession(const VisualSessionIdentity&a,const VisualSessionIdentity&b){return a.pid&&a.pid==b.pid&&a.creationTime==b.creationTime&&a.moduleBase==b.moduleBase&&a.generation==b.generation&&!a.targetSha256.empty()&&a.targetSha256==b.targetSha256;}
 bool BindVisualSessionCache(VisualSessionCache& c,const VisualRuntimeState& r,const VisualSessionIdentity&i,std::string& error){if(!r.resolved||!r.tSkill||!r.visualField||!r.originalValue||r.pid!=i.pid||r.creationTime!=i.creationTime||r.moduleBase!=i.moduleBase||r.targetSha256!=i.targetSha256){error="Resolved TSkill does not match the active manager session.";return false;}c={};c.valid=true;c.identity=i;c.tSkill=r.tSkill;c.visualField=r.visualField;c.fieldOffset=r.fieldOffset;c.originalValue=r.originalValue;error.clear();return true;}
 void InvalidateVisualSessionCache(VisualSessionCache& c,const std::string& reason){c={};c.error=reason;}

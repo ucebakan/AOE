@@ -24,10 +24,10 @@ static class DashboardTests
         check(overview.MoveCard(8, 0) && overview.Cards[0].Id == 8, "card can move from last to first");
         using (var reopened = new OverviewPanel(_ => { }, _ => { }, new CoordinateDraft(), Path.Combine(Program.DataRoot, "card-order.json")))
             check(reopened.Cards.Select(c => c.Id).SequenceEqual(overview.Cards.Select(c => c.Id)), "card order survives overview reconstruction");
-        check(overview.MoveCard(8, 7) && overview.Cards.Select(c => c.Id).SequenceEqual(before), "card can move back to last without losing other order");
+        check(overview.MoveCard(8, 7) && overview.Cards.Select(c => c.Id).SequenceEqual(before), "card can move back without losing other order or new Salesman card");
         check(!overview.MoveCard(-1, 0) && !overview.MoveCard(1, 99), "invalid reorder cannot corrupt card list");
         string damaged = Path.Combine(output, "order-fixture.json"); File.WriteAllText(damaged, "[8,8,999,1]");
-        check(new CardOrder(damaged).Load(before).SequenceEqual(new[] { 8, 1, 2, 3, 4, 5, 6, 7 }), "saved order tolerates duplicates unknown ids and new cards");
+        check(new CardOrder(damaged).Load(before).SequenceEqual(new[] { 8, 1, 2, 3, 4, 5, 6, 7, 9, 10 }), "saved order tolerates duplicates unknown ids and new cards");
         File.WriteAllText(damaged, "broken"); check(new CardOrder(damaged).Load(before).SequenceEqual(before), "corrupt order recovers default arrangement");
         shell.SelectPage(0); overview.AutoScrollPosition = Point.Empty;
     }

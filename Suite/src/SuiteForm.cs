@@ -5,11 +5,11 @@ namespace UnityTools;
 
 sealed class SuiteForm : Form
 {
-    internal static readonly string[] Names = ["Genel bakış", "Player XYZ", "Speed / Jump", "Invisible / Aggro", "MobTP", "AOE Manager", "PlayerCounter", "SafeMode", "Multikill"];
+    internal static readonly string[] Names = ["Genel bakış", "Player XYZ", "Speed / Jump", "Invisible / Aggro", "MobTP", "AOE Manager", "PlayerCounter", "SafeMode", "Multikill", "Salesman", "Collection"];
     static readonly string[] Descriptions = ["İşlevleri buradan aç, kapat veya uygula. Ayrıntılar için karttaki ayarlar bağlantısını kullan.",
         "Canlı koordinatları kontrol et ve hedef X, Y, Z değerlerini hazırla.", "Speed ve Jump bağımsız çalışır.",
         "Mod durumunu ve gerekirse yeni build doğrulamasını kontrol et.", "Mesafeyi, listeyi ve oyun içi kısayolu yönet.",
-        "Bağlantı, doğrulama ve AOE çalışma ayarları.", "", "", "JE işlevi, AOB / profil doğrulaması ve patch recovery."];
+        "Bağlantı, doğrulama ve AOE çalışma ayarları.", "", "", "JE işlevi, AOB / profil doğrulaması ve patch recovery.", "NPC olmadan satış penceresini doğrudan aç; profil ve geri alma durumunu kontrol et.", "Yeni ölen mobların loot’unu hedef seçmeden otomatik topla; buradan aç veya kapat."];
     readonly Label info = Responsive.Text("Genel bakış düğmeleri işlevleri çalıştırır. İlk kullanımda gerekli doğrulama kontrol edilir."),
         title = Responsive.Text("", 22, true), subtitle = Responsive.Text("");
     readonly TextBox footer = new() { Multiline = true, ReadOnly = true, ScrollBars = ScrollBars.Vertical, Dock = DockStyle.Fill, BorderStyle = BorderStyle.None, BackColor = Palette.Elevated, ForeColor = Palette.Muted };
@@ -59,7 +59,7 @@ sealed class SuiteForm : Form
         var information = new ContentStack { BackColor = Palette.Elevated, Padding = new(12, 3, 12, 3), Margin = new(0, 0, 0, 6) };
         info.ForeColor = Palette.Muted; information.AddRow(info); layout.Controls.Add(information, 0, 1);
         navigation.Margin = new(0, 0, 0, 4);
-        foreach (int i in new[] { 0, 1, 2, 3, 4, 5, 8 })
+        foreach (int i in new[] { 0, 1, 2, 3, 4, 5, 8, 9, 10 })
         {
             int index = i; var button = new NavButton { Text = Names[i], AutoSize = true, AutoSizeMode = AutoSizeMode.GrowAndShrink, Padding = new(14, 10, 14, 10), Margin = new(0, 3, 5, 3) };
             button.Click += (_, _) => SelectPage(index); buttons.Add(button); navigation.Controls.Add(button);
@@ -149,7 +149,7 @@ sealed class SuiteForm : Form
             scanAccepted = !scanCancel.IsCancellationRequested;
             if (!automatic) retryUntil = DateTime.UtcNow.AddMinutes(2);
             int ready = startupScan.Results.Values.Count(r => r.Status == ScanStatus.Ready);
-            footer.Text = $"Tarama: {ready}/9 canlı yol doğrulandı. İşlevler açılmadı. Manuel / bekleyen kontroller için Tarama / durum düğmesini kullan.";
+            footer.Text = $"Tarama: {ready}/{StartupScan.Order.Length} canlı yol doğrulandı. İşlevler açılmadı. Manuel / bekleyen kontroller için Tarama / durum düğmesini kullan.";
         }
         catch (Exception ex) { footer.Text = "Tarama tamamlanamadı: " + ex.Message; }
         finally { scanCancel.Dispose(); scanCancel = null; scanTask = null; if (!closing && !exitRequested) navigation.Enabled = Overview.Enabled = true; }
@@ -169,7 +169,7 @@ sealed class SuiteForm : Form
         {
             Workspace.Show(index); Overview.Visible = index == 0; if (index == 0) Overview.BringToFront();
             SelectedPage = index; title.Text = index == 0 ? "Tüm araçların. Tek kontrol alanı." : Names[index]; subtitle.Text = Descriptions[index];
-            for (int i = 0; i < buttons.Count; i++) { buttons[i].Selected = (i == 6 ? 8 : i) == index; buttons[i].Invalidate(); }
+            for (int i = 0; i < buttons.Count; i++) { buttons[i].Selected = (i >= 6 ? i + 2 : i) == index; buttons[i].Invalidate(); }
             Overview.UpdateState(Actions);
         }
         catch (Exception ex) { footer.Text = "Araç açılamadı: " + ex.Message; }

@@ -14,6 +14,11 @@
 #include <vector>
 
 namespace {
+int ownershipCalls=0;
+int __cdecl OwnerProof(uint32_t pid,uint64_t created,uint64_t base,const char* sha,uint64_t rva,const uint8_t* original,const uint8_t* patched,size_t count){
+    ++ownershipCalls;
+    return pid==100&&created==200&&base==0x180000000&&std::string(sha)==std::string(64,'A')&&rva==0x309&&count==6&&original[0]==0x0F&&original[1]==0x86&&patched[1]==0x84&&std::equal(original+2,original+6,patched+2);
+}
 void Require(bool condition, const std::string& message) {
     if (!condition) throw std::runtime_error(message);
 }
@@ -374,6 +379,24 @@ int main(int argc, char** argv) {
         Require(error == "Invalid AOE live session/build identity", "Null handle reached process identity API");
     });
 
+    check("owned_Multikill_JE_preserves_AOE_live_evidence_guards",[]{
+        aoe::TargetInfo target;target.verified=true;target.pid=100;target.creationTime=200;target.base=0x180000000;target.size=0x1000;target.image.sha256=std::string(64,'A');
+        aoe::AoeLocatorResult result;result.ready=true;result.image.sha256=target.image.sha256;result.image.imageSize=uint32_t(target.size);
+        aoe::AoeSignatureResult radius;radius.name="AcquisitionRadiusGuard";radius.valid=true;radius.rva=0x300;result.signatures.push_back(radius);
+        std::vector<uint8_t> disk={0xF3,0x41,0x0F,0x10,0x46,0x48,0x0F,0x2F,0xC1,0x0F,0x86,0x78,0x01,0,0},live=disk;live[10]=0x84;
+        result.liveEvidence.push_back({0x300,disk});std::vector<uint8_t> branch(live.begin()+9,live.end());
+        auto match=[&](const auto& bytes,aoe::OwnedPatchValidator validator){return aoe::MatchAoeLiveEvidence(target,result,0x300,disk,bytes,branch,validator);};
+        ownershipCalls=0;Require(match(disk,nullptr),"Original code requires no owner");Require(ownershipCalls==0,"Unpatched code invoked owner");
+        Require(!match(live,nullptr),"Foreign JE accepted without owner");
+        Require(match(live,OwnerProof)&&ownershipCalls==1,"Same-session owned JE rejected");
+        auto bad=live;bad[0]^=1;Require(!match(bad,OwnerProof),"Neighboring opcode change accepted");
+        branch[2]^=1;bad=live;bad[11]^=1;Require(!match(bad,OwnerProof),"Jcc displacement change accepted");branch.assign(live.begin()+9,live.end());
+        target.pid++;Require(!match(live,OwnerProof),"Different PID accepted");target.pid--;
+        target.creationTime++;Require(!match(live,OwnerProof),"Reused PID accepted");target.creationTime--;
+        target.base+=0x10000;Require(!match(live,OwnerProof),"Old module base accepted");target.base-=0x10000;
+        target.image.sha256[0]='B';Require(!match(live,OwnerProof),"Different SHA accepted");target.image.sha256=result.image.sha256;
+        result.signatures[0].valid=false;Require(!match(live,OwnerProof),"Unproven radius anchor accepted");
+    });
     if (currentImage) {
         try {
             const std::filesystem::path source = LR"(C:\Games\4Unity\TClient.exe)";

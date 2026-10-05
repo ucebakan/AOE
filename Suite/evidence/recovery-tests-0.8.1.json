@@ -1,0 +1,186 @@
+{
+  "status": "PASS",
+  "sha": "4DC9C526A895A10113C4CF23F2D199BFF283D2C7CE75F949DC49CEF15D27D622",
+  "failed": 0,
+  "checks": [
+    {
+      "name": "XYZ automatic recovery and SHA cache",
+      "status": "PASS",
+      "detail": {
+        "RootRva": 16080232,
+        "OwnerToPlayerOffset": 10080,
+        "CoordinateA": [
+          112,
+          116,
+          120
+        ],
+        "CoordinateB": [
+          176,
+          180,
+          184
+        ],
+        "CtclientcharVtableRva": 14281784
+      }
+    },
+    {
+      "name": "Speed/Jump automatic recovery and SHA cache",
+      "status": "PASS",
+      "detail": {
+        "RootRva": 16080232,
+        "OwnerToPlayerOffset": 10080,
+        "SpeedFieldOffset": 4764,
+        "JumpFieldOffset": 2280,
+        "JumpWriterRva": 2101049
+      }
+    },
+    {
+      "name": "Recovered root rebuilds current pointers under ASLR",
+      "status": "PASS",
+      "detail": "Both bases rebuilt; missing root and changed live getter rejected"
+    },
+    {
+      "name": "Invisible/Aggro automatic fields and exact writer bytes",
+      "status": "PASS",
+      "detail": {
+        "Context": 16080232,
+        "Player": 10080,
+        "ActorId": 1904,
+        "ActorType": 2025,
+        "Stealth": 2026,
+        "Visual": 1150
+      }
+    },
+    {
+      "name": "MobTP automatic recovery and SHA cache",
+      "status": "PASS",
+      "detail": {
+        "RootRva": 16080232,
+        "ActorIdOffset": 1904,
+        "ActorTypeOffset": 2025,
+        "HomeOffset": 5000,
+        "ActorSize": 5072
+      }
+    },
+    {
+      "name": "AOE automatic profile, loader and live gate",
+      "status": "PASS",
+      "detail": "C:\\Users\\xaofx\\AppData\\Local\\Temp\\4UnityTools-tests\\7980\\AOE\\profiles\\4DC9C526A895A10113C4CF23F2D199BFF283D2C7CE75F949DC49CEF15D27D622.json"
+    },
+    {
+      "name": "Counter/Exit automatic disk recovery",
+      "status": "PASS",
+      "detail": "Counter\u002BExit resolved: root=f55d68 count=1188 exit=335290"
+    },
+    {
+      "name": "Counter/Exit click uses current recovered profile",
+      "status": "PASS",
+      "detail": "PASS: current Exit profile selects recovered RVA/root; legacy fallback, changed code/context/slot rejected; no live dispatch"
+    },
+    {
+      "name": "Multikill semantic recovery",
+      "status": "PASS",
+      "detail": {
+        "Sha256": "4DC9C526A895A10113C4CF23F2D199BFF283D2C7CE75F949DC49CEF15D27D622",
+        "ImageSize": 17178624,
+        "Timestamp": 1791055429,
+        "SignatureRva": 1645374,
+        "PatchOffset": 16,
+        "Aob": "0FC6D2000F51CAF3410F1046480F2FC10F86780100008BBF7007000085FF0F846A010000488B442460482B44245848C1F8034883F8400F8352010000B908000000E83CD49D004C8BF88938C6400402",
+        "Original": "0F8678010000",
+        "Patched": "0F8478010000"
+      }
+    },
+    {
+      "name": "Salesman direct opening and patch recovery",
+      "status": "PASS",
+      "detail": {
+        "status": "PASS",
+        "game_memory_writes": 0,
+        "game_function_calls": 0,
+        "Sha": "4DC9C526A895A10113C4CF23F2D199BFF283D2C7CE75F949DC49CEF15D27D622",
+        "Sender": 653568,
+        "Finder": 11684432,
+        "CloseSite": 1473955,
+        "checks": [
+          "unchanged file ID/change time reuses verified SHA",
+          "same size and restored last-write time cannot hide changed resource contents",
+          "replacement file ID forces new SHA verification",
+          "explicit resource recovery bypasses fingerprint cache",
+          "same exact EXE SHA and unchanged JSON reuse semantic proof without AOB rescan",
+          "edited cached JSON cannot bypass semantic checks; corrupted profile rebuilt",
+          "current game\u0027s operands and method links recovered",
+          "cached operand corruption rejected",
+          "foreign SHA rejected",
+          "inconsistent linked session operands rejected",
+          "changed SHA re-derives session operand rather than old RVA profile",
+          "missing opening signature fails closed",
+          "duplicate opening signature fails closed",
+          "changed request opcode semantic fingerprint rejected",
+          "managed/native request layout matches",
+          "direct bridge calls own UI-thread fixture once; wrong session, expired request and wrong PID rejected; no keyboard input",
+          "separate-process fixture receives NPC 22631 exactly once on its own UI thread without key input",
+          "separate-process guardian restores original code and RX protection: normal",
+          "separate-process guardian restores original code and RX protection: fault",
+          "separate-process guardian restores original code and RX protection: abrupt",
+          "separate-process guardian restores original code and RX protection: protected",
+          "separate-process guardian restores original code and RX protection: expired",
+          "one-click action, read-only scan and sequential cleanup integrated"
+        ]
+      }
+    },
+    {
+      "name": "Collection grouped automation and patch recovery",
+      "status": "PASS",
+      "detail": [
+        "Managed bridge ABI matches native layout",
+        "Native batch ABI 6952 bytes",
+        "Native 64 group, duplicate, partial failure, mixed session, host identity, cancellation and deadline guards",
+        "Native recovered fields, live fingerprint, stale membership, parent relationship and real 9909 buff guards",
+        "Native cancellation retains mapping until in-flight callback finishes",
+        "Same SHA validated profile reused without scan",
+        "Current build sender, world, death and registry fields derived semantically",
+        "Corrupt profile field rejected",
+        "Altered cached profile recovered through fresh unique scan",
+        "Ambiguous sender AOB rejected",
+        "Missing sender AOB has no old RVA fallback",
+        "New SHA relocates unique sender and revalidates manual call link",
+        "Changed native sender schema rejected",
+        "Existing corpses skipped on activation",
+        "150 deaths sent as 64/64/22 without one-mob wait",
+        "Repeated dead snapshots never duplicate loot",
+        "Recycled actor invalidates pending death",
+        "Despawn invalidates pending death",
+        "Respawn creates one new death generation",
+        "Prepare/startup validation cannot activate automation",
+        "Automatic deaths dispatch without target selection",
+        "Controller drains batch backlog immediately",
+        "Worker deduplicates recurring dead registry",
+        "Button stop cancels and disposes session after clean callback",
+        "SafeMode cancels continuous automation without future sends",
+        "Pending native cleanup retains session and blocks new sends",
+        "Pending cleanup may finish before serialized shutdown advances"
+      ]
+    },
+    {
+      "name": "AOE/Multikill same-session ownership and native bridge",
+      "status": "PASS",
+      "detail": {
+        "checks": 14,
+        "game_memory_writes": 0,
+        "scope": "Owned fake session; no game attach, arm or patch"
+      }
+    },
+    {
+      "name": "Changed SHA extracts new fields; inconsistent layout rejected",
+      "status": "PASS",
+      "detail": "Changed offsets recovered; inconsistent triplet and root rejected"
+    },
+    {
+      "name": "Missing and duplicate anchor rejection",
+      "status": "PASS",
+      "detail": "Missing and ambiguous roots rejected"
+    }
+  ],
+  "game_memory_writes": 0,
+  "feature_activation": 0
+}

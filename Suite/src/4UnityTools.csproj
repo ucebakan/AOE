@@ -9,7 +9,7 @@
     <PlatformTarget>x64</PlatformTarget>
     <AssemblyName>4UnityTools</AssemblyName>
     <RootNamespace>UnityTools</RootNamespace>
-    <Version>0.6.0</Version>
+    <Version>0.8.1</Version>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <PublishSingleFile>true</PublishSingleFile>
     <SelfContained>true</SelfContained>
@@ -22,6 +22,10 @@
       <Output TaskParameter="Result" PropertyName="_SuiteRequestedExecutionLevel" />
     </XmlPeek>
     <Error Condition="'$(_SuiteRequestedExecutionLevel)' != 'requireAdministrator'" Text="4UnityTools requires requestedExecutionLevel=requireAdministrator. Do not remove the UAC requirement." />
+    <XmlPeek XmlInputPath="$(MSBuildProjectDirectory)/app.manifest" Query="//*[local-name()='requestedExecutionLevel']/@uiAccess">
+      <Output TaskParameter="Result" PropertyName="_SuiteUiAccess" />
+    </XmlPeek>
+    <Error Condition="'$(_SuiteUiAccess)' != 'false'" Text="4UnityTools requires uiAccess=false in its UAC manifest." />
   </Target>
   <ItemGroup>
     <ProjectReference Include="../../Multikill/src/Multikill.csproj" />
@@ -31,6 +35,10 @@
     <ProjectReference Include="../../MobTP/tools/MobTP/MobTP.csproj" />
     <EmbeddedResource Include="../build/native/Release/UnityAoe.dll" LogicalName="payload/UnityAoe.dll" />
     <EmbeddedResource Include="../build/native/Release/UnityCounter.dll" LogicalName="payload/UnityCounter.dll" />
+    <EmbeddedResource Include="../build/native/Release/UnitySalesman.dll" LogicalName="payload/UnitySalesman.dll" />
+    <EmbeddedResource Include="../build/native/Release/UnityCollection.dll" LogicalName="payload/UnityCollection.dll" />
+    <EmbeddedResource Include="Collection/patterns.json" LogicalName="Collection.patterns.json" />
+    <EmbeddedResource Include="../../MobTP/tools/MobTP/signatures.json" LogicalName="Collection.registry.json" />
     <EmbeddedResource Include="../../AOE/profiles/*.json" LogicalName="payload/AOE/profiles/%(Filename)%(Extension)" />
     <EmbeddedResource Include="../../AOE/docs/*.md" LogicalName="payload/AOE/docs/%(Filename)%(Extension)" />
   </ItemGroup>

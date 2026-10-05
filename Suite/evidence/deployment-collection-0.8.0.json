@@ -1,0 +1,17 @@
+{
+  "artifact": "C:\\Users\\Public\\Documents\\4UnityTools\\Suite\\releases\\0.8.0\\4UnityTools.exe",
+  "root_exe_updated": true,
+  "game_function_calls_in_live_probe": 0,
+  "uiAccess": false,
+  "ui": "PASS",
+  "version": "0.8.0",
+  "uac": "requireAdministrator",
+  "collection": "PASS",
+  "game_memory_writes_in_tests": 0,
+  "live_profile": "PASS",
+  "ui_checks": 225,
+  "live_automatic_loot_tested": false,
+  "recovery": "PASS",
+  "sha256": "263A7EB4C575D271B323A58493C276BA9DE7B061F79B52F4CE8B9288B568B9EE",
+  "collection_checks": 27
+}

@@ -36,6 +36,11 @@ bool DecodeAoeCall(const std::vector<uint8_t>& bytes,uint64_t instructionRva,uin
 std::vector<VisualReaderCandidate> DecodeVisualReaderSequences(const std::vector<uint8_t>& bytes,uint64_t baseRva,uint64_t imageSize);
 bool LocateAoeImage(const std::filesystem::path& path,AoeLocatorResult& result,std::string& error,const BuildProfile* cached=nullptr);
 bool ValidateAoeProfile(const BuildProfile& profile,const AoeLocatorResult& result,std::string& error);
+using OwnedPatchValidator = int (__cdecl*)(uint32_t,uint64_t,uint64_t,const char*,uint64_t,const uint8_t*,const uint8_t*,size_t);
+void ConfigureOwnedPatchValidator(OwnedPatchValidator validator);
+int CheckOwnedPatchProof(uint32_t pid,uint64_t created,uint64_t base,const char* sha,uint64_t rva,const uint8_t* original,const uint8_t* patched,size_t count);
+bool MatchAoeLiveEvidence(const TargetInfo& target,const AoeLocatorResult& result,uint64_t rva,
+    const std::vector<uint8_t>& expected,const std::vector<uint8_t>& actual,const std::vector<uint8_t>& liveBranch,OwnedPatchValidator validator);
 bool ValidateAoeLive(HANDLE process,const TargetInfo& target,const AoeLocatorResult& result,std::string& error);
 bool RecoverAndSaveAoeProfile(const std::filesystem::path& image,const std::filesystem::path& directory,BuildProfile& profile,std::filesystem::path& selected,std::string& error);
 }

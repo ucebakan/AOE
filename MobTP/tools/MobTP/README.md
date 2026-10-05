@@ -10,6 +10,8 @@ Yönetici olarak açın; birden fazla görünür TClient varsa işlem reddedilir
 2. İsterseniz "Arka plandaki mob listesini göster" kutusunu açın.
 3. Çevre mesafesi varsayılan 2 birimdir (1–10). Mob hedefleri bu yarıçapta XZ halkasına
    dağılır, Y oyuncudan alınır. Bu geometrik yerleşimdir; zemin/engel veya model boyutu testi yapılmaz.
+   **Home range (XZ)** alanına istediğiniz Home mesafesini girin (pozitif değer, en az 0.1).
+   Varsayılan 50'dir; 50 üzerinde sabit bir sınır yoktur. Değer ayarlarda saklanır.
 4. "UYGUN MOBLARI YANIMA GETİR" düğmesine basın. Düğme bir batch yapar;
    otomatik/sürekli teleport yoktur. Atanabilir Windows kısayolu da aynı batch yolunu çağırır. Batch sırasında sabit durun.
 
@@ -20,7 +22,8 @@ harita moblarını keşfetmez. Observer araştırma capture'ı veya öğrenilmi�
 
 - Kullanıcı seçimiyle Home = Actor+12D8/12DC/12E0 güncel XYZ.
 - Player = mevcut doğrulanmış PlayerXYZ profili, A koordinatları.
-- Hem Player→Home XZ hem Target→Home XZ **<=50** olmalıdır.
+- Hem Player→Home XZ hem Target→Home XZ, kullanıcının **Home range (XZ)** değerini aşmamalıdır.
+  Önizleme, düğme, kısayol ve yazma öncesi kontroller aynı değeri kullanır; batch boyunca değer sabittir.
 - Ayrıca Current→Player 100 birim sınırı yoktur; kullanıcı yalnız Home filtresi istedi.
 - Sınır içindeki oyuncuya rağmen halkanın hedefi sınırı aşıyorsa o mob atlanır.
 - Mobları oyuncunun koordinatına yığmaz; hedef en az 0.9 XZ uzaklık kontrolünden geçer.
@@ -28,6 +31,9 @@ harita moblarını keşfetmez. Observer araştırma capture'ı veya öğrenilmi�
   ardından A alanına 12 byte XYZ (mevcut build: +B0, +70). Her API sonucu/byte sayısı kontrol edilir.
 - İki yazma atomik değildir. Kısmi hata veya B sonrasında doğrulama kaybında batch durur;
   eski bir pointer'a kör geri alma yapılmaz. Önceki başarılar geri alınmaz.
+- Geçerli kimlik ve başarılı iki yazımdan sonraki konum farkı yalnız o mobun sonucudur;
+  kalan moblar kendi taze kontrolleriyle işlenir. Küçük Y farkı ayrı XZ sonucu olarak
+  gösterilir. Okunamayan/geçersiz geri okuma veya geri okuma sırasında kimlik kaybı batch'i durdurur.
 
 Salt-okunur izleme için ayrı handle, düğmenin batch'i için kısa ömürlü write handle açılır.
 ALL_ACCESS, injection, koruma değiştirme, remote thread, paket gönderimi yoktur.
@@ -53,7 +59,7 @@ raporunun uyarlamasıdır; güncel oyunun bunu koruyacağı henüz doğrulanmad�
 dotnet build tools/MobTP/MobTP.csproj -c Release
 dotnet publish tools/MobTP/MobTP.csproj -c Release -o dist/MobTP
 
---self-test: 20 sentetik/Windows hotkey kayıt filtre/yerleşim/guard/partial-write/readback testi; process yazmaz.
+--self-test: 30 sentetik/Windows hotkey kayıt filtre/yerleşim/guard/partial-write/readback/ayar testi; process yazmaz.
 --ui-test: sentetik arayüz resmi üretir; oyuna bağlanmaz.
 --probe: yalnız salt-okunur bağlantıyı dener, probe.json üretir; teleport yapmaz.
 
@@ -74,10 +80,10 @@ Aynı anda iki batch çalışmaz. Tuş/düğme kullanımı logda ayrı kaydedili
 
 ## Sayaçlar
 
-Yüklenen mob, Home<=50 olan ve Teleport koşullarını sağlayan sayıları ayrı gösterilir.
+Yüklenen mob, seçilen Home range içinde olan ve Teleport koşullarını sağlayan sayıları ayrı gösterilir.
 Sonuncusu hem oyuncu-Home hem hesaplanan halka hedefi-Home mesafesini ve merkezden
 uzaklığı kontrol eder. UI ve gerçek batch aynı Placement.Plan fonksiyonunu kullanır.
-Çevre mesafesi değişince sayı da yenilenir. Sayaç son okumaya aittir; gerçek yazma öncesi
+Çevre mesafesi veya Home range değişince sayı da yenilenir. Sayaç son okumaya aittir; gerçek yazma öncesi
 tekrar kontrol edildiğinden hareket eden veya kaybolan mob sonradan atlanabilir.
 
 ## Speed uygulamasından uyarlanan profil ve patch koruması

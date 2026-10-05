@@ -20,3 +20,12 @@ extern "C" __declspec(dllexport) int ResolveCounterDisk(const char* sha,char* me
     if(message&&capacity>0)strncpy_s(message,size_t(capacity),text.str().c_str(),_TRUNCATE);
     return p?1:0;
 }
+extern "C" __declspec(dllexport) int ProbeCounterExit(wchar_t* message,int capacity){
+    pc::ProcessReader reader;std::wstring result;bool ok=false;
+    if(!reader.Open())result=reader.Error();
+    else if(auto count=reader.Poll()){
+        ok=reader.CanExit();result=L"PlayerCounter="+std::to_wstring(*count)+(ok?L"; current Exit profile ready; no Exit dispatch":L"; Exit live guards not ready");
+    }else result=reader.Error();
+    if(message&&capacity>0)wcsncpy_s(message,size_t(capacity),result.c_str(),_TRUNCATE);
+    return ok?1:0;
+}

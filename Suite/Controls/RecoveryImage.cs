@@ -8,6 +8,35 @@ public sealed class RecoveryImage : IDisposable
 {
     readonly byte[] image;
     readonly PEReader pe;
+    (int Start,int End,int Unwind)[]? functions;
+    (int Start,int End,int Unwind)[] Functions
+    {
+        get
+        {
+            if(functions is not null)return functions;
+            var d=pe.PEHeaders.PEHeader!.ExceptionTableDirectory;
+            if(d.Size==0||d.Size%12!=0)throw new IOException("Recovery: x64 fonksiyon sınırları eksik.");
+            var data=At(d.RelativeVirtualAddress,d.Size);
+            var entries=new (int Start,int End,int Unwind)[data.Length/12];
+            for(int i=0;i<entries.Length;i++)
+            {
+                int p=i*12;entries[i]=(BitConverter.ToInt32(data,p),BitConverter.ToInt32(data,p+4),BitConverter.ToInt32(data,p+8));
+                if(entries[i].Start>=entries[i].End || (i>0&&entries[i-1].End>entries[i].Start))
+                    throw new IOException("Recovery: sırasız veya çakışan fonksiyon tablosu.");
+            }
+            return functions=entries;
+        }
+    }
+    (int Start,int End,int Unwind) Entry(int site)
+    {
+        var entries=Functions;int lo=0,hi=entries.Length-1;
+        while(lo<=hi)
+        {
+            int mid=lo+(hi-lo)/2;var e=entries[mid];
+            if(site<e.Start)hi=mid-1;else if(site>=e.End)lo=mid+1;else return e;
+        }
+        throw new IOException("Recovery: fonksiyon sınırı bulunamadı.");
+    }
     public long ImageBase => checked((long)pe.PEHeaders.PEHeader!.ImageBase);
     public RecoveryImage(byte[] image)
     {
@@ -40,11 +69,7 @@ public sealed class RecoveryImage : IDisposable
     public int FindUnique(string pattern,string name)=>Unique(Find(pattern),name);
     public (int Start,int End) Function(int site)
     {
-        var d=pe.PEHeaders.PEHeader!.ExceptionTableDirectory;
-        if(d.Size==0||d.Size%12!=0)throw new IOException("Recovery: x64 fonksiyon sınırları eksik.");
-        var data=At(d.RelativeVirtualAddress,d.Size);
-        for(int i=0;i<data.Length;i+=12){int a=BitConverter.ToInt32(data,i),b=BitConverter.ToInt32(data,i+4);if(a<=site&&site<b)return(a,b);}
-        throw new IOException("Recovery: fonksiyon sınırı bulunamadı.");
+        var e=Entry(site);return(e.Start,e.End);
     }
     public Instruction[] Decode(int start,int length)
     {
@@ -65,9 +90,7 @@ public sealed class RecoveryImage : IDisposable
     public static bool Field(ulong value,int alignment=1)=>value>=0x100&&value<=0x10000&&value%(uint)alignment==0;
     public int FunctionRoot(int site)
     {
-        var d=pe.PEHeaders.PEHeader!.ExceptionTableDirectory;var data=At(d.RelativeVirtualAddress,d.Size);
-        int entry=Function(site).Start, unwind=0;
-        for(int p=0;p<data.Length;p+=12)if(BitConverter.ToInt32(data,p)==entry){unwind=BitConverter.ToInt32(data,p+8);break;}
+        var e=Entry(site);int entry=e.Start,unwind=e.Unwind;
         var seen=new HashSet<int>();
         while(unwind!=0)
         {

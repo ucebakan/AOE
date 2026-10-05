@@ -7,7 +7,11 @@
 #include <vector>
 #include <fstream>
 void Require(bool value, const char* message) { if (!value) throw std::runtime_error(message); }
+#ifdef PC_TEST_EXPORT
+static int CounterFixtureMain(int argc, char** argv) {
+#else
 int main(int argc, char** argv) {
+#endif
     try {
         if(argc==3&&std::string(argv[1])=="--current-image"){
             std::ifstream file(pc::targetPath,std::ios::binary);
@@ -43,6 +47,9 @@ int main(int argc, char** argv) {
             contextTable+=8;Require(!pc::ReadCount(read,base,&p),"Wrong context accepted");contextTable-=8;
             changedRoot=true;rootReads=0;Require(!pc::ReadCount(read,base,&p),"Root replacement accepted");changedRoot=false;
             auto plan=pc::PrepareExit(read,base,&p);Require(plan&&plan->function==base+p.exitRva&&plan->root==context-p.rootDelta,"Dynamic Exit plan failed");
+            // Reproduce the stale-profile bug on the post-update image, without
+            // creating a thread or sending any request to the running game.
+            if(p.sha!=pc::knownSha)Require(!pc::PrepareExit(read,base,nullptr),"Legacy fallback unexpectedly accepted current image");
             for(const auto& g:p.guards){memory[g.rva]^=1;Require(!pc::PrepareExit(read,base,&p),"Changed live Exit evidence accepted");memory[g.rva]^=1;}
             memory[p.guards[2].rva]^=1;Require(!pc::ValidateLive(read,base,&p),"Changed live count resolver accepted");
             std::cout<<"PASS: automatic Counter/Exit recovery, SHA/cache/live guards, ASLR, missing count and root replacement; no game writes or Exit dispatch\n";return 0;
@@ -113,14 +120,14 @@ int main(int argc, char** argv) {
             if (n == 8 && p == context) { std::memcpy(d,&contextTable,8); return true; }
             return image(p,d,n);
         };
-        auto plan = pc::PrepareExit(exitRead,base);
+        auto plan = pc::PrepareExit(exitRead,base,nullptr);
         Require(plan && plan->root == expectedRoot && plan->context == context && plan->function == base+0x95F200,"Exit argument and ASLR function");
-        rootTable+=8; Require(!pc::PrepareExit(exitRead,base),"wrong root type rejected"); rootTable-=8;
-        contextTable+=8; Require(!pc::PrepareExit(exitRead,base),"wrong context type rejected"); contextTable-=8;
-        root=1; Require(!pc::PrepareExit(exitRead,base),"root subtraction underflow rejected"); root=context;
-        replacement=true; rootReads=0; Require(!pc::PrepareExit(exitRead,base),"Exit context replacement rejected"); replacement=false;
+        rootTable+=8; Require(!pc::PrepareExit(exitRead,base,nullptr),"wrong root type rejected"); rootTable-=8;
+        contextTable+=8; Require(!pc::PrepareExit(exitRead,base,nullptr),"wrong context type rejected"); contextTable-=8;
+        root=1; Require(!pc::PrepareExit(exitRead,base,nullptr),"root subtraction underflow rejected"); root=context;
+        replacement=true; rootReads=0; Require(!pc::PrepareExit(exitRead,base,nullptr),"Exit context replacement rejected"); replacement=false;
         memory[pc::exit_profile::rootVtableRva+0x2F0]^=1;
-        Require(!pc::PrepareExit(exitRead,base),"patched virtual slot rejected");
+        Require(!pc::PrepareExit(exitRead,base,nullptr),"patched virtual slot rejected");
         memory[pc::exit_profile::rootVtableRva+0x2F0]^=1;
         // Synthetic disk fixture: AOB must occur exactly once in executable code at the approved RVA.
         std::vector<unsigned char> disk(4096);
@@ -144,3 +151,14 @@ int main(int argc, char** argv) {
         return 0;
     } catch (const std::exception& e) { std::cerr << e.what() << '\n'; return 1; }
 }
+#ifdef PC_TEST_EXPORT
+// Fixed fixture entry points only: these never select the live --probe branch.
+extern "C" __declspec(dllexport) int RunCounterExitFixtures(const char* sha,char* message,int capacity) {
+    if(!sha||strlen(sha)!=64)return 0;
+    char name[]="counter-fixture",option[]="--current-image";
+    std::string digest(sha);char* args[]={name,option,digest.data()};
+    bool ok=CounterFixtureMain(1,args)==0&&CounterFixtureMain(3,args)==0;
+    if(message&&capacity>0)strncpy_s(message,size_t(capacity),ok?"PASS: current Exit profile selects recovered RVA/root; legacy fallback, changed code/context/slot rejected; no live dispatch":"Counter Exit fixture failed",_TRUNCATE);
+    return ok?1:0;
+}
+#endif

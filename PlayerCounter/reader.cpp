@@ -189,7 +189,7 @@ bool ProcessReader::RequestExit() {
         SIZE_T got = 0;
         return ValidPointer(p,n) && ReadProcessMemory(action.value,reinterpret_cast<void*>(p),d,n,&got) && got == n;
     };
-    const auto plan = PrepareExit(read, base_);
+    const auto plan = PrepareExit(read, base_, profile_.get());
     if (!plan || !IsAlive()) { exitError_ = L"Canlı kod veya root/context kimliği değişti; Exit engellendi."; return false; }
     MEMORY_BASIC_INFORMATION region{};
     if (!VirtualQueryEx(action.value,reinterpret_cast<void*>(plan->function),&region,sizeof(region)) ||

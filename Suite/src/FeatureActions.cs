@@ -1,6 +1,6 @@
 namespace UnityTools;
 
-enum Feature { Coordinates, Speed, Jump, Invisible, Aggro, MobTP, Aoe, Counter, SafeMode, Multikill }
+enum Feature { Coordinates, Speed, Jump, Invisible, Aggro, MobTP, Aoe, Counter, SafeMode, Multikill, Salesman, Collection }
 record FeatureState(bool Ready, bool Active, string Message);
 record ActionReply(bool RequiresSetup, string Message);
 
@@ -29,9 +29,9 @@ sealed class FeatureActions(IFeatureBackend backend)
         catch (Exception ex) { return new(true, ex.Message); }
         finally { Busy = false; }
     }
-    internal static int Page(Feature f) => f switch { Feature.Coordinates => 1, Feature.Speed or Feature.Jump => 2, Feature.Invisible or Feature.Aggro => 3, Feature.MobTP => 4, Feature.Aoe => 5, Feature.Multikill => 8, _ => 0 };
-    internal static string Name(Feature f) => f switch { Feature.Coordinates => "Işınlan", Feature.Speed => "Speed", Feature.Jump => "Jump", Feature.Invisible => "Invisible", Feature.Aggro => "Aggro", Feature.MobTP => "MobTP uygula", Feature.Aoe => "AOE", Feature.SafeMode => "SafeMode", Feature.Multikill => "Multikill", _ => "PlayerCounter" };
-    internal static bool OneShot(Feature f) => f is Feature.Coordinates or Feature.MobTP;
+    internal static int Page(Feature f) => f switch { Feature.Coordinates => 1, Feature.Speed or Feature.Jump => 2, Feature.Invisible or Feature.Aggro => 3, Feature.MobTP => 4, Feature.Aoe => 5, Feature.Multikill => 8, Feature.Salesman => 9, Feature.Collection => 10, _ => 0 };
+    internal static string Name(Feature f) => f switch { Feature.Coordinates => "Işınlan", Feature.Speed => "Speed", Feature.Jump => "Jump", Feature.Invisible => "Invisible", Feature.Aggro => "Aggro", Feature.MobTP => "MobTP uygula", Feature.Aoe => "AOE", Feature.SafeMode => "SafeMode", Feature.Multikill => "Multikill", Feature.Salesman => "Salesman", Feature.Collection => "Collection", _ => "PlayerCounter" };
+    internal static bool OneShot(Feature f) => f is Feature.Coordinates or Feature.MobTP or Feature.Salesman;
 }
 
 sealed class LiveFeatureBackend(ToolWorkspace workspace, bool preview, SafeMode safeMode) : IFeatureBackend
@@ -49,6 +49,8 @@ sealed class LiveFeatureBackend(ToolWorkspace workspace, bool preview, SafeMode 
             SpeedJump.MainForm speed => new(speed.SuiteReady, speed.SuiteActive(feature == Feature.Jump), speed.SuiteMessage),
             InvisibleAggro.MainForm invisible => new(invisible.SuiteReady, invisible.SuiteActive(feature == Feature.Aggro), invisible.SuiteMessage),
             Multikill.MainForm multi => new(multi.SuiteReady, multi.SuiteActive, multi.SuiteMessage),
+            Salesman.SalesmanForm salesman => new(salesman.SuiteReady, salesman.SuiteActive, salesman.SuiteMessage),
+            Collection.CollectionForm collection => new(collection.SuiteReady, collection.SuiteActive, collection.SuiteMessage),
             MobTP.MainForm mob => new(mob.SuiteReady, false, mob.SuiteValidation),
             _ => new(false, false, "Araç hazır değil.")
         };
@@ -66,6 +68,8 @@ sealed class LiveFeatureBackend(ToolWorkspace workspace, bool preview, SafeMode 
                 case SpeedJump.MainForm speed: await speed.SuiteRefreshAsync(); break;
                 case InvisibleAggro.MainForm invisible: await invisible.SuiteRefreshAsync(); break;
                 case Multikill.MainForm multi: await multi.SuiteRefreshAsync(); break;
+                case Salesman.SalesmanForm salesman: await salesman.SuiteRefreshAsync(); break;
+                case Collection.CollectionForm collection: await collection.SuiteRefreshAsync(); break;
                 case MobTP.MainForm mob: await mob.SuiteRefreshAsync(); break;
             }
         }
@@ -86,6 +90,10 @@ sealed class LiveFeatureBackend(ToolWorkspace workspace, bool preview, SafeMode 
                 var invisible = (InvisibleAggro.MainForm)workspace.Forms[3]; await invisible.SuiteToggleAsync(feature == Feature.Aggro); return invisible.SuiteMessage;
             case Feature.Multikill:
                 var multi = (Multikill.MainForm)workspace.Forms[8]; await multi.SuiteToggleAsync(); return multi.SuiteMessage;
+            case Feature.Salesman:
+                return await ((Salesman.SalesmanForm)workspace.Forms[9]).SuiteOpenAsync();
+            case Feature.Collection:
+                return await ((Collection.CollectionForm)workspace.Forms[10]).SuiteToggleAsync();
             case Feature.MobTP:
                 var mob = (MobTP.MainForm)workspace.Forms[4]; await mob.SuiteTeleportAsync(); return mob.SuiteMessage;
             case Feature.Aoe:

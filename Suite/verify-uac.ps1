@@ -37,7 +37,7 @@ namespace UnityTools {
 $exePath = (Resolve-Path -LiteralPath $Path).Path
 [xml]$manifest = [UnityTools.ManifestReader]::Read($exePath)
 $execution = $manifest.SelectSingleNode("//*[local-name()='requestedExecutionLevel']")
-if ($null -eq $execution -or $execution.GetAttribute('level') -ne 'requireAdministrator') {
-    throw "UAC verification failed: $exePath must embed requireAdministrator."
+if ($null -eq $execution -or $execution.GetAttribute('level') -ne 'requireAdministrator' -or $execution.GetAttribute('uiAccess') -ne 'false') {
+    throw "UAC verification failed: $exePath must embed requireAdministrator with uiAccess=false."
 }
-Write-Output "UAC verified: requireAdministrator ($exePath)"
+Write-Output "UAC verified: requireAdministrator, uiAccess=false ($exePath)"
