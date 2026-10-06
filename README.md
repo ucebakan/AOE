@@ -2,8 +2,11 @@
 
 ## Birleşik uygulama
 
-[4UnityTools Control Center](Suite/) genel bakış düğmeleriyle araçları yönetir; PlayerCounter ayrı küçük pencere olarak açılır.
-[Windows x64 ZIP · tek EXE](Suite/releases/0.8.1/4UnityTools-0.8.1-win-x64.zip) · Derleme: `.\Suite\build.ps1`.
+[4UnityTools Control Center](Suite/) Butonlar ana sayfasından araçları yönetir; PlayerCounter ayrı küçük pencere olarak açılır.
+[Windows x64 ZIP · tek EXE](Suite/releases/0.9.3/4UnityTools-0.9.3-win-x64.zip) · Derleme: `.\Suite\build.ps1`.
+0.9.3: Rain of Arrows başlangıç yolu ve caster → AOE nesnesi sahipliği düzeltildi; AOE Manager kısa durum metinleri kullanır. [AOE 0.9.3](Suite/AOE-0.9.3.md).
+0.9.2: AOE Manager Rain of Arrows, Ice Rain ve Shadow Thunderstorm için ayrı canlı doğrulama kullanır; Archer/Mage gerçek cast doğrulaması bekler. Ayrıntılar: [AOE 0.9.2](Suite/AOE-0.9.2.md).
+0.9.1: Player XYZ'de canlı konum ve başlangıçta boş hedef alanları ayrıdır. Genel bakış kaldırıldı; Butonlar ana görünümdür. XYZ yeniden açılırken hazır penceresi kullanılır.
 0.8.1, PlayerCounter Exit tıklamasını güncel SHA profiline bağlar; eski sabit profile dönüş hatası giderildi.
 0.8.0 sürümünde [Collection](Suite/COLLECTION-0.8.0.md) düğmesi hedef seçmeden otomatik grup toplamayı açıp kapatır; SHA/AOB recovery ve SafeMode ile bütünleşiktir.
 0.7.3 sürümünde MobTP, geçerli bir mobdaki geri okuma farkını ayrı raporlayıp kalan mobları işlemeye devam eder.

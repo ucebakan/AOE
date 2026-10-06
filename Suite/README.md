@@ -1,4 +1,35 @@
-# 4UnityTools · Control Center 0.8.1
+# 4UnityTools · Control Center 0.9.3
+
+0.9.3: Rain of Arrows başlangıcı farklı çağrı yolundan takip edilir; periyodik nesnenin local caster sahipliği doğrulanır. Dört takip noktası Hide/Nx boyunca sabittir. Uzun beyaz tanı yazıları kaldırıldı. [0.9.3 ayrıntıları](AOE-0.9.3.md).
+
+0.9.2: AOE Manager Priest, Mage ve Archer yeteneklerini normal castten tanır; aileler arasında canlı kanıt taşınmaz. [AOE 0.9.2 ayrıntıları](AOE-0.9.2.md). Archer/Mage canlı oyun doğrulaması henüz bekler.
+
+0.9.1: Player XYZ'de **Kendi konumum · canlı** kutuları salt okunurdur.
+**Hedef konum** için ayrı, başlangıçta boş X/Y/Z kutuları bulunur; **Işınlan**
+ve **Listeye ekle** bu hedefi kullanır. **Konumumu hedefe kopyala** isteğe bağlıdır.
+Genel bakış kaldırıldı; ana sayfa Butonlar'dır. XYZ'yi kapatınca pencere gizlenir,
+yeniden Aç aynı hazır pencereyi gösterir. Gizliyken koordinat sorguları durur;
+ana uygulama kapanınca XYZ de kapanır. [0.9.1 ayrıntıları](XYZ-0.9.1.md).
+
+0.9.0: **Butonlar → Player XYZ → Aç**, ana EXE içinden ayrı PlayerXYZ EXE
+penceresini açar. Pencere dar, dikey ve topmost olarak kullanıcı kapatana kadar
+açık kalır. Yalnız üç X/Y/Z kutusu vardır: canlı konum izlenir; kullanıcı
+düzenlediğinde hedef olur ve okuma yazılan hedefi ezmez. **Konumu getir** canlı
+izlemeye geri döner, **Işınlan** tek seferlik doğrulanmış yazım yapar.
+
+Noktaya ad verip **Listeye ekle** ile sıralı liste oluşturabilirsin. **Liste
+kaydet** JSON dosyası oluşturur; **Liste yükle** oyunu yeniden açtıktan sonra bu
+dosyayı geri getirir. Son liste ayrıca otomatik saklanır ve pencere açılınca
+geri gelir. Nokta yanındaki **↗** yalnız o noktaya bir kez ışınlanır; listeyi
+açmak, kaydetmek veya pencereyi açmak ışınlanma yapmaz. Oyun kapalıyken de
+listeler yönetilebilir. Genel bakış kartındaki mevcut Işınlan işlemi korunur.
+
+Çocuk pencere oyun belleğine erişmez. İstekleri ana uygulamanın mevcut SHA /
+profil / canlı oturum doğrulaması ve SafeMode kapısı üzerinden uygulanır.
+Ana uygulama kapanırsa çocuk pencere açık kalabilir; listeler görülebilir,
+ışınlanma devre dışı kalır. Her iki EXE aynı requireAdministrator / uiAccess=false
+manifestini taşır; zaten yönetici olan ana uygulamadan açılan çocuk için Windows
+yeniden UAC istemeyebilir. Ayrı çalışma zamanı kurulumu gerekmez.
 
 0.8.1, PlayerCounter **Exit** tıklamasının oyun patchinden sonra eski profili
 kullanıp reddedilmesini düzeltir. Hazır olma ve tıklama aynı güncel profil ile
@@ -25,14 +56,14 @@ penceresini doğrudan açar; SELL TRASH'a oyun içinde sen basarsın. SHA/profil
 tekil AOB + metot bağlantısı recovery, salt okunur açılış taraması ve SafeMode /
 kapanışta geri alma ile bütünleşiktir. [Salesman ayrıntıları](SALESMAN-0.7.0.md).
 
-Yeni uygulama: [4UnityTools 0.8.1 ZIP](releases/0.8.1/4UnityTools-0.8.1-win-x64.zip).
+Yeni uygulama: [4UnityTools 0.9.3 ZIP](releases/0.9.3/4UnityTools-0.9.3-win-x64.zip).
 Önce açık eski 4UnityTools'u kapat, ardından yeni EXE'yi aç.
 
-Genel bakıştaki düğmeler gerçek işlevleri çalıştırır. Player XYZ, Speed / Jump,
+Butonlar sayfasındaki düğmeler gerçek işlevleri çalıştırır. Player XYZ, Speed / Jump,
 Invisible / Aggro, MobTP ve AOE aynı uygulamada yönetilir. PlayerCounter eski
 görünümüyle ayrı, küçük, taşınabilir ve üstte kalan pencere olarak açılır.
 
-ZIP içindeki `4UnityTools.exe` doğrudan çalıştırılır. SHA-256 değerleri aynı klasördeki `SHA256SUMS.txt` dosyasındadır. Önceki sürüm: [0.7.0 ZIP](releases/0.7.0/4UnityTools-0.7.0-win-x64.zip).
+ZIP içindeki `4UnityTools.exe` doğrudan çalıştırılır. SHA-256 değerleri aynı klasördeki `SHA256SUMS.txt` dosyasındadır.
 
 0.6.3, Hide + Initial birlikteyken görsel reader geçişinin bekleyen DR6
 bitlerini silmesini düzeltir. Core breakpoint'ler yerinde korunur; reader

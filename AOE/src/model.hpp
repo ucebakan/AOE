@@ -1,4 +1,5 @@
 #pragma once
+#include "operation_observer.hpp"
 #include <cstdint>
 #include <array>
 #include <filesystem>
@@ -27,7 +28,19 @@ inline constexpr char PreviousPatchHash[] = "D0ECBBA10685D94E7CA632D6A9CEB9B3C2C
 inline constexpr char CurrentPatchHash[] = "FB13C1257A401BB4E866247921A79D7C044AFC69CDAED9869C945940DD60B8D7";
 enum class X64RegisterId : uint8_t { Rax, Rcx, Rdx, Rbx, Rsp, Rbp, Rsi, Rdi, R8, R9, R10, R11, R12, R13, R14, R15, Invalid=0xFF };
 inline const char* X64RegisterName(X64RegisterId value){switch(value){case X64RegisterId::Rax:return "RAX";case X64RegisterId::Rcx:return "RCX";case X64RegisterId::Rdx:return "RDX";case X64RegisterId::Rbx:return "RBX";case X64RegisterId::Rsp:return "RSP";case X64RegisterId::Rbp:return "RBP";case X64RegisterId::Rsi:return "RSI";case X64RegisterId::Rdi:return "RDI";case X64RegisterId::R8:return "R8";case X64RegisterId::R9:return "R9";case X64RegisterId::R10:return "R10";case X64RegisterId::R11:return "R11";case X64RegisterId::R12:return "R12";case X64RegisterId::R13:return "R13";case X64RegisterId::R14:return "R14";case X64RegisterId::R15:return "R15";default:return "INVALID";}}
+struct AoeOwnerGetter {
+    uint64_t slotRva=0,methodRva=0;
+    uint32_t fieldOffset=0;
+    std::vector<uint8_t> bytes;
+};
 struct RuntimeLayout {
+    // Ephemeral read-only probe anchor; never saved as a gameplay capability.
+    uint64_t classProbeLookupRva=0;
+    bool classProbeWorkerEntry=false;
+    uint64_t alternateInitialPrepRva=0,alternateInitialCallRva=0,alternateInitialReturnRva=0;
+    std::vector<uint8_t> alternateInitialPrepBytes,alternateInitialCallBytes,alternateInitialReturnBytes;
+    bool workerEntryCoverage=false;
+    std::vector<AoeOwnerGetter> ownerGetters;
     uint64_t initialPrepRva=0,initialCallRva=0,initialReturnRva=0,sharedWorkerRva=0,producerRva=0;
     uint64_t producerCallRva=0,typedActorLookupRva=0,targetBuilderVectorRva=0,differentialParsedRva=0,idSerializationRva=0,typeSerializationRva=0;
     uint64_t targetVectorOffset=0,actorIdOffset=0,actorTypeOffset=0,actorEligibilityOffset=0,actorStatusOffset=0,localActorOffset=0,actorPositionOffset=0;
@@ -135,11 +148,16 @@ struct InitialCallSnapshot {
     double timestampMs=0;
     uint64_t rip=0,rsp=0,r12=0,r13=0,r14=0,r15=0,rsi=0,rdi=0,rcx=0,rdx=0,r8=0,r9=0;
     uint16_t operationWord0=0;
+    uint64_t prepRva=0,returnRva=0,rbp=0,localActor=0;
+    uint32_t casterId=0;
+    bool ownershipRequired=false,ownershipVerified=false;
 };
 struct InitialReturnValidation {
     bool performed=false,rspMatched=false,r12Matched=false,r13Matched=false,r14Matched=false,r15Matched=false,rsiMatched=false,rdiMatched=false;
 };
 struct Initial2xExperiment {
+    AoeSkillFamily skillFamily=AoeSkillFamily::Priest;
+    uint64_t expectedReturnRva=0;
     Initial2xPhase phase=Initial2xPhase::NotArmed;
     bool armed=false,completed=false,aborted=false,repeatPending=false,replayInProgress=false;
     bool redirectClaimed=false,ripRedirectPerformed=false,producerObservationAvailable=false,awaitingReplayedCall=false;

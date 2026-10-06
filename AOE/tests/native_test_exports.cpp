@@ -6,4 +6,5 @@ extern "C" __declspec(dllexport) int RunTests(){char name[]="locator-tests";char
 #else
 int wmain(int,wchar_t**);
 extern "C" __declspec(dllexport) int RunTests(){wchar_t name[]=L"tracer-tests";wchar_t* args[]={name};return wmain(1,args);}
+extern "C" __declspec(dllexport) int RunAnalysisTests(){wchar_t name[]=L"tracer-tests";wchar_t mode[]=L"--analysis-only";wchar_t* args[]={name,mode};return wmain(2,args);}
 #endif

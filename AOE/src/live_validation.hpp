@@ -7,6 +7,7 @@ namespace aoe {
 inline constexpr uint64_t RequiredPeriodic020AForLiveValidation=9;
 
 struct LiveValidationState {
+    AoeSkillFamily skillFamily=AoeSkillFamily::Unknown;
     uint32_t pid=0;
     uint64_t creationTime=0,moduleBase=0;
     std::string targetSha256,profileIdentity;
@@ -23,6 +24,7 @@ struct LiveValidationState {
     uint64_t producer0209Count=0,producer020ACount=0,producerOtherCount=0,producerUnreadableCount=0;
     uint64_t prepHitCount=0,callHitCount=0,returnHitCount=0;
     InitialCallSnapshot validationInitialCall;
+    InitialCallSnapshot pendingCall;
     std::string blockingReason,registerFailureReason;
 };
 
@@ -30,9 +32,10 @@ std::string LiveValidationProfileIdentity(const BuildProfile& profile);
 bool LiveValidationSessionMatches(const LiveValidationState& state,const TargetInfo& target,const std::string& profileIdentity);
 bool EnsureLiveValidationSession(LiveValidationState& state,const TargetInfo& target,const std::string& profileIdentity);
 void MarkLiveProfileFingerprintsPassed(LiveValidationState& state);
+bool BindLiveSkillFamily(LiveValidationState& state,AoeSkillFamily family);
 void ObserveLivePrep(LiveValidationState& state,uint32_t threadId,int64_t qpc);
 void ObserveLiveCall(LiveValidationState& state,const OperationObservation& operation,const InitialCallSnapshot* registers);
-void ObserveLiveReturn(LiveValidationState& state,uint32_t threadId,uint64_t rsp,uint64_t r12,uint64_t r13,uint64_t r14,uint64_t r15,uint64_t rsi,uint64_t rdi);
+void ObserveLiveReturn(LiveValidationState& state,uint32_t threadId,uint64_t rsp,uint64_t r12,uint64_t r13,uint64_t r14,uint64_t r15,uint64_t rsi,uint64_t rdi,uint64_t rbp=0);
 void ObserveLiveProducer(LiveValidationState& state,const OperationObservation& operation);
 void RecomputeLiveValidation(LiveValidationState& state);
 bool CanArmInitialNxFromValidation(const LiveValidationState& state,const TargetInfo& target,const std::string& profileIdentity);

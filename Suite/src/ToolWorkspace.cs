@@ -9,15 +9,43 @@ sealed class ToolWorkspace : IDisposable
     internal readonly CounterOverlay Counter = new();
     internal readonly UnityTools.Controls.CoordinateDraft Coordinates = new();
     internal NativeTool? Aoe;
+    Xyz.WindowBridge? xyzWindow;
+    bool quiesced;
     internal ToolWorkspace(Panel viewport, bool preview) { this.viewport = viewport; this.preview = preview; }
+    internal Task OpenXyzAsync()
+    {
+        if (!UnityTools.Controls.OperationGate.Blocked) quiesced = false;
+        xyzWindow ??= new(viewport, HandleXyzAsync);
+        return xyzWindow.OpenAsync();
+    }
+    async Task<Xyz.Reply> HandleXyzAsync(Xyz.Request request)
+    {
+        string[] draft = Enumerable.Range(0, 3).Select(i => Coordinates[i]).ToArray();
+        if (quiesced || UnityTools.Controls.OperationGate.Blocked)
+            return new(false, true, false, "SafeMode / kapanış nedeniyle XYZ işlemleri durduruldu.", Draft: draft);
+        if (request.Command is not ("snapshot" or "teleport")) return new(false, true, false, "Bilinmeyen XYZ işlemi.");
+        if (preview) return new(false, false, false, "Önizleme · oyun bağlantısı ve yazma işlemleri kapalı.", Draft: draft);
+        Ensure(1); var form = (PlayerXYZ.MainForm)Forms[1];
+        if (request.Command == "teleport")
+        {
+            if (request.Values is not { Length: 3 } || request.Values.Any(v => !float.IsFinite(v)))
+                return new(false, true, false, "X, Y, Z geçersiz.");
+            await form.SuiteApplyCoordinatesAsync(request.Values);
+            return new(true, false, true, form.SuiteMessage, request.Values);
+        }
+        var values = await form.SuiteReadCoordinatesAsync();
+        return new(true, false, true, "Bağlı · canlı koordinatlar", values, draft);
+    }
     internal void Ensure(int index)
     {
         if (Pages.ContainsKey(index)) return;
+        quiesced = false;
         var page = new Panel { Dock = DockStyle.Fill, AutoScroll = true, BackColor = Palette.Background, Visible = false };
         if (index == 5)
         {
             Aoe = new NativeTool(preview); page.Controls.Add(Aoe);
             page.Resize += (_, _) => FitAoe();
+            page.Scroll += (_, _) => Aoe?.Redraw();
         }
         else
         {
@@ -60,6 +88,7 @@ sealed class ToolWorkspace : IDisposable
     }
     internal void Quiesce()
     {
+        quiesced = true;
         foreach (var page in Pages.Values) page.Enabled = false;
         foreach (var form in Forms.Values)
         {
@@ -122,5 +151,5 @@ sealed class ToolWorkspace : IDisposable
         Remove(index); return ShutdownResult.Complete;
     }
     void Remove(int index) { Forms.Remove(index); if (Pages.Remove(index, out var page)) page.Dispose(); if (index == 5) Aoe = null; }
-    public void Dispose() { Counter.Dispose(); }
+    public void Dispose() { xyzWindow?.Dispose(); Counter.Dispose(); }
 }

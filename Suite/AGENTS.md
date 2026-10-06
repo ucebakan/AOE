@@ -1,5 +1,7 @@
 # Kalıcı ürün gereksinimi
 
+- 2026-10-06 güncellemesi: Ana görünüm Butonlar'dır; Genel bakış sayfası ve kartları kaldırılmıştır. Aşağıdaki eski genel bakış/kart hükümleri artık uygulanmaz. Player XYZ penceresinde üç salt okunur canlı konum kutusundan ayrı üç başlangıçta boş hedef kutusu bulunur; Işınlan ve Listeye ekle hedefi kullanır. Normal kapatma pencereyi gizler, tekrar Aç aynı süreci gösterir; gizliyken koordinat sorgulaması durur. Ana uygulama kapanınca çocuk süreç de kapanır. SafeMode ve oturum doğrulaması her yazımda korunur.
+
 - Arayüz dinamik ve DPI uyumlu olmalı. Yazılar/kontroller üst üste binmemeli, metin arka planla kaybolmamalı; normal, dar ve tam ekran geçişlerinde düzen korunmalı. Yüksek DPI ve yeniden boyutlandırma kontrollerini her UI değişikliğinde çalıştır.
 - İş mantığı, araç adaptörleri ve yerleşim ayrı modüllerde kalmalı. Sabit piksel koordinatlarını ana yerleşim mekanizması olarak kullanma; içerik ölçümü, akış, oranlı kolonlar ve gerektiğinde kaydırma kullan.
 - Genel bakış kartlarının asıl düğmeleri gerçek işlevleri açıp kapatır/çalıştırır; yalnız sayfa açmaz. Ayarlar ayrı bağlantıdan açılır. XYZ ve MobTP tek seferlik işlemlerdir; kullanıcı istemeden sürekli yazıcıya dönüştürme.
@@ -8,7 +10,7 @@
 - SafeMode açıkken doğrulanmış Player Count >= 1 ise birleşik uygulamanın etkin işlemlerini kapanıştaki gibi geri al. Sayaç overlay'den bağımsız izlenir. Eksik okuma sıfır değildir. Başarısız geri alma durumunda işlemleri engelli tut; sayı tekrar 0 olduğunda işlevleri otomatik açma. Tamamlanmış XYZ/MobTP tek seferlik taşıma geçmişini geri alma vaadi verme.
 - Multikill modülünde tekil AOB, exact SHA/profil/canlı oturum doğrulaması ve patch recovery kaydı zorunlu. UAC ve aynı oturumda sahiplik/geri alma denetimlerini her sürümde koru.
 - Kullanıcının “Patch Recovery” dediği, OYUN güncellemesi sonrası kod yerini AOB + semantik fingerprint ile yeniden bulmaktır; uygulama çökmesi sonrası geri alma ile karıştırma. SHA değişince otomatik tarama yap, tekil semantik aday ve canlı profil doğrulaması olmadan patch açma. Bilinmeyen/çoklu eşleşmede eski RVA'yı kullanma. Oturum geri alma kaydını ayrıca koru.
-- Player XYZ genel bakış kartında doğrudan X/Y/Z girişleri ve Işınlan düğmesi bulunur. Detay sayfasıyla aynı hedef taslağını kullanır, sayı filtresi ve tek seferlik yazım korunur.
+- Player XYZ genel bakış kartında doğrudan X/Y/Z girişleri ve Işınlan düğmesi bulunur. Detay sayfasıyla aynı hedef taslağını kullanır, sayı filtresi ve tek seferlik yazım korunur. Butonlar sekmesindeki Player XYZ → Aç ve XYZ ayarlar bağlantısı ayrı, dar/dikey PlayerXYZ EXE penceresini açar. Bu pencere kullanıcı kapatana kadar açık kalır; canlı → hedef aktarımı, sıralı/adlı nokta listesi, JSON liste kaydet/yükle ve nokta yanında tek seferlik ışınlanma düğmesi bulunur. Son liste oyun/araç yeniden açılınca otomatik geri gelir. Çocuk EXE oyun belleğine erişmez; yazımı ana uygulamanın doğrulanmış XYZ oturumu ve SafeMode kapısı üzerinden ister.
 - Genel bakış kartları kullanıcı tarafından sürüklenerek sıralanabilir; sıra kalıcıdır, yeni sürümlerde yeni kartlar eklenirken mevcut düzen korunur.
 - Bu birleşik build'de AOE Research/Recovery ve Profiles sayfaları görünmez. Çalışma profili/oturum doğrulaması iç işleyişte korunur.
 

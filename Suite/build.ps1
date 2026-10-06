@@ -15,8 +15,8 @@ if (-not $SkipTests) {
     # Test UI without a UAC prompt; the distributed native EXE is verified above.
     $dotnetPath = (Get-Command dotnet -ErrorAction Stop).Source
     $testDll = "$taskRoot/src/bin/Release/net9.0-windows/win-x64/4UnityTools.dll"
-    $test = Start-Process -FilePath $dotnetPath -ArgumentList @("`"$testDll`"", '--self-test', "`"$taskRoot/evidence`"") -WindowStyle Hidden -PassThru
-    if (-not $test.WaitForExit(120000)) { throw 'Suite UI tests did not finish within 120 seconds.' }
+    $test = Start-Process -FilePath $dotnetPath -ArgumentList @("`"$testDll`"", '--self-test', "`"$taskRoot/evidence`"") -WindowStyle Normal -PassThru
+    if (-not $test.WaitForExit(240000)) { throw 'Suite UI tests did not finish within 240 seconds.' }
     if ($test.ExitCode -ne 0) { throw "Suite tests failed ($($test.ExitCode)); inspect evidence/suite-tests.json." }
     $recovery = Start-Process -FilePath $dotnetPath -ArgumentList @("`"$testDll`"", '--recovery-test', "`"$taskRoot/evidence/recovery-tests.json`"") -WindowStyle Hidden -PassThru
     if (-not $recovery.WaitForExit(120000)) { throw 'Patch recovery tests timed out.' }

@@ -33,6 +33,8 @@ struct AoeLocatorResult {
 };
 std::vector<size_t> MatchAoePattern(const std::vector<uint8_t>& bytes,const std::string& pattern);
 bool DecodeAoeCall(const std::vector<uint8_t>& bytes,uint64_t instructionRva,uint64_t imageSize,uint64_t& target);
+bool ResolveAlternateInitialRoute(const ImageInfo& image,RuntimeLayout& runtime,std::string& error);
+bool ResolveAoeWorkerRoutes(const ImageInfo& image,RuntimeLayout& runtime,std::string& error);
 std::vector<VisualReaderCandidate> DecodeVisualReaderSequences(const std::vector<uint8_t>& bytes,uint64_t baseRva,uint64_t imageSize);
 bool LocateAoeImage(const std::filesystem::path& path,AoeLocatorResult& result,std::string& error,const BuildProfile* cached=nullptr);
 bool ValidateAoeProfile(const BuildProfile& profile,const AoeLocatorResult& result,std::string& error);

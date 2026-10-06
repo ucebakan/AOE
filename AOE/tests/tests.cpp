@@ -31,6 +31,8 @@ unsigned TargetInspectorTests(const std::filesystem::path& artifacts);
 unsigned SelectedTargetProvenanceTests(const std::filesystem::path& artifacts);
 unsigned TargetWriterRuntimeTests(const std::filesystem::path& artifacts);
 unsigned LiveValidationTests(const std::filesystem::path& artifacts);
+unsigned WorkerRouteTests(const std::filesystem::path& artifacts);
+unsigned SkillFamilyTests(const std::filesystem::path& artifacts);
 unsigned VisualSuppressionTests(const std::filesystem::path& artifacts);
 namespace {
 unsigned passed=0;
@@ -463,7 +465,7 @@ int wmain(int argc,wchar_t** argv) {
         std::filesystem::create_directories(artifacts);
         aoe::InitLog(artifacts);
         AnalyzerTests(artifacts);
-        passed+=TimingTests(artifacts);passed+=ProducerTests(artifacts);passed+=RecordInitTests(artifacts);passed+=BudgetWriteTests(artifacts);passed+=TickPatchTests(artifacts);passed+=Initial2xTests(artifacts);passed+=InitialNxLifecycleTests(artifacts);passed+=CallerTraceTests(artifacts);passed+=TargetInspectorTests(artifacts);passed+=SelectedTargetProvenanceTests(artifacts);passed+=TargetWriterRuntimeTests(artifacts);passed+=LiveValidationTests(artifacts);passed+=VisualSuppressionTests(artifacts);passed+=ManagerTests(artifacts);
+        passed+=TimingTests(artifacts);passed+=ProducerTests(artifacts);passed+=RecordInitTests(artifacts);passed+=BudgetWriteTests(artifacts);passed+=TickPatchTests(artifacts);passed+=Initial2xTests(artifacts);passed+=InitialNxLifecycleTests(artifacts);passed+=CallerTraceTests(artifacts);passed+=TargetInspectorTests(artifacts);passed+=SelectedTargetProvenanceTests(artifacts);passed+=TargetWriterRuntimeTests(artifacts);passed+=LiveValidationTests(artifacts);passed+=SkillFamilyTests(artifacts);passed+=WorkerRouteTests(artifacts);passed+=VisualSuppressionTests(artifacts);passed+=ManagerTests(artifacts);
         const bool analysisOnly=argc>1&&std::wstring(argv[1])==L"--analysis-only";
         if(!analysisOnly) TracerTests(executable.parent_path()/L"trace_fixture.exe",artifacts);
         std::cout<<passed<<" test groups passed. No TClient attachment was performed.\n";

@@ -11,6 +11,32 @@ sealed partial class MainForm
     internal string SuiteMessage => status.Text;
     internal async Task SuiteRefreshAsync() { while (busy && !closing) await Task.Delay(30); if (!closing) { retry = DateTime.MinValue; await Poll(); if (Enabled) timer.Start(); } }
     internal Task SuiteWriteAsync() => WriteAsync();
+    internal async Task<float[]> SuiteReadCoordinatesAsync()
+    {
+        await SuiteRefreshAsync();
+        if (closing || session is null || !Enabled) throw new IOException(status.Text);
+        while (busy && !closing) await Task.Delay(30);
+        if (closing || session is null) throw new IOException("XYZ oturumu kapalı.");
+        busy = true; write.Enabled = false;
+        try { return (await Task.Run(session.Snapshot)).A; }
+        finally { timer.Stop(); busy = false; write.Enabled = !closing && session is not null; }
+    }
+    internal async Task SuiteApplyCoordinatesAsync(float[] values)
+    {
+        if (values.Length != 3 || values.Any(v => !float.IsFinite(v))) throw new IOException("X, Y, Z geçersiz.");
+        UnityTools.Controls.OperationGate.Check();
+        await SuiteRefreshAsync();
+        UnityTools.Controls.OperationGate.Check();
+        if (closing || busy || session is null || !Enabled) throw new IOException(status.Text);
+        busy = true; write.Enabled = false;
+        try
+        {
+            await Task.Run(() => { UnityTools.Controls.OperationGate.Check(); session.SetCoordinates(values[0], values[1], values[2]); });
+            for (int i = 0; i < 3; i++) inputs[i].Text = ((double)values[i]).ToString("0.##############################", System.Globalization.CultureInfo.InvariantCulture);
+            status.Text = "Koordinatlar yazıldı ve doğrulandı.";
+        }
+        finally { timer.Stop(); busy = false; write.Enabled = !closing && session is not null; }
+    }
     internal void SuiteBindCoordinates(CoordinateDraft draft)
     {
         for (int i = 0; i < 3; i++) { int axis = i; inputs[i].Text = draft[i]; inputs[i].TextChanged += (_, _) => draft[axis] = inputs[axis].Text; }

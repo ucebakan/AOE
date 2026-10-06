@@ -1,0 +1,62 @@
+{
+  "read_only": true,
+  "client_sha": "4DC9C526A895A10113C4CF23F2D199BFF283D2C7CE75F949DC49CEF15D27D622",
+  "initial_calls": 1,
+  "periodic_calls": 9,
+  "verified_returns": [
+    {
+      "skill": 321,
+      "matched": true,
+      "return_rva": "0x14F4D0"
+    },
+    {
+      "skill": 322,
+      "matched": true,
+      "return_rva": "0x1AB0E1"
+    },
+    {
+      "skill": 322,
+      "matched": true,
+      "return_rva": "0x1AB0E1"
+    },
+    {
+      "skill": 322,
+      "matched": true,
+      "return_rva": "0x1AB0E1"
+    },
+    {
+      "skill": 322,
+      "matched": true,
+      "return_rva": "0x1AB0E1"
+    },
+    {
+      "skill": 322,
+      "matched": true,
+      "return_rva": "0x1AB0E1"
+    },
+    {
+      "skill": 322,
+      "matched": true,
+      "return_rva": "0x1AB0E1"
+    },
+    {
+      "skill": 322,
+      "matched": true,
+      "return_rva": "0x1AB0E1"
+    },
+    {
+      "skill": 322,
+      "matched": true,
+      "return_rva": "0x1AB0E1"
+    },
+    {
+      "skill": 322,
+      "matched": true,
+      "return_rva": "0x1AB0E1"
+    }
+  ],
+  "all_observed_register_returns_matched": true,
+  "clean_detach": true,
+  "replay_tested": false,
+  "mage_tested": false
+}

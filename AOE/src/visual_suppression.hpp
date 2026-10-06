@@ -7,6 +7,8 @@ enum class VisualRuntimePhase { NotLocated, LocatorReady, WaitingForAoeCast, TSk
 const char* VisualRuntimePhaseName(VisualRuntimePhase phase);
 
 struct VisualRuntimeState {
+    AoeSkillFamily skillFamily=AoeSkillFamily::Unknown;
+    uint16_t pendingSkillWord=0;
     VisualRuntimePhase phase=VisualRuntimePhase::NotLocated;
     bool locatorReady=false,captureBreakpointActive=false,readerCoverageActive=false,resolved=false,suppressionRequested=false,downstreamOriginalActive=false,restoreRequired=false;
     uint32_t pid=0,pendingThreadId=0,downstreamThreadId=0;
@@ -18,13 +20,14 @@ struct VisualRuntimeState {
     bool pendingSeenPrep=false;
 };
 void InitializeVisualRuntime(VisualRuntimeState& state,const TargetInfo& target);
-bool ObserveVisualReader(VisualRuntimeState& state,uint32_t threadId,uint64_t tSkill,uint32_t currentValue,std::string& error);
+bool ObserveVisualReader(VisualRuntimeState& state,uint32_t threadId,uint64_t tSkill,uint32_t currentValue,std::string& error,uint16_t skillWord);
 void ObserveVisualPreparation(VisualRuntimeState& state,uint32_t threadId);
 bool ConfirmVisualAoeCall(VisualRuntimeState& state,uint32_t threadId,bool operationReadable,uint16_t operationWord);
 void InvalidateVisualRuntime(VisualRuntimeState& state,VisualRuntimePhase phase,const std::string& reason);
 
 struct VisualSessionIdentity {uint32_t pid=0;uint64_t creationTime=0,moduleBase=0,generation=0;std::string targetSha256;};
 struct VisualSessionCache {
+    AoeSkillFamily skillFamily=AoeSkillFamily::Unknown;
     bool valid=false,hidden=false;
     VisualSessionIdentity identity;
     uint64_t tSkill=0,visualField=0,fieldOffset=0;

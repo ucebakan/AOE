@@ -41,9 +41,9 @@ static class SafeModeTests
         {
             shell.Show(); shell.SelectPage(2); await shell.ExecuteFeatureAsync(Feature.Counter);
             await shell.ExecuteFeatureAsync(Feature.SafeMode); count.Value = 1; await shell.Safety.SampleAsync();
-            check(shell.Workspace.Forms.Count == 0 && !shell.Workspace.Counter.Active && shell.SelectedPage == 0, "SafeMode actual shell closes tools and overlay but leaves shell open");
+            check(shell.Workspace.Forms.Count == 0 && !shell.Workspace.Counter.Active && shell.SelectedPage == SuiteForm.ButtonsPage, "SafeMode actual shell closes tools and overlay but leaves Buttons open");
             var blocked = await shell.ExecuteFeatureAsync(Feature.Speed); check(!blocked.RequiresSetup && shell.Workspace.Forms.Count == 0, "blocked overview cannot reopen a tool");
-            shell.SelectPage(4); check(shell.SelectedPage == 0, "blocked settings cannot enable embedded actions");
+            shell.SelectPage(4); check(shell.SelectedPage == SuiteForm.ButtonsPage, "blocked settings cannot enable embedded actions");
             count.Value = 0; await shell.Safety.SampleAsync(); shell.SelectPage(2); check(shell.SelectedPage == 2, "zero permits manual navigation again");
             await shell.CloseTools(); shell.Close();
         }

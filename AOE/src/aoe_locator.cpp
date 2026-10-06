@@ -5,6 +5,7 @@
 #include <cstring>
 #include <fstream>
 #include <functional>
+#include <map>
 #include <sstream>
 #include <stdexcept>
 
@@ -71,6 +72,50 @@ const AoeSignatureResult* Find(const AoeLocatorResult& r,const std::string& name
 }
 
 std::vector<size_t> MatchAoePattern(const std::vector<uint8_t>& bytes,const std::string& text){Pattern p(text);std::vector<size_t> out;if(bytes.size()<p.bytes.size())return out;for(size_t i=0;i<=bytes.size()-p.bytes.size();++i)if(p.at(bytes,i))out.push_back(i);return out;}
+bool ResolveAlternateInitialRoute(const ImageInfo& image,RuntimeLayout& r,std::string& error){
+    r.alternateInitialPrepRva=r.alternateInitialCallRva=r.alternateInitialReturnRva=0;
+    r.alternateInitialPrepBytes.clear();r.alternateInitialCallBytes.clear();r.alternateInitialReturnBytes.clear();
+    try{
+        Pe pe(image.path);
+        if(image.sha256.empty()||Sha256(pe.data.data(),pe.data.size())!=image.sha256)throw std::runtime_error("AOE route image identity changed");
+        const char* pattern="8B 87 14 05 00 00 89 44 24 30 45 33 FF 44 89 7C 24 28 48 8D 44 24 50 48 89 44 24 20 4C 8B 4D 98 4C 8D 87 F0 04 00 00 48 8B 55 A0 49 8B CE E8 ?? ?? ?? ?? 41 8B F7";
+        auto matches=pe.scan(pattern);std::vector<uint64_t> valid;
+        for(auto site:matches)if(pe.function(site)&&pe.function(site)==pe.function(site+51)&&pe.call(site+46)==r.sharedWorkerRva&&pe.at(site+54,"48 8B 54 24 58 48 8B C2 48 8B 4C 24 50 48 2B C1 48 C1 F8 03"))valid.push_back(site);
+        if(valid.size()!=1)throw std::runtime_error("Alternate AOE preparation is unresolved or ambiguous; semantic matches="+std::to_string(valid.size()));
+        r.alternateInitialPrepRva=valid[0];r.alternateInitialCallRva=valid[0]+46;r.alternateInitialReturnRva=valid[0]+51;
+        r.alternateInitialPrepBytes=pe.bytes(valid[0],46);r.alternateInitialCallBytes=pe.bytes(valid[0]+46,5);r.alternateInitialReturnBytes=pe.bytes(valid[0]+51,3);
+        error.clear();return true;
+    }catch(const std::exception& ex){error=ex.what();return false;}
+}
+bool ResolveAoeWorkerRoutes(const ImageInfo& image,RuntimeLayout& r,std::string& error){
+    r.workerEntryCoverage=false;r.ownerGetters.clear();
+    if(!r.visualSuppressionAvailable||!r.visualReaderRva){error="AOE shared-entry coverage requires the validated visual reader.";return false;}
+    if(!ResolveAlternateInitialRoute(image,r,error))return false;
+    try{
+        Pe pe(image.path);
+        if(Sha256(pe.data.data(),pe.data.size())!=image.sha256)throw std::runtime_error("AOE ownership image identity changed");
+        // The independently verified worker calls owner->vtable[0x1A0] and
+        // compares its DWORD result with the local actor ID before producing.
+        const auto checks=pe.scan("8B 98 ?? ?? 00 00 48 8B 02 FF 90 A0 01 00 00 3B D8 0F 85 ?? ?? ?? ??");
+        if(checks.size()!=1||pe.function(checks[0])!=r.sharedWorkerRva||Read<uint32_t>(pe.data,pe.offset(checks[0]+2,4))!=r.actorIdOffset)throw std::runtime_error("AOE creator/local-ID worker semantics changed");
+        std::map<uint64_t,std::pair<uint64_t,uint32_t>> getters;
+        for(auto getter:pe.scan("8B 81 ?? ?? 00 00 C3")){
+            // Leaf getters have no unwind entry. Their aligned seven-byte body
+            // plus INT3 padding and immutable vtable reference establish the
+            // boundary; a chained/non-leaf body is not accepted as a getter.
+            const auto function=pe.function(getter);
+            if((getter&15)||(function&&function!=getter)||!pe.at(getter+7,"CC CC CC CC CC CC CC CC CC"))continue;
+            auto offset=Read<uint32_t>(pe.data,pe.offset(getter+2,4));if(offset<0x100||offset>=0x10000)continue;
+            getters.emplace(pe.nt.OptionalHeader.ImageBase+getter,std::make_pair(getter,offset));
+        }
+        for(const auto& section:pe.sections){
+                if((section.Characteristics&IMAGE_SCN_MEM_EXECUTE)||!(section.Characteristics&IMAGE_SCN_MEM_READ)||(section.Characteristics&IMAGE_SCN_MEM_WRITE))continue;
+                for(size_t x=0;x+8<=section.SizeOfRawData;x+=8){auto it=getters.find(Read<uint64_t>(pe.data,section.PointerToRawData+x));if(it!=getters.end())r.ownerGetters.push_back({uint64_t(section.VirtualAddress)+x,it->second.first,it->second.second,pe.bytes(it->second.first,7)});}
+        }
+        if(r.ownerGetters.empty())throw std::runtime_error("AOE immutable owner vtable/getter evidence is unavailable");
+        r.workerEntryCoverage=true;error.clear();return true;
+    }catch(const std::exception& ex){r.ownerGetters.clear();error=ex.what();return false;}
+}
 bool DecodeAoeCall(const std::vector<uint8_t>& bytes,uint64_t rva,uint64_t imageSize,uint64_t& target){target=0;if(bytes.size()<5||bytes[0]!=0xE8||rva>=imageSize||imageSize-rva<5||imageSize>INT64_MAX)return false;int32_t d=0;std::memcpy(&d,bytes.data()+1,4);const uint64_t next=rva+5;if(d>=0){if(uint64_t(d)>=imageSize-next)return false;target=next+uint64_t(d);}else{const uint64_t distance=uint64_t(-int64_t(d));if(distance>next)return false;target=next-distance;}return true;}
 
 std::vector<VisualReaderCandidate> DecodeVisualReaderSequences(const std::vector<uint8_t>& bytes,uint64_t baseRva,uint64_t imageSize){

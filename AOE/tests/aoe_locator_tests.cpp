@@ -1,4 +1,5 @@
 #include "aoe_locator.hpp"
+#include "tracer.hpp"
 #include <algorithm>
 #include <cstdint>
 #include <cstring>
@@ -416,6 +417,23 @@ int main(int argc, char** argv) {
                 Require(aoe::ValidateAoeProfile(profile, located, error), error);
             });
             Require(located.ready, "Positive locator result is required before mutation fixtures");
+            check("current_image_alternate_initial_and_creator_vtable_semantics",[&]{
+                auto runtime=profile.runtime;Require(aoe::ResolveAoeWorkerRoutes(located.image,runtime,error),error);
+                Require(runtime.workerEntryCoverage&&runtime.alternateInitialCallRva!=runtime.initialCallRva&&runtime.alternateInitialReturnRva==runtime.alternateInitialCallRva+5&&!runtime.ownerGetters.empty(),"alternate call and immutable creator getters");
+            });
+            check("alternate_initial_missing_pattern_and_wrong_worker_fail_closed",[&]{
+                auto runtime=profile.runtime;Require(aoe::ResolveAlternateInitialRoute(located.image,runtime,error),error);auto changed=original;changed[pe.offset(runtime.alternateInitialPrepRva,1)]=0x90;
+                aoe::ImageInfo image;Require(aoe::InspectImage(temporary.write(changed),runtime.sharedWorkerRva,image,error),error);
+                Require(!aoe::ResolveAlternateInitialRoute(image,runtime,error)&&!runtime.alternateInitialCallRva,"missing alternate cannot reuse old RVA");
+                runtime=profile.runtime;++runtime.sharedWorkerRva;Require(!aoe::ResolveAlternateInitialRoute(located.image,runtime,error),"different worker direct target rejected");
+            });
+            check("duplicate_semantic_alternate_initial_is_rejected",[&]{
+                auto runtime=profile.runtime;Require(aoe::ResolveAlternateInitialRoute(located.image,runtime,error),error);
+                auto changed=original;const uint64_t copied=runtime.alternateInitialPrepRva+0x80;const auto start=pe.offset(runtime.alternateInitialPrepRva,74),destination=pe.offset(copied,74);
+                std::copy_n(original.begin()+start,74,changed.begin()+destination);const int32_t displacement=int32_t(int64_t(runtime.sharedWorkerRva)-int64_t(copied+51));std::memcpy(changed.data()+destination+47,&displacement,4);
+                aoe::ImageInfo image;Require(aoe::InspectImage(temporary.write(changed),runtime.sharedWorkerRva,image,error),error);
+                Require(!aoe::ResolveAlternateInitialRoute(image,runtime,error)&&error.find("semantic matches=2")!=std::string::npos,"multiple valid routes cannot pick first");
+            });
             const auto prepCall = Signature(located, "AoeLifecycleCaller").rva;
             Require(prepCall >= located.prepDistance, "Lifecycle call cannot contain preparation prefix");
             const uint64_t prep = prepCall - located.prepDistance;

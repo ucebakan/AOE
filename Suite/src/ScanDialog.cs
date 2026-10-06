@@ -14,7 +14,7 @@ sealed class ScanDialog : Form
     {
         Text = "4UnityTools · Başlangıç kontrolü"; AutoScaleDimensions = new(96, 96); AutoScaleMode = AutoScaleMode.Dpi;
         Font = new("Segoe UI", 10); ClientSize = new(660, 620); MinimumSize = new(430, 340);
-        StartPosition = FormStartPosition.CenterParent; MinimizeBox = false;
+        StartPosition = FormStartPosition.CenterParent; MinimizeBox = false; TopMost = true;
         var layout = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 1, RowCount = 3, Padding = new(18) };
         layout.ColumnStyles.Add(new(SizeType.Percent, 100));
         layout.RowStyles.Add(new(SizeType.AutoSize)); layout.RowStyles.Add(new(SizeType.Percent, 100)); layout.RowStyles.Add(new(SizeType.AutoSize));
@@ -43,7 +43,16 @@ sealed class ScanDialog : Form
         };
         close.Click += (_, _) => { if (busy) { cancel.Cancel(); close.Text = "Durduruluyor…"; } else Close(); };
         FormClosing += (_, e) => { if (busy) { cancel.Cancel(); e.Cancel = true; close.Text = "Durduruluyor…"; } };
-        Shown += (_, _) => { var area = Screen.FromControl(this).WorkingArea; MinimumSize = new(Math.Min(MinimumSize.Width, area.Width), Math.Min(MinimumSize.Height, area.Height)); Size = new(Math.Min(Width, area.Width), Math.Min(Height, area.Height)); };
+        Shown += (_, _) =>
+        {
+            TopMost = true;
+            var area = Screen.FromControl(this).WorkingArea;
+            MinimumSize = new(Math.Min(MinimumSize.Width, area.Width), Math.Min(MinimumSize.Height, area.Height));
+            Size = new(Math.Min(Width, area.Width), Math.Min(Height, area.Height));
+            // The owner is also topmost. Put this newly opened dialog above it once,
+            // without a timer that would keep taking focus from the user.
+            BeginInvoke(() => WindowLayer.PlaceTopmost(this, focus: true));
+        };
     }
     internal void UpdateResult(ScanResult result)
     {

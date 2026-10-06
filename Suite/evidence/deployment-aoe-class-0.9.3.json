@@ -1,0 +1,16 @@
+{
+  "version": "0.9.3",
+  "root_updated": true,
+  "exe_sha256": "4B3AAC460D9B45E1844187E782CB9B9A4F362D977216577C1F7A3940ACD86325",
+  "zip_sha256": "FFAA818399111779E40E167FABF53F4024AF124C11C0AE834E9633F4C1872E44",
+  "ui_status": "PASS",
+  "ui_count": 347,
+  "recovery_status": "PASS",
+  "game_memory_writes": 0,
+  "uac": "requireAdministrator",
+  "uiAccess": false,
+  "backup": "C:\\Users\\Public\\Documents\\4UnityTools\\Suite\\build\\backups\\4UnityTools-before-0.9.3-85369bbe2a414ef2a417b1369c0e068c.exe",
+  "old_root_sha": "7806CDAD1EEEBCCD7049FE0A9BBF0203152A8AA6BE32A3ACAF2B81FB50926D4F",
+  "retry": "",
+  "install_error": ""
+}

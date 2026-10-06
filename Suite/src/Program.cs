@@ -21,6 +21,14 @@ static class Program
         Application.EnableVisualStyles();
         Application.SetCompatibleTextRenderingDefault(false);
         Application.SetDefaultFont(new Font("Segoe UI", 9));
+        if (args.Length is >= 4 and <= 6 && args[0] == "--xyz-window")
+        {
+            if (!int.TryParse(args[3],out int parentPid) || parentPid<=0) return 2;
+            if (args.Length >= 5 && !SetFixtureRoot(args[4])) return 2;
+            using var window = new Xyz.XyzWindow(new Xyz.PipeClient(args[1], args[2]), Path.Combine(DataRoot, "XYZ-lists"),reuseOnClose:true,parentPid:parentPid);
+            if (args.Length == 6) Xyz.XyzTests.ConfigureChildFixture(window, args[5]);
+            Application.Run(window); return 0;
+        }
         if (args.Length == 2 && args[0] == "--counter-exit-verify")
         {
             try {
@@ -59,8 +67,9 @@ static class Program
             catch (Exception ex) { File.WriteAllText(args[1], System.Text.Json.JsonSerializer.Serialize(new { status = "FAIL", error = ex.ToString(), game_memory_writes = 0, game_function_calls = 0 })); return 1; }
         }
         bool collectionTesting=args.Contains("--collection-test");
+        bool xyzTesting=args.Contains("--xyz-test");
         bool recoveryTesting=args.Contains("--recovery-test");
-        bool testing = args.Contains("--self-test") || args.Contains("--ui-test") || recoveryTesting || collectionTesting;
+        bool testing = args.Contains("--self-test") || args.Contains("--ui-test") || recoveryTesting || collectionTesting || xyzTesting;
         if (testing) DataRoot = Path.Combine(Path.GetTempPath(), "4UnityTools-tests", Environment.ProcessId.ToString());
         using var mutex = new Mutex(true, @"Local\4UnityTools.Suite" + (testing ? ".test." + Environment.ProcessId : ""), out bool first);
         if (!first && args.Contains("--elevated")) { try { first = mutex.WaitOne(TimeSpan.FromSeconds(15)); } catch (AbandonedMutexException) { first = true; } }
@@ -72,6 +81,7 @@ static class Program
             PlayerXYZ.Files.Root = Path.Combine(DataRoot, "PlayerXYZ");
             SpeedJump.Files.Root = Path.Combine(DataRoot, "SpeedJump");
             if(collectionTesting) return Collection.Tests.Report(args.Last());
+            if(xyzTesting) return Xyz.XyzTests.RunStandalone(args.Last());
             if(recoveryTesting)return RecoveryTests.Run(args.LastOrDefault() is string report&&!report.StartsWith("--")?report:Path.Combine(DataRoot,"recovery-tests.json"));
             if (testing) return SuiteTests.Run(args.LastOrDefault() is string output && !output.StartsWith("--") ? output : Path.Combine(DataRoot, "evidence"));
             Application.Run(new SuiteForm());
