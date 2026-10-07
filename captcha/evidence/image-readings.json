@@ -1,0 +1,226 @@
+{
+  "language": "tr",
+  "input_sent": false,
+  "result": [
+    {
+      "file": "C:/Users/xaofx/AppData/Local/Temp/codex-clipboard-e7f7b9fb-73ef-4f85-a2ad-1a68ad3bbc54.jpg",
+      "raw_text": "Macro protection puzzle Click the matching symbol Tarqet SUN Step 1 of 4 3 attempts - 90 seconds CROWN SUN STAR LEAF",
+      "reading": {
+        "Kind": 2,
+        "Target": "SUN",
+        "Step": 1,
+        "Attempts": 3,
+        "Options": [
+          {
+            "Word": "CROWN",
+            "Center": {
+              "IsEmpty": false,
+              "X": 127,
+              "Y": 344
+            }
+          },
+          {
+            "Word": "STAR",
+            "Center": {
+              "IsEmpty": false,
+              "X": 290,
+              "Y": 344
+            }
+          },
+          {
+            "Word": "SUN",
+            "Center": {
+              "IsEmpty": false,
+              "X": 128,
+              "Y": 400
+            }
+          },
+          {
+            "Word": "LEAF",
+            "Center": {
+              "IsEmpty": false,
+              "X": 291,
+              "Y": 400
+            }
+          }
+        ],
+        "Detail": "",
+        "Key": "1:SUN:3:CROWN@127,344|STAR@290,344|SUN@128,400|LEAF@291,400",
+        "Valid": true
+      },
+      "exact_match": {
+        "Word": "SUN",
+        "Center": {
+          "IsEmpty": false,
+          "X": 128,
+          "Y": 400
+        }
+      }
+    },
+    {
+      "file": "C:/Users/xaofx/AppData/Local/Temp/codex-clipboard-d47d49d7-b571-44a1-9ba5-8054f18efe5f.jpg",
+      "raw_text": "Macro protection puzzle Click the matching symbol Tarqet STAR Step 2 of 4 3 attempts - 51 seconds GEM CROWN STAR LEAF",
+      "reading": {
+        "Kind": 2,
+        "Target": "STAR",
+        "Step": 2,
+        "Attempts": 3,
+        "Options": [
+          {
+            "Word": "GEM",
+            "Center": {
+              "IsEmpty": false,
+              "X": 129,
+              "Y": 344
+            }
+          },
+          {
+            "Word": "STAR",
+            "Center": {
+              "IsEmpty": false,
+              "X": 291,
+              "Y": 344
+            }
+          },
+          {
+            "Word": "CROWN",
+            "Center": {
+              "IsEmpty": false,
+              "X": 128,
+              "Y": 400
+            }
+          },
+          {
+            "Word": "LEAF",
+            "Center": {
+              "IsEmpty": false,
+              "X": 292,
+              "Y": 400
+            }
+          }
+        ],
+        "Detail": "",
+        "Key": "2:STAR:3:GEM@129,344|STAR@291,344|CROWN@128,400|LEAF@292,400",
+        "Valid": true
+      },
+      "exact_match": {
+        "Word": "STAR",
+        "Center": {
+          "IsEmpty": false,
+          "X": 291,
+          "Y": 344
+        }
+      }
+    },
+    {
+      "file": "C:/Users/xaofx/AppData/Local/Temp/codex-clipboard-a483ba0e-1185-49aa-8e84-e00df742a535.jpg",
+      "raw_text": "Macro protection puzzle Click the matching symbol Tarqet: MOON Step 3 of 4 3 attempts - 42 seconds GEM SHIELD MOON CROWN",
+      "reading": {
+        "Kind": 2,
+        "Target": "MOON",
+        "Step": 3,
+        "Attempts": 3,
+        "Options": [
+          {
+            "Word": "GEM",
+            "Center": {
+              "IsEmpty": false,
+              "X": 128,
+              "Y": 356
+            }
+          },
+          {
+            "Word": "MOON",
+            "Center": {
+              "IsEmpty": false,
+              "X": 290,
+              "Y": 356
+            }
+          },
+          {
+            "Word": "SHIELD",
+            "Center": {
+              "IsEmpty": false,
+              "X": 129,
+              "Y": 412
+            }
+          },
+          {
+            "Word": "CROWN",
+            "Center": {
+              "IsEmpty": false,
+              "X": 289,
+              "Y": 412
+            }
+          }
+        ],
+        "Detail": "",
+        "Key": "3:MOON:3:GEM@128,356|MOON@290,356|SHIELD@129,412|CROWN@289,412",
+        "Valid": true
+      },
+      "exact_match": {
+        "Word": "MOON",
+        "Center": {
+          "IsEmpty": false,
+          "X": 290,
+          "Y": 356
+        }
+      }
+    },
+    {
+      "file": "C:/Users/xaofx/AppData/Local/Temp/codex-clipboard-9e8d9c50-d452-425d-a43d-b8482c7d11fd.jpg",
+      "raw_text": "Macro protection puzzle Click the matching symbol Tarqet: SUN Step 4 of 4 3 attempts - 37 seconds 4 SWORD STAR SUN LEAF",
+      "reading": {
+        "Kind": 2,
+        "Target": "SUN",
+        "Step": 4,
+        "Attempts": 3,
+        "Options": [
+          {
+            "Word": "SWORD",
+            "Center": {
+              "IsEmpty": false,
+              "X": 123,
+              "Y": 350
+            }
+          },
+          {
+            "Word": "SUN",
+            "Center": {
+              "IsEmpty": false,
+              "X": 285,
+              "Y": 350
+            }
+          },
+          {
+            "Word": "STAR",
+            "Center": {
+              "IsEmpty": false,
+              "X": 123,
+              "Y": 407
+            }
+          },
+          {
+            "Word": "LEAF",
+            "Center": {
+              "IsEmpty": false,
+              "X": 286,
+              "Y": 406
+            }
+          }
+        ],
+        "Detail": "",
+        "Key": "4:SUN:3:SWORD@123,350|SUN@285,350|STAR@123,407|LEAF@286,406",
+        "Valid": true
+      },
+      "exact_match": {
+        "Word": "SUN",
+        "Center": {
+          "IsEmpty": false,
+          "X": 285,
+          "Y": 350
+        }
+      }
+    }
+  ]
+}

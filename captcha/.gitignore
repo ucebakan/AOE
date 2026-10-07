@@ -1,0 +1,7 @@
+**/bin/
+**/obj/
+**/logs/
+**/__pycache__/
+releases/
+*.user
+*.tmp

@@ -1,0 +1,180 @@
+{
+  "pass": true,
+  "checks": 41,
+  "language": "tr",
+  "live_game_accessed": false,
+  "readings": [
+    {
+      "Kind": 2,
+      "Target": "SUN",
+      "Step": 1,
+      "Attempts": 3,
+      "Options": [
+        {
+          "Word": "CROWN",
+          "Center": {
+            "IsEmpty": false,
+            "X": 114,
+            "Y": 345
+          }
+        },
+        {
+          "Word": "STAR",
+          "Center": {
+            "IsEmpty": false,
+            "X": 292,
+            "Y": 345
+          }
+        },
+        {
+          "Word": "SUN",
+          "Center": {
+            "IsEmpty": false,
+            "X": 114,
+            "Y": 403
+          }
+        },
+        {
+          "Word": "LEAF",
+          "Center": {
+            "IsEmpty": false,
+            "X": 293,
+            "Y": 403
+          }
+        }
+      ],
+      "Detail": "",
+      "Key": "1:SUN:3:CROWN@114,345|STAR@292,345|SUN@114,403|LEAF@293,403",
+      "Valid": true
+    },
+    {
+      "Kind": 2,
+      "Target": "STAR",
+      "Step": 2,
+      "Attempts": 3,
+      "Options": [
+        {
+          "Word": "GEM",
+          "Center": {
+            "IsEmpty": false,
+            "X": 114,
+            "Y": 345
+          }
+        },
+        {
+          "Word": "STAR",
+          "Center": {
+            "IsEmpty": false,
+            "X": 292,
+            "Y": 345
+          }
+        },
+        {
+          "Word": "CROWN",
+          "Center": {
+            "IsEmpty": false,
+            "X": 114,
+            "Y": 403
+          }
+        },
+        {
+          "Word": "LEAF",
+          "Center": {
+            "IsEmpty": false,
+            "X": 293,
+            "Y": 403
+          }
+        }
+      ],
+      "Detail": "",
+      "Key": "2:STAR:3:GEM@114,345|STAR@292,345|CROWN@114,403|LEAF@293,403",
+      "Valid": true
+    },
+    {
+      "Kind": 2,
+      "Target": "MOON",
+      "Step": 3,
+      "Attempts": 3,
+      "Options": [
+        {
+          "Word": "GEM",
+          "Center": {
+            "IsEmpty": false,
+            "X": 114,
+            "Y": 345
+          }
+        },
+        {
+          "Word": "MOON",
+          "Center": {
+            "IsEmpty": false,
+            "X": 292,
+            "Y": 345
+          }
+        },
+        {
+          "Word": "SHIELD",
+          "Center": {
+            "IsEmpty": false,
+            "X": 114,
+            "Y": 403
+          }
+        },
+        {
+          "Word": "CROWN",
+          "Center": {
+            "IsEmpty": false,
+            "X": 292,
+            "Y": 403
+          }
+        }
+      ],
+      "Detail": "",
+      "Key": "3:MOON:3:GEM@114,345|MOON@292,345|SHIELD@114,403|CROWN@292,403",
+      "Valid": true
+    },
+    {
+      "Kind": 2,
+      "Target": "SUN",
+      "Step": 4,
+      "Attempts": 3,
+      "Options": [
+        {
+          "Word": "SWORD",
+          "Center": {
+            "IsEmpty": false,
+            "X": 114,
+            "Y": 345
+          }
+        },
+        {
+          "Word": "SUN",
+          "Center": {
+            "IsEmpty": false,
+            "X": 292,
+            "Y": 345
+          }
+        },
+        {
+          "Word": "STAR",
+          "Center": {
+            "IsEmpty": false,
+            "X": 114,
+            "Y": 403
+          }
+        },
+        {
+          "Word": "LEAF",
+          "Center": {
+            "IsEmpty": false,
+            "X": 293,
+            "Y": 403
+          }
+        }
+      ],
+      "Detail": "",
+      "Key": "4:SUN:3:SWORD@114,345|SUN@292,345|STAR@114,403|LEAF@293,403",
+      "Valid": true
+    }
+  ]
+}

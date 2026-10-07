@@ -1,0 +1,237 @@
+{
+  "report_date": "2026-10-07",
+  "snapshot_version": "1.1.0",
+  "game_input_during_export": false,
+  "files": [
+    {
+      "path": ".gitattributes",
+      "bytes": 109,
+      "sha256": "3947acfc61c5d84e6ffadb347f0a204cbacf2657a21687325e6f2e7222d0ad57"
+    },
+    {
+      "path": ".gitignore",
+      "bytes": 64,
+      "sha256": "7fb5110bfe1131d2fe27ddb4f5f6b60333d06934f78a2b8534a501524a0a9043"
+    },
+    {
+      "path": "evidence/auto-tests.json",
+      "bytes": 22522,
+      "sha256": "da760c7dcd94229ea8161d7d8789990324f371ea3442a9d5886826e7238fa693"
+    },
+    {
+      "path": "evidence/automatic-session.json",
+      "bytes": 255,
+      "sha256": "f1da3651bac056476e6c2f1b4aa0901bb86122099f18479a6086b64083a44eb3"
+    },
+    {
+      "path": "evidence/build.json",
+      "bytes": 467,
+      "sha256": "11da975e2ca3793041b10bf0afc0e019c4c388c31030177cc0d766d7948eeeb6"
+    },
+    {
+      "path": "evidence/fixture-step-1.png",
+      "bytes": 8044,
+      "sha256": "1975b5ccfc46c8b1d114e0c8ae3a8447645e322dea79853ad56c93fef4763bd6"
+    },
+    {
+      "path": "evidence/fixture-step-2.png",
+      "bytes": 8138,
+      "sha256": "d9862f360962d45bdd5a5fe7faa72fea904d8f7002ae04d35828dbbb5480f47d"
+    },
+    {
+      "path": "evidence/fixture-step-3.png",
+      "bytes": 8211,
+      "sha256": "d8fc88350cf7796e3b65c0a057ad2bb77b2cbc76d5bbf71d1abeeb6a2c31594f"
+    },
+    {
+      "path": "evidence/fixture-step-4.png",
+      "bytes": 8023,
+      "sha256": "9280da8b5400e5900ce351071ba47a813b51e0667c1ab275ad2ddf7faf7d6d4b"
+    },
+    {
+      "path": "evidence/image-readings.json",
+      "bytes": 5734,
+      "sha256": "01abadddc756cd03ddfc0010977df6abc88d3b719872377df8d4c9bf7f7ae682"
+    },
+    {
+      "path": "evidence/memory-probe.json",
+      "bytes": 269,
+      "sha256": "aa4063fc0f711f1350aec9df682bd50bf3b339b49122fc8bf04b333a2c9479f7"
+    },
+    {
+      "path": "evidence/puzzle-test-ui.png",
+      "bytes": 49594,
+      "sha256": "6dcd9f82b290cf6885f4daf36c7435f448c21e7d31a48d22b59f02ac2a33607d"
+    },
+    {
+      "path": "evidence/self-tests.json",
+      "bytes": 3692,
+      "sha256": "97575649e554c57e08b8cf29741aecaaba2060aaded72986dd14b26caee67d6a"
+    },
+    {
+      "path": "evidence/static-profile/refs.json",
+      "bytes": 42078,
+      "sha256": "b24b9380c20125a2392bf3da5553e37836d7581b29f69bc69dfa8c67f5e4c771"
+    },
+    {
+      "path": "evidence/static-profile/strings.json",
+      "bytes": 23882,
+      "sha256": "dd624187a7f39df961bb542a4e027b4c2fb8d00fbd90238442442754f13cb040"
+    },
+    {
+      "path": "evidence/static-profile/vtable.json",
+      "bytes": 1402,
+      "sha256": "9d98db9ff8b184ffaf5fa21552b98a936f07b830f94440dcb8f0bb3768bbe5f6"
+    },
+    {
+      "path": "evidence/uac-manifest.xml",
+      "bytes": 638,
+      "sha256": "45a4328147155fd936a4fd092230faa88effebf29ead960c72f266443e41bb73"
+    },
+    {
+      "path": "evidence/window-tests.json",
+      "bytes": 148,
+      "sha256": "a3b61864212a578509482167dd124a282680fcd367377e03d69cd75e83e4a6af"
+    },
+    {
+      "path": "README.md",
+      "bytes": 1952,
+      "sha256": "83acad1012c8f444f29900b942d5c6be82884291db7f44326b57398010cd3be3"
+    },
+    {
+      "path": "references/step-1.jpg",
+      "bytes": 42541,
+      "sha256": "a0871e0847c9449171502ad604d2cb2dd56ec2d3a57dee46a4d28b449b78fa67"
+    },
+    {
+      "path": "references/step-2.jpg",
+      "bytes": 41421,
+      "sha256": "4af89214a1bcd497a58af61c14c045a746ca07ac77a0169914b48dda8a2c107c"
+    },
+    {
+      "path": "references/step-3.jpg",
+      "bytes": 37730,
+      "sha256": "fdc1ab5e2ecabff18001b61da72e9eb35e28771c1058b45192c41fa56068e921"
+    },
+    {
+      "path": "references/step-4.jpg",
+      "bytes": 34508,
+      "sha256": "be785458663b018cacdc363fd876fcab7fb7cad28ea0ae7e05413442b47e01ed"
+    },
+    {
+      "path": "report-tools/captcha_report_body.md",
+      "bytes": 25512,
+      "sha256": "3e05a66f25ac47ad99b716d4f907c3fd82152bce558bed739632e5e378275dc6"
+    },
+    {
+      "path": "report-tools/export_captcha_report.py",
+      "bytes": 5805,
+      "sha256": "35d594385ff6fe131c4b1e0c7d648bb678345ef4f7997b2372c85fe2a683838c"
+    },
+    {
+      "path": "report-tools/verify_captcha_archive.py",
+      "bytes": 1881,
+      "sha256": "36a5e48976d4db0d7b7b54279e669ed76c9cf57e65cd04a5becbe809a72df0a2"
+    },
+    {
+      "path": "research/puzzle_static_probe.py",
+      "bytes": 2353,
+      "sha256": "b653f0e49152cf05ddccef075561b0ef67508f33419fdefddc23116daff87626"
+    },
+    {
+      "path": "research/puzzle_string_refs.py",
+      "bytes": 2075,
+      "sha256": "089daf4c93fc440a4664c2db591488c0742d0a5c3bbab6127119157c39e31e55"
+    },
+    {
+      "path": "research/puzzle_vtable_probe.py",
+      "bytes": 1897,
+      "sha256": "795d01ed9122c349a2dac305964363fe87aa745974290c96d8a9846c41ebd5f5"
+    },
+    {
+      "path": "research/requirements.txt",
+      "bytes": 18,
+      "sha256": "94b6292179914274eb5d637b9681a4843da3e5bc2b007d2a5554f353a266a80c"
+    },
+    {
+      "path": "src/4UnityPuzzleTest.csproj",
+      "bytes": 625,
+      "sha256": "37fa1276bd1d9a5b26e18be4d581f5948512aaef0d9ff2771c22849f87bf468d"
+    },
+    {
+      "path": "src/app.manifest",
+      "bytes": 562,
+      "sha256": "434c83886041666b1e9715281478cfdb052bf624d6281eae342de185737b7f7f"
+    },
+    {
+      "path": "src/AutoTests.cs",
+      "bytes": 5053,
+      "sha256": "ede745f0f5c26940734ec19a9879a7ea747dfe69fb48084fd9327ae43efefdbf"
+    },
+    {
+      "path": "src/CropForm.cs",
+      "bytes": 3216,
+      "sha256": "311f3f06b745ebf4ffb7300a82dc9b473500a1736197eba7942e17ae03c38dc3"
+    },
+    {
+      "path": "src/DemoForm.cs",
+      "bytes": 4044,
+      "sha256": "7e1b4cf3358d49c910fea9ec9207c0a6072ecd7211f20cf50f2edfa17349e394"
+    },
+    {
+      "path": "src/docs/puzzle_detection_profile.md",
+      "bytes": 2375,
+      "sha256": "e63a2c4250b63b8c00d5130caebe6b9b4c346b57d5a9d51e161c95b31587c62c"
+    },
+    {
+      "path": "src/KULLANIM.txt",
+      "bytes": 4255,
+      "sha256": "8128b33b939df0e7f5c0572a6bc3deb64182ff3bc081c71829db6768e1d2dd31"
+    },
+    {
+      "path": "src/MainForm.cs",
+      "bytes": 20868,
+      "sha256": "aa955b9da3943642e544379ea1943b99b8390f20d9ea68354c4d2297335cdef5"
+    },
+    {
+      "path": "src/MemoryDetector.cs",
+      "bytes": 9552,
+      "sha256": "f14f167ac004a3870e328f965a62c23a4932aa2d24af3c504afb2c45510e838a"
+    },
+    {
+      "path": "src/OcrReader.cs",
+      "bytes": 6397,
+      "sha256": "02f59444e61ba8c970bda74a774fa4f74ee374ef202bb6fa0fca064997800f0f"
+    },
+    {
+      "path": "src/Program.cs",
+      "bytes": 6165,
+      "sha256": "2f7c12f3310deae1e4e53fe09863a88cc3598faad613744efa4772c8ceedb377"
+    },
+    {
+      "path": "src/PuzzleFlow.cs",
+      "bytes": 3692,
+      "sha256": "77b7377fcd6dd61c3c4286f8cfce596e8ef7f9984cf0813aca3888a9241c1302"
+    },
+    {
+      "path": "src/PuzzleLocator.cs",
+      "bytes": 2527,
+      "sha256": "54bb81a48c1c00936e8f6631e4d0ce06839c6774fd6fde8afe6e1f1493b01463"
+    },
+    {
+      "path": "src/README.md",
+      "bytes": 4903,
+      "sha256": "014416459ce4c855cb0008be2dd80f496e0f737859b4cdcd699babb735c7abdd"
+    },
+    {
+      "path": "src/SelfTests.cs",
+      "bytes": 10049,
+      "sha256": "af6f88a516518aa3644c2481405d640df2b5463c3a4da16d3ed0e99e742f5554"
+    },
+    {
+      "path": "src/TargetWindow.cs",
+      "bytes": 7137,
+      "sha256": "82947640cf79cf6a2a54dd3958aad28f8ecf2c2c10063742453247b1c84002d5"
+    }
+  ]
+}

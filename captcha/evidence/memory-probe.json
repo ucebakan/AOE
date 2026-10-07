@@ -1,0 +1,9 @@
+{
+  "pid": 900,
+  "Path": "C:\\Games\\4Unity\\TClient.exe",
+  "access": "0x410",
+  "detail": "Bellek: okuma eri\u015Fimi a\u00E7\u0131lamad\u0131 (Win32 5); g\u00F6r\u00FCnt\u00FC izleniyor",
+  "state": null,
+  "input_sent": false,
+  "writes_attempted": false
+}

@@ -1,0 +1,15 @@
+{
+  "version": "1.1.0",
+  "utc": "2026-10-05T19:03:44.8715565+00:00",
+  "bytes": 56699173,
+  "sha256": "B3CDF76E3F7E8E318CAE1B5DE7082FA9F11C457A1913D780054FFC938413BDA7",
+  "file_version": "1.1.0.0",
+  "execution_level": "requireAdministrator",
+  "ui_access": "false",
+  "self_checks": 41,
+  "automatic_checks": 38,
+  "window_checks": 23,
+  "automatic_arrival_session": true,
+  "game_input_tested": false,
+  "live_memory_transitions_verified": false
+}

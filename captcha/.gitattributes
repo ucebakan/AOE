@@ -1,0 +1,2 @@
+# Preserve the archived bytes so SHA-256 checks also work after a Git checkout.
+* -text whitespace=cr-at-eol

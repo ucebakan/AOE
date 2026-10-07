@@ -21,6 +21,7 @@ Bu depo önceki AOE Git geçmişini korur. Projeler ayrı klasörlerdedir:
 |---|---|---|
 | AOE Manager 1.1.17 | [AOE](AOE/) | [EXE](AOE/releases/1.1.17-research/4UnityAOEManager-1.1.17-research.exe) |
 | Invisible / Aggro 1.1.0 | [InvisibleAggro](InvisibleAggro/) | [ZIP](InvisibleAggro/releases/1.1.0/4UnityInvisibleAggro-1.1.0-win-x64.zip) |
+| Captcha / Puzzle Test 1.1.0 | [captcha](captcha/) | [Tam kaynak ve çalışma raporu](captcha/CAPTCHA_TAM_RAPOR.md) |
 
 Invisible/Aggro ZIP dosyasını çıkarıp EXE'yi çalıştırın. Kaynak kodu `InvisibleAggro/src`,
 test raporu ve ekran görüntüleri `InvisibleAggro/evidence` içindedir.

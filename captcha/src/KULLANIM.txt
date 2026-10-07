@@ -1,0 +1,70 @@
+4Unity Puzzle Test v1.1 — bağımsız offline test yardımcısı
+
+4UnityPuzzleTest.exe dosyasını aç ve Windows yönetici onayını tamamla.
+Windows 10 (19041 ve üzeri) veya Windows 11 gerekir. .NET paket içindedir.
+
+OTOMATİK KULLANIM
+1. Kendi offline oyununu pencere modunda aç.
+2. Listeden TClient.exe olan doğru oyun penceresini seç. Gerekirse Yenile kullan.
+3. Kutuyu otomatik bul işaretli kalsın. Eşleştir · offline test varsayılan moddur.
+4. Bağlan ve başlat'a bas. Puzzle henüz açık olmasa da izleme başlar.
+5. Oyunu önde ve görünür tut. Puzzle geldiğinde program kendisi kutuyu bulur,
+   hedefi ve seçenekleri okur, eşleşen seçeneğe tıklar. Alan çizmek veya
+   puzzle geldiğini ayrıca bildirmek gerekmez.
+6. Dört adımdan sonra kutunun kapandığı doğrulanır. Program çalışmaya devam
+   eder ve sonraki puzzle için tekrar 1/4 bekler.
+7. F9 veya Durdur ile durdur. F9 başka uygulamada kullanılıyorsa Ctrl+Shift+F9
+   denenir; etkin kısayol durum satırında gösterilir.
+
+YEREL DENEME
+Yerel deneme aç → Bağlan ve başlat. Bu uygulamanın kendi penceresinde dört
+adım tamamlanır. Gerçek oyuna girdi göndermez.
+
+BELLEKTEN OTOMATİK ALGILAMA
+Bu TClient.exe sürümünün CTSecuritySystemDlg nesnesinde görünürlük ve
+eşleştirme türü alanları bulundu. Başlangıçta yalnız okuma erişimiyle
+nesne aranır; bulunursa pencerenin açık/kapalı durumu izlenir.
+İstemci sürümü farklıysa, erişim alınamazsa veya nesne bulunamazsa görüntü
+ile otomatik arama devam eder. Durum satırı ve logs/integration-state.json
+hangi yöntemin çalıştığını ve nedenini gösterir.
+Bellek sinyali cevap seçmez; her seçim ayrıca ekrandan doğrulanır.
+Oyun belleğine yazılmaz veya koruma kodu değiştirilmez.
+Canlı bellek geçişi geliştirme oturumunda doğrulanamadı: yönetici olarak
+çalışan istemciye normal tanılama işlemi Win32 5 erişim reddi aldı.
+Yeni EXE yönetici onayı ister; gerçek istemcideki sonuç ayrıca denenmelidir.
+
+BEKLEME / HATA
+- Oyun arkadaysa, küçültülmüşse veya başka pencere alanı kapatıyorsa ekran
+  okuma/tıklama bekler. Bellek izleme bağlıysa açık durumunu yine gösterebilir.
+- Başlatma hataları mesaj kutusunda ve logs/last-error.txt dosyasında görünür.
+- logs/integration-state.json: PID, bağlantı aşaması, okuma/tıklama sayısı,
+  bellek durumu, okunan hedef/adım ve son neden.
+- logs/events.jsonl: durum değişiklikleri. Tıklama kareleri logs altında tutulur.
+- Elle alan seçimi isteğe bağlıdır. Bu seçim otomatik kutu bulmayı kapatır.
+- Yalnız oku · tıklama yok modu, okunan bilgiyi kontrol etmek içindir.
+
+SEÇİM KURALLARI
+- Desteklenen kelimeler: SUN, STAR, MOON, LEAF, CROWN, GEM, SHIELD, SWORD.
+- Başlık, hedef, adım, kalan deneme ve dört farklı seçenek birlikte okunmalıdır.
+- Sembol adlarına yaklaşık eşleştirme yapılmaz; tek bir kesin eşleşme gerekir.
+- İki aynı okuma ve tıklama öncesinde yeni bir kontrol gerekir.
+- Her adıma en fazla bir tıklama gönderilir. Sonraki adım 12 saniyede gelmezse
+  durur. Odak kaybında bu süre bekletilir. Yeniden başlatma kullanıcıya aittir.
+- Akış 1/4'ten başlar. Belirsizlikte tıklama yapılmaz. Aktif adımda pencere
+  boyutu veya oyun oturumu değişirse durur.
+- Tıklama seçili pencereye Windows fare mesajıyla gönderilir. Gerçek oyun
+  istemcisinin bu mesajı kabul ettiği henüz doğrulanmadı.
+- Windows metin tanıma dili yoksa Windows dil ayarlarından İngilizce veya
+  Türkçe temel yazma özelliğini ekle. Program dil indirmez.
+
+FARM BAĞLANTISI
+Bu bağımsız sürüm mevcut farm EXE'sini durdurmaz veya yeniden başlatmaz.
+logs/integration-state.json sonraki birleştirme için durum arayüzüdür.
+
+DOĞRULAMA
+41 davranış/OCR kontrolü, 38 otomatik bulma/bellek alanı kontrolü ve
+23 yerel pencere kontrolü geçti. Dört örnek görüntü üç ölçekte okundu.
+Tam uygulama testi: önce boş ekran izlendi; sonra beliren puzzle kullanıcı
+bildirimi veya alan seçimi olmadan algılandı; dört doğru seçimle kapandı.
+Gerçek oyuna test sırasında girdi gönderilmedi. Canlı bellek geçişi doğrulanmadı.
+UAC: requireAdministrator / uiAccess=false. Dijital yayıncı imzası değildir.

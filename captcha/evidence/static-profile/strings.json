@@ -1,0 +1,363 @@
+[
+  {
+    "file": "4Unity_Launcher.exe",
+    "bytes": 8259584,
+    "sha256": "0c9d9dab33d6658b969bc98f61f4ce95113039255eb39c9e3edf133e6bf03217",
+    "image_base": "0x400000",
+    "rtti": [],
+    "hits": [
+      {
+        "term": "protect",
+        "offset": "0x1e98cb",
+        "encoding": "ascii",
+        "context": "\u0000r\u0002GetFileTime\u0000K\u0005SetErrorMode\u0000\u0000\t\u0006VirtualProtect\u0000\u0000\ufffd\u0002GetOEMCP\u0000\u0000\ufffd\u0001GetCPInfo\u0000S\u0003GetWindowsDirectoryA\u0000\u00006\u0003GetTickCount64\u0000\u0000\ufffd\u0005VerSetConditionMask\u0000\u0001\u0006VerifyVersionInfoA\u0000\u0000\ufffd",
+        "rva": "0x1ea8cb"
+      }
+    ]
+  },
+  {
+    "file": "d3dx11_43.dll",
+    "bytes": 276832,
+    "sha256": "981e42629df751217406e7150477cddc853b79abd6a8568a1566298ed8f7bd59",
+    "image_base": "0x180000000",
+    "rtti": [],
+    "hits": [
+      {
+        "term": "protect",
+        "offset": "0x3a95b",
+        "encoding": "ascii",
+        "context": "XZ\u0000\ufffd\u0000DisableThreadLibraryCalls\u0000\ufffd\u0004VirtualProtect\u0000\u0000\ufffd\u0004Sleep\u0000\u001a\u0002GetModuleHandleA\u0000\u0000>\u0003LoadLibraryA\u0000\u0000K\u0002GetProcAddress\u0000\u0000i\u0001FreeLibrary\u0000R\u0000CloseHandle\u0000\ufffd\u0003ReadFile\u0000\u0000\ufffd\u0001GetFile",
+        "rva": "0x3b55b"
+      }
+    ]
+  },
+  {
+    "file": "D3DX9_43.dll",
+    "bytes": 2401112,
+    "sha256": "84b900dbd7fa978d6e0caee26fc54f2f61d92c9c75d10b35f00e3e82cd1d67b4",
+    "image_base": "0x180000000",
+    "rtti": [],
+    "hits": [
+      {
+        "term": "protect",
+        "offset": "0x229e79",
+        "encoding": "ascii",
+        "context": "ll\u0000\ufffd\u0000DisableThreadLibraryCalls\u0000\ufffd\u0004VirtualProtect\u0000\u0000\ufffd\u0004Sleep\u0000\ufffd\u0002GetVersionExA\u0000>\u0003LoadLibraryA\u0000\u0000K\u0002GetProcAddress\u0000\u0000i\u0001FreeLibrary\u0000\u001a\u0002GetModuleHandleA\u0000\u0000\ufffd\u0003OutputDebugString",
+        "rva": "0x22aa79"
+      }
+    ]
+  },
+  {
+    "file": "TClient.exe",
+    "bytes": 16549888,
+    "sha256": "4dc9c526a895a10113c4cf23f2d199bff283d2c7ce75f949dc49cef15d27d622",
+    "image_base": "0x140000000",
+    "rtti": [
+      ".?AVCTMacroBuilderDlg@@"
+    ],
+    "hits": [
+      {
+        "term": "puzzle",
+        "offset": "0xdc8b61",
+        "encoding": "ascii",
+        "context": " can try again.\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000Macro protection puzzle\u0000Click the matching symbol\u0000\u0000\u0000\u0000\u0000\u0000\u0000Target:  %s\u0000\u0000\u0000\u0000\u0000Step %u of %u\u0000\u0000\u0000%u attempts - %u seconds\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000PA\ufffd@\u0001\u0000\u0000\u0000\ufffd\ufffd\u0001@\u0001\u0000\u0000\u0000\u0010",
+        "rva": "0xdc9f61"
+      },
+      {
+        "term": "macro protection",
+        "offset": "0xdc8b50",
+        "encoding": "ascii",
+        "context": "nute(s) until you can try again.\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000Macro protection puzzle\u0000Click the matching symbol\u0000\u0000\u0000\u0000\u0000\u0000\u0000Target:  %s\u0000\u0000\u0000\u0000\u0000Step %u of %u\u0000\u0000\u0000%u attempts - %u seconds\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+        "rva": "0xdc9f50"
+      },
+      {
+        "term": "matching symbol",
+        "offset": "0xdc8b72",
+        "encoding": "ascii",
+        "context": "\u0000\u0000\u0000\u0000\u0000\u0000Macro protection puzzle\u0000Click the matching symbol\u0000\u0000\u0000\u0000\u0000\u0000\u0000Target:  %s\u0000\u0000\u0000\u0000\u0000Step %u of %u\u0000\u0000\u0000%u attempts - %u seconds\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000PA\ufffd@\u0001\u0000\u0000\u0000\ufffd\ufffd\u0001@\u0001\u0000\u0000\u0000\u0010P8@\u0001\u0000\u0000\u0000\ufffd\ufffd\ufffd@\u0001\u0000\u0000\u0000 6",
+        "rva": "0xdc9f72"
+      },
+      {
+        "term": "attempts",
+        "offset": "0xdc883b",
+        "encoding": "ascii",
+        "context": " be locked for 24 hours after 10 failed attempts.\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000Entered Securecode is invalid. Please check again and re-enter your Securecode.\u0000If you forgot your ",
+        "rva": "0xdc9c3b"
+      },
+      {
+        "term": "attempts",
+        "offset": "0xdc8bab",
+        "encoding": "ascii",
+        "context": "\u0000\u0000\u0000\u0000\u0000Target:  %s\u0000\u0000\u0000\u0000\u0000Step %u of %u\u0000\u0000\u0000%u attempts - %u seconds\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000PA\ufffd@\u0001\u0000\u0000\u0000\ufffd\ufffd\u0001@\u0001\u0000\u0000\u0000\u0010P8@\u0001\u0000\u0000\u0000\ufffd\ufffd\ufffd@\u0001\u0000\u0000\u0000 6\ufffd@\u0001\u0000\u0000\u0000\u0010\ufffd\ufffd@\u0001\u0000\u0000\u0000p,\ufffd@\u0001\u0000\u0000\u0000@R8@\u0001\u0000\u0000\u0000\ufffd/\ufffd@\u0001\u0000\u0000\u0000\ufffd/\ufffd@\u0001\u0000\u0000\u0000\ufffdw\ufffd@\u0001\u0000\u0000\u00000t\ufffd",
+        "rva": "0xdc9fab"
+      },
+      {
+        "term": "protect",
+        "offset": "0xd9cb2a",
+        "encoding": "ascii",
+        "context": "\u0000\u0000\u0000\u0000\u0000\u0000Failed to create duplicate-window protection mutex.\u0000\u0000\u0000\u0000\u0000InitInstance failure 1\u0000\u00004Unity is already running.\u0000\u0000\u0000\u0000\u0000\u0000InitInstance failure 2\u0000\u0000opening TCD archiv",
+        "rva": "0xd9df2a"
+      },
+      {
+        "term": "protect",
+        "offset": "0xda1353",
+        "encoding": "ascii",
+        "context": "BJ_ACK\u0000\u0000\u0000\u0000\u0000\u0000\u0000CS_DELSELFOBJ_ACK\u0000\u0000\u0000\u0000\u0000\u0000\u0000CS_PROTECTEDLIST_ACK\u0000\u0000\u0000\u0000CS_PROTECTEDADD_REQ\u0000\u0000\u0000\u0000\u0000CS_PROTECTEDADD_ACK\u0000\u0000\u0000\u0000\u0000CS_PROTECTEDERASE_REQ\u0000\u0000\u0000CS_PROTECTEDERASE_ACK\u0000\u0000\u0000CS_",
+        "rva": "0xda2753"
+      },
+      {
+        "term": "protect",
+        "offset": "0xda136b",
+        "encoding": "ascii",
+        "context": "BJ_ACK\u0000\u0000\u0000\u0000\u0000\u0000\u0000CS_PROTECTEDLIST_ACK\u0000\u0000\u0000\u0000CS_PROTECTEDADD_REQ\u0000\u0000\u0000\u0000\u0000CS_PROTECTEDADD_ACK\u0000\u0000\u0000\u0000\u0000CS_PROTECTEDERASE_REQ\u0000\u0000\u0000CS_PROTECTEDERASE_ACK\u0000\u0000\u0000CS_REVIVALASK_REQ\u0000\u0000\u0000\u0000\u0000\u0000\u0000CS_",
+        "rva": "0xda276b"
+      },
+      {
+        "term": "protect",
+        "offset": "0xda1383",
+        "encoding": "ascii",
+        "context": "DLIST_ACK\u0000\u0000\u0000\u0000CS_PROTECTEDADD_REQ\u0000\u0000\u0000\u0000\u0000CS_PROTECTEDADD_ACK\u0000\u0000\u0000\u0000\u0000CS_PROTECTEDERASE_REQ\u0000\u0000\u0000CS_PROTECTEDERASE_ACK\u0000\u0000\u0000CS_REVIVALASK_REQ\u0000\u0000\u0000\u0000\u0000\u0000\u0000CS_REVIVALASK_ACK\u0000\u0000\u0000\u0000\u0000\u0000\u0000CS_",
+        "rva": "0xda2783"
+      },
+      {
+        "term": "protect",
+        "offset": "0xda139b",
+        "encoding": "ascii",
+        "context": "DADD_REQ\u0000\u0000\u0000\u0000\u0000CS_PROTECTEDADD_ACK\u0000\u0000\u0000\u0000\u0000CS_PROTECTEDERASE_REQ\u0000\u0000\u0000CS_PROTECTEDERASE_ACK\u0000\u0000\u0000CS_REVIVALASK_REQ\u0000\u0000\u0000\u0000\u0000\u0000\u0000CS_REVIVALASK_ACK\u0000\u0000\u0000\u0000\u0000\u0000\u0000CS_CORPSHP_REQ\u0000\u0000CS_CORPSHP_",
+        "rva": "0xda279b"
+      },
+      {
+        "term": "protect",
+        "offset": "0xda13b3",
+        "encoding": "ascii",
+        "context": "DADD_ACK\u0000\u0000\u0000\u0000\u0000CS_PROTECTEDERASE_REQ\u0000\u0000\u0000CS_PROTECTEDERASE_ACK\u0000\u0000\u0000CS_REVIVALASK_REQ\u0000\u0000\u0000\u0000\u0000\u0000\u0000CS_REVIVALASK_ACK\u0000\u0000\u0000\u0000\u0000\u0000\u0000CS_CORPSHP_REQ\u0000\u0000CS_CORPSHP_ACK\u0000\u0000CS_PARTYMOVE_REQ\u0000\u0000\u0000",
+        "rva": "0xda27b3"
+      },
+      {
+        "term": "protect",
+        "offset": "0xda2810",
+        "encoding": "ascii",
+        "context": "_REQ\u0000\u0000\u0000\u0000CS_RELAYCHARDATA_ACK\u0000\u0000\u0000\u0000CS_RELAYPROTECTEDLIST_REQ\u0000\u0000\u0000\u0000\u0000\u0000\u0000CS_RELAYPROTECTEDADD_REQ\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000CS_RELAYPROTECTEDDEL_REQ\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000CS_CHECKRELAY_REQ\u0000\u0000\u0000\u0000\u0000\u0000\u0000CS_RELAY",
+        "rva": "0xda3c10"
+      },
+      {
+        "term": "protect",
+        "offset": "0xda2830",
+        "encoding": "ascii",
+        "context": "CS_RELAYPROTECTEDLIST_REQ\u0000\u0000\u0000\u0000\u0000\u0000\u0000CS_RELAYPROTECTEDADD_REQ\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000CS_RELAYPROTECTEDDEL_REQ\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000CS_CHECKRELAY_REQ\u0000\u0000\u0000\u0000\u0000\u0000\u0000CS_RELAYPROTECTEDOPTION_REQ\u0000\u0000\u0000\u0000\u0000CS_COMME",
+        "rva": "0xda3c30"
+      },
+      {
+        "term": "protect",
+        "offset": "0xda2850",
+        "encoding": "ascii",
+        "context": "CS_RELAYPROTECTEDADD_REQ\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000CS_RELAYPROTECTEDDEL_REQ\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000CS_CHECKRELAY_REQ\u0000\u0000\u0000\u0000\u0000\u0000\u0000CS_RELAYPROTECTEDOPTION_REQ\u0000\u0000\u0000\u0000\u0000CS_COMMENT_REQ\u0000\u0000CS_COMMENT_ACK\u0000\u0000CS_PVPPO",
+        "rva": "0xda3c50"
+      },
+      {
+        "term": "protect",
+        "offset": "0xda2888",
+        "encoding": "ascii",
+        "context": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000CS_CHECKRELAY_REQ\u0000\u0000\u0000\u0000\u0000\u0000\u0000CS_RELAYPROTECTEDOPTION_REQ\u0000\u0000\u0000\u0000\u0000CS_COMMENT_REQ\u0000\u0000CS_COMMENT_ACK\u0000\u0000CS_PVPPOINT_ACK\u0000CS_GUILDPOINTLOG_REQ\u0000\u0000\u0000\u0000CS_GUILDPOINTLOG_ACK\u0000\u0000\u0000\u0000",
+        "rva": "0xda3c88"
+      },
+      {
+        "term": "protect",
+        "offset": "0xda2a2b",
+        "encoding": "ascii",
+        "context": "LEAVECASTLE_ACK\u0000\u0000\u0000\u0000\u0000\u0000CS_WARP_ACK\u0000\u0000\u0000\u0000\u0000CS_PROTECTEDOPTION_REQ\u0000\u0000CS_FRIENDLIST_REQ\u0000\u0000\u0000\u0000\u0000\u0000\u0000CS_ITEMCHANGE_REQ\u0000\u0000\u0000\u0000\u0000\u0000\u0000CS_ITEMCHANGE_ACK\u0000\u0000\u0000\u0000\u0000\u0000\u0000CS_COUNTDOWN_REQ\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000CS_",
+        "rva": "0xda3e2b"
+      },
+      {
+        "term": "protect",
+        "offset": "0xda4a88",
+        "encoding": "ascii",
+        "context": "ACK\u0000\u0000\u0000\u0000\u0000CS_NOTIFYTZORVAS_ACK\u0000\u0000\u0000\u0000CS_MACROPROTECTION_VERIFY_REQ\u0000\u0000\u0000CS_MACROPROTECTION_ACK\u0000\u0000CS_CANCELCOLLOSEUMQUEUE_ACK\u0000\u0000\u0000\u0000\u0000CS_COLLOSEUMMSG_ACK\u0000\u0000\u0000\u0000\u0000CS_REGISTERCOLLO",
+        "rva": "0xda5e88"
+      },
+      {
+        "term": "protect",
+        "offset": "0xda4aa8",
+        "encoding": "ascii",
+        "context": "CS_MACROPROTECTION_VERIFY_REQ\u0000\u0000\u0000CS_MACROPROTECTION_ACK\u0000\u0000CS_CANCELCOLLOSEUMQUEUE_ACK\u0000\u0000\u0000\u0000\u0000CS_COLLOSEUMMSG_ACK\u0000\u0000\u0000\u0000\u0000CS_REGISTERCOLLOSEUM_REQ\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000CS_REGISTERCOLLO",
+        "rva": "0xda5ea8"
+      },
+      {
+        "term": "protect",
+        "offset": "0xda577c",
+        "encoding": "ascii",
+        "context": "D_REQ\u0000\u0000\u0000\u0000\u0000\u0000\u0000CS_HACKSHIELD_ACK\u0000\u0000\u0000\u0000\u0000\u0000\u0000CS_NPROTECT_REQ\u0000CS_NPROTECT_ACK\u0000CS_WINLDIC_REQ\u0000\u0000CS_WHIP_ACK\u0000\u0000\u0000\u0000\u0000CS_UPLOAD_GUILDMARK\u0000\u0000\u0000\u0000\u0000CS_REQ_GUILDMARK_IMAGE\u0000\u0000CS_REQ_GUILD",
+        "rva": "0xda6b7c"
+      },
+      {
+        "term": "protect",
+        "offset": "0xda578c",
+        "encoding": "ascii",
+        "context": "ACKSHIELD_ACK\u0000\u0000\u0000\u0000\u0000\u0000\u0000CS_NPROTECT_REQ\u0000CS_NPROTECT_ACK\u0000CS_WINLDIC_REQ\u0000\u0000CS_WHIP_ACK\u0000\u0000\u0000\u0000\u0000CS_UPLOAD_GUILDMARK\u0000\u0000\u0000\u0000\u0000CS_REQ_GUILDMARK_IMAGE\u0000\u0000CS_REQ_GUILDMARK_IMAGE_ACK\u0000\u0000",
+        "rva": "0xda6b8c"
+      },
+      {
+        "term": "protect",
+        "offset": "0xdbbd08",
+        "encoding": "ascii",
+        "context": "\ufffd\ufffd#@\u0001\u0000\u0000\u00000\ufffd#@\u0001\u0000\u0000\u0000\ufffd\ufffd.@\u0001\u0000\u0000\u0000\u0010\ufffd.@\u0001\u0000\u0000\u0000Ocupy\u0000\u0000\u0000Protected\u0000\u0000\u0000Peace\u0000\u0000\u0000\u0000\u0000\u0000\u0000Conquest\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\ufffd\u0011\ufffd@\u0001\u0000\u0000\u0000\ufffd\ufffd\u0001@\u0001\u0000\u0000\u0000\ufffd\ufffd.@\u0001\u0000\u0000\u0000\ufffd\ufffd\ufffd@\u0001\u0000\u0000\u0000 6\ufffd@\u0001\u0000\u0000\u0000\u0010\ufffd\ufffd@\u0001\u0000\u0000\u0000p,\ufffd@\u0001\u0000\u0000\u0000\ufffd'\u0002@\u0001\u0000\u0000\u0000\ufffd/\ufffd@\u0001\u0000\u0000\u0000\ufffd/\ufffd@\u0001\u0000\u0000\u0000",
+        "rva": "0xdbd108"
+      },
+      {
+        "term": "protect",
+        "offset": "0xdc025d",
+        "encoding": "ascii",
+        "context": "ng Volition\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000Wind Shield\u0000\u0000\u0000\u0000\u0000Mana Protective Barrier\u0000Focus\u0000\u0000\u0000Lightning Calculation\u0000\u0000\u0000Lightning Magic\u0000Power of Pauldron\u0000\u0000\u0000\u0000\u0000\u0000\u0000Inner Calm\u0000\u0000\u0000\u0000\u0000\u0000Mana Enhancem",
+        "rva": "0xdc165d"
+      },
+      {
+        "term": "protect",
+        "offset": "0xdc02f7",
+        "encoding": "ascii",
+        "context": "hancement\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000Spark of Life\u0000\u0000\u0000Divine Protection\u0000\u0000\u0000\u0000\u0000\u0000\u0000Calmness\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000Audaciousness\u0000\u0000\u0000Godly Courage\u0000\u0000\u0000Abundant Mana\u0000\u0000\u0000Soul Band\u0000\u0000\u0000\u0000\u0000\u0000\u0000Protection of Earth\u0000Rag",
+        "rva": "0xdc16f7"
+      },
+      {
+        "term": "protect",
+        "offset": "0xdc0358",
+        "encoding": "ascii",
+        "context": "urage\u0000\u0000\u0000Abundant Mana\u0000\u0000\u0000Soul Band\u0000\u0000\u0000\u0000\u0000\u0000\u0000Protection of Earth\u0000Rage\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000Good Luck\u0000\u0000\u0000\u0000\u0000\u0000\u0000Boiling Blood\u0000\u0000\u0000Pendatron's Divine Protection\u0000\u0000\u0000Pendatron Divine Protect",
+        "rva": "0xdc1758"
+      },
+      {
+        "term": "protect",
+        "offset": "0xdc03ab",
+        "encoding": "ascii",
+        "context": "\u0000\u0000\u0000\u0000\u0000Boiling Blood\u0000\u0000\u0000Pendatron's Divine Protection\u0000\u0000\u0000Pendatron Divine Protection\u0000\u0000\u0000\u0000\u0000Pendatrons Cloak\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000Invisibility Potion\u0000\u0000\u0000\u0000\u0000Premium Invisibility Potion",
+        "rva": "0xdc17ab"
+      },
+      {
+        "term": "protect",
+        "offset": "0xdc03c9",
+        "encoding": "ascii",
+        "context": "'s Divine Protection\u0000\u0000\u0000Pendatron Divine Protection\u0000\u0000\u0000\u0000\u0000Pendatrons Cloak\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000Invisibility Potion\u0000\u0000\u0000\u0000\u0000Premium Invisibility Potion\u0000\u0000\u0000\u0000\u0000Potion of Invisibility (G",
+        "rva": "0xdc17c9"
+      },
+      {
+        "term": "protect",
+        "offset": "0xdc0526",
+        "encoding": "ascii",
+        "context": "\u0000\u0000Buff Attack\u0000\u0000\u0000\u0000\u0000Armour Potion\u0000\u0000\u0000Magic Protection Potion\u0000 \"\ufffd@\u0001\u0000\u0000\u0000\ufffd\ufffd\u0001@\u0001\u0000\u0000\u0000\ufffd\ufffd1@\u0001\u0000\u0000\u0000\ufffd\ufffd\ufffd@\u0001\u0000\u0000\u0000 6\ufffd@\u0001\u0000\u0000\u0000\u0010\ufffd\ufffd@\u0001\u0000\u0000\u0000p,\ufffd@\u0001\u0000\u0000\u0000\u0000\ufffd)@\u0001\u0000\u0000\u0000\ufffd/\ufffd@\u0001\u0000\u0000\u0000\ufffd/\ufffd@\u0001\u0000\u0000\u0000\ufffdw\ufffd@\u0001\u0000\u0000\u00000t\ufffd@\u0001\u0000\u0000\u00000t\ufffd@\u0001\u0000",
+        "rva": "0xdc1926"
+      },
+      {
+        "term": "protect",
+        "offset": "0xdc866b",
+        "encoding": "ascii",
+        "context": "e. When disabled, you will no longer be protected by the Securecode system.\u0000\u0000Disable\u0000The Securecode system has been disabled.\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000The Securecode syst",
+        "rva": "0xdc9a6b"
+      },
+      {
+        "term": "protect",
+        "offset": "0xdc8b56",
+        "encoding": "ascii",
+        "context": ") until you can try again.\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000Macro protection puzzle\u0000Click the matching symbol\u0000\u0000\u0000\u0000\u0000\u0000\u0000Target:  %s\u0000\u0000\u0000\u0000\u0000Step %u of %u\u0000\u0000\u0000%u attempts - %u seconds\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000PA\ufffd@\u0001\u0000",
+        "rva": "0xdc9f56"
+      },
+      {
+        "term": "protect",
+        "offset": "0xefc067",
+        "encoding": "ascii",
+        "context": "appingW\u0000\u0000\ufffd\u0003InitOnceExecuteOnce\u0000\u001a\u0006VirtualProtect\u0000\u0000-\u0006WakeAllConditionVariable\u0000\u0000\ufffd\u0005SleepConditionVariableSRW\u0000\t\u0005RtlCaptureContext\u0000\u0011\u0005RtlLookupFunctionEntry\u0000\u0000\u0018\u0005RtlVirt",
+        "rva": "0xefd467"
+      },
+      {
+        "term": "protect",
+        "offset": "0xefe8e7",
+        "encoding": "ascii",
+        "context": "BinaryA\u0000\u0000|\u0000CryptBinaryToStringA\u0000\u0000\ufffd\u0000CryptProtectData\u0000\u0000\ufffd\u0000CryptUnprotectData\u0000\u0000CRYPT32.dll\u0000[\u0000NCryptOpenStorageProvider\u0000Y\u0000NCryptOpenKey\u0000B\u0000NCryptCreatePersistedKey\u0000\u0000b",
+        "rva": "0xeffce7"
+      },
+      {
+        "term": "protect",
+        "offset": "0xefe8fd",
+        "encoding": "ascii",
+        "context": "ToStringA\u0000\u0000\ufffd\u0000CryptProtectData\u0000\u0000\ufffd\u0000CryptUnprotectData\u0000\u0000CRYPT32.dll\u0000[\u0000NCryptOpenStorageProvider\u0000Y\u0000NCryptOpenKey\u0000B\u0000NCryptCreatePersistedKey\u0000\u0000b\u0000NCryptSetProperty\u0000O\u0000N",
+        "rva": "0xeffcfd"
+      }
+    ]
+  },
+  {
+    "file": "unins000.exe",
+    "bytes": 6940402,
+    "sha256": "d4f76ba3296335cdd5f0387f3bff51496d855b15be1bfdbaa9f8788e83256aeb",
+    "image_base": "0x400000",
+    "rtti": [],
+    "hits": [
+      {
+        "term": "protect",
+        "offset": "0x65cf9",
+        "encoding": "ascii",
+        "context": "Visibility\u0001\u0000\u0000\u0000\u0000\u0003\u0000\u0000\u0000\ufffdhF\u0000\u0000\u0000\u0000\u0000\tmvPrivate\u000bmvProtected\bmvPublic\u000bmvPublished\u000eSystem.TypInfo\u0002\u00000iF\u0000\u0000\u0000\u0000\u0000\u0003\u000bTMethodKind\u0001\u0000\u0000\u0000\u0000\n\u0000\u0000\u0000(iF\u0000\u0000\u0000\u0000\u0000\u000bmkProcedure\nmkFunction\rmkConstruct",
+        "rva": "0x668f9"
+      },
+      {
+        "term": "protect",
+        "offset": "0x4ee7db",
+        "encoding": "ascii",
+        "context": "teger): Boolean;\u0000\ufffd\u0004\u0001\u0000\ufffd\ufffd\ufffd\ufffd@\u0000\u0000\u0000function IsProtectedSystemFile(const Filename: String): Boolean;\u0000\u0000\u0000\u0000\ufffd\u0004\u0001\u0000\ufffd\ufffd\ufffd\ufffd9\u0000\u0000\u0000function MakePendingFileRenameOperationsChecksum: S",
+        "rva": "0x4ef3db"
+      },
+      {
+        "term": "protect",
+        "offset": "0x517162",
+        "encoding": "ascii",
+        "context": "\u0000\u0000ShellExecAsOriginalUser\u0000\ufffd\u0004\u0001\u0000\ufffd\ufffd\ufffd\ufffd\u0015\u0000\u0000\u0000ISPROTECTEDSYSTEMFILE\u0000\u0000\u0000\ufffd\u0004\u0001\u0000\ufffd\ufffd\ufffd\ufffd'\u0000\u0000\u0000MAKEPENDINGFILERENAMEOPERATIONSCHECKSUM\u0000\ufffd\u0004\u0001\u0000\ufffd\ufffd\ufffd\ufffd\r\u0000\u0000\u0000MODIFYPIFFILE\u0000\u0000\u0000\ufffd\u0004\u0001\u0000\ufffd\ufffd\ufffd\ufffd\u000e\u0000\u0000\u0000REGIST",
+        "rva": "0x517d62"
+      },
+      {
+        "term": "protect",
+        "offset": "0x549e71",
+        "encoding": "ascii",
+        "context": " ]\ufffd\ufffd\u0004\u0002\u0000\ufffd\ufffd\ufffd\ufffd\u0007\u0000\u0000\u0000s\u0000f\u0000c\u0000.\u0000d\u0000l\u0000l\u0000\u0000\u0000SfcIsFileProtected\u0000\u0001\ufffd\ufffd\ufffd\ufffdUH\ufffd\ufffdPH\ufffd\ufffdH\ufffdm8H\ufffdM`\ufffdUhL\ufffdEpL\ufffdMxH\ufffd\ufffd\ufffd\u0000\u0000\u0000H\ufffd\ufffd\ufffd\u0000\u0000\u0000\ufffd\ufffd}h\u0002u\u0018\ufffdUpH\ufffdM`\ufffd2\u0000\u0000\u0000\ufffd\ufffd\ufffd\ufffd\ufffd=\u0002\u0001\u0000\u0000t\ufffd\ufffd}h\u0001\u000f\ufffd\ufffd\u0000\u0000\u0000H\ufffd}x\u0000t\nH\ufffdE@2\u0000\u0000\u0000\ufffd\t\ufffd\ufffd\ufffd\ufffd\ufffdH",
+        "rva": "0x54aa71"
+      },
+      {
+        "term": "protect",
+        "offset": "0x4d65c2",
+        "encoding": "utf-16le",
+        "context": "ault bitness: 32-bit\u0000\u04b0\u0002\uffff\uffff2\u0000Dest file is protected by Windows File Protection.\u0000\u0000\u04b0\u0002\uffff\uffff\u001a\u0000Time stamp of our file: %s\u0000\u0000\u04b0\u0002\uffff\uffff(\u0000Time stamp of our file: (failed to read)\u0000",
+        "rva": "0x4d71c2"
+      },
+      {
+        "term": "protect",
+        "offset": "0x4d65f6",
+        "encoding": "utf-16le",
+        "context": "\u0000Dest file is protected by Windows File Protection.\u0000\u0000\u04b0\u0002\uffff\uffff\u001a\u0000Time stamp of our file: %s\u0000\u0000\u04b0\u0002\uffff\uffff(\u0000Time stamp of our file: (failed to read)\u0000\u0000\u04b0\u0002\uffff\uffff\u0011\u0000Dest file exists.\u0000\u04b0",
+        "rva": "0x4d71f6"
+      },
+      {
+        "term": "protect",
+        "offset": "0x4d6daa",
+        "encoding": "utf-16le",
+        "context": "stamp. Skipping.\u0000\u04b0\u0002\uffff\uffff@\u0000Existing file is protected by Windows File Protection. Skipping.\u0000\u0000\u04b0\u0002\uffff\uffff\u0004\u0000\r\n\r\n\u0000\u0000\u04b0\u0002\uffff\uffffJ\u0000User opted not to strip the existing file's read-only",
+        "rva": "0x4d79aa"
+      },
+      {
+        "term": "protect",
+        "offset": "0x4d6dde",
+        "encoding": "utf-16le",
+        "context": "sting file is protected by Windows File Protection. Skipping.\u0000\u0000\u04b0\u0002\uffff\uffff\u0004\u0000\r\n\r\n\u0000\u0000\u04b0\u0002\uffff\uffffJ\u0000User opted not to strip the existing file's read-only attribute. Skipping.\u0000\u0000\u04b0\u0002\uffff",
+        "rva": "0x4d79de"
+      },
+      {
+        "term": "protect",
+        "offset": "0x53557c",
+        "encoding": "utf-16le",
+        "context": "\u504b\u02ba\u0000\ue800\ub0d8\uffad\u8d48\u808b\u0000\ue800\uafec\uffad\u8d48\u988b\u0000\ue800\uafe0\uffad\u8d48\u2865\u5d5b\u00c3\u04b0\u0002\uffff\uffff\u0004\u0000.tmp\u0000\u0000\u04b0\u0002\uffff\uffff\n\u0000protected \u0000\u0000\u04b0\u0002\uffff\uffff!\u0000Created %stemporary directory: %s\u0000\u04b0\u0002\uffff\uffff\u0007\u0000_isetup\u0000\u5657\u4853\uec83\u4820\ucb89\u8948\u48d6\ufffd\u2be8\uadcd\u48ff\uc189\ua3e8\uaede\u85ff\u40c0\u950f\u40c7\uff84\u2e75\u23e8\uaee1\u83ff\u02f8\u2474\u19e8\uaee1\u83ff\u03f8\u1a74\u3fe8\uaee3\u2bff\u3dc6\u07d0\u0000\u0c73\u32b9\u0000\ue800\u349c\uffb1\ub7eb\u8940\u48f8\uc483\u5b20\u5f5e\uccc3\ucccc\ucccc\ucccc\ucccc\ucccc",
+        "rva": "0x53617c"
+      },
+      {
+        "term": "protect",
+        "offset": "0x69bb86",
+        "encoding": "utf-16le",
+        "context": "Password:\u0000This installation is password protected.\u0000Please provide the password, then click Next to continue. Passwords are case-sensitive.\u0000&Path:\u0000You must be lo"
+      }
+    ]
+  }
+]

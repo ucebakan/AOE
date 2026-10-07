@@ -1,0 +1,13 @@
+{
+  "pass": true,
+  "manual_area_selected": false,
+  "manually_notified_arrival": false,
+  "idle_frames": 2,
+  "frames": 13,
+  "clicks": 4,
+  "accepted": 4,
+  "attempts": 3,
+  "complete": true,
+  "target_pid": 14872,
+  "game_accessed": false
+}

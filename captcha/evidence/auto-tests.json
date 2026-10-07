@@ -1,0 +1,943 @@
+{
+  "pass": true,
+  "checks": 38,
+  "game_accessed": false,
+  "input_sent": false,
+  "results": [
+    {
+      "fixture": true,
+      "found": {
+        "HeaderSeen": true,
+        "Bounds": {
+          "Location": {
+            "IsEmpty": false,
+            "X": 24,
+            "Y": 34
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 406,
+            "Height": 441
+          },
+          "X": 24,
+          "Y": 34,
+          "Width": 406,
+          "Height": 441,
+          "Left": 24,
+          "Top": 34,
+          "Right": 430,
+          "Bottom": 475,
+          "IsEmpty": false
+        },
+        "Detail": "Do\u011Frulama kutusu bulundu \u00B7 se\u00E7enekler okunuyor"
+      },
+      "reading": {
+        "Kind": 2,
+        "Target": "SUN",
+        "Step": 1,
+        "Attempts": 3,
+        "Options": [
+          {
+            "Word": "CROWN",
+            "Center": {
+              "IsEmpty": false,
+              "X": 114,
+              "Y": 347
+            }
+          },
+          {
+            "Word": "STAR",
+            "Center": {
+              "IsEmpty": false,
+              "X": 292,
+              "Y": 347
+            }
+          },
+          {
+            "Word": "SUN",
+            "Center": {
+              "IsEmpty": false,
+              "X": 114,
+              "Y": 405
+            }
+          },
+          {
+            "Word": "LEAF",
+            "Center": {
+              "IsEmpty": false,
+              "X": 293,
+              "Y": 405
+            }
+          }
+        ],
+        "Detail": "",
+        "Key": "1:SUN:3:CROWN@114,347|STAR@292,347|SUN@114,405|LEAF@293,405",
+        "Valid": true
+      }
+    },
+    {
+      "file": "codex-clipboard-e7f7b9fb-73ef-4f85-a2ad-1a68ad3bbc54.jpg",
+      "factor": 1,
+      "found": {
+        "HeaderSeen": true,
+        "Bounds": {
+          "Location": {
+            "IsEmpty": false,
+            "X": 518,
+            "Y": 181
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 402,
+            "Height": 437
+          },
+          "X": 518,
+          "Y": 181,
+          "Width": 402,
+          "Height": 437,
+          "Left": 518,
+          "Top": 181,
+          "Right": 920,
+          "Bottom": 618,
+          "IsEmpty": false
+        },
+        "Detail": "Do\u011Frulama kutusu bulundu \u00B7 se\u00E7enekler okunuyor"
+      },
+      "reading": {
+        "Kind": 2,
+        "Target": "SUN",
+        "Step": 1,
+        "Attempts": 3,
+        "Options": [
+          {
+            "Word": "CROWN",
+            "Center": {
+              "IsEmpty": false,
+              "X": 119,
+              "Y": 343
+            }
+          },
+          {
+            "Word": "STAR",
+            "Center": {
+              "IsEmpty": false,
+              "X": 282,
+              "Y": 343
+            }
+          },
+          {
+            "Word": "SUN",
+            "Center": {
+              "IsEmpty": false,
+              "X": 120,
+              "Y": 399
+            }
+          },
+          {
+            "Word": "LEAF",
+            "Center": {
+              "IsEmpty": false,
+              "X": 283,
+              "Y": 399
+            }
+          }
+        ],
+        "Detail": "",
+        "Key": "1:SUN:3:CROWN@119,343|STAR@282,343|SUN@120,399|LEAF@283,399",
+        "Valid": true
+      }
+    },
+    {
+      "file": "codex-clipboard-e7f7b9fb-73ef-4f85-a2ad-1a68ad3bbc54.jpg",
+      "factor": 1.25,
+      "found": {
+        "HeaderSeen": true,
+        "Bounds": {
+          "Location": {
+            "IsEmpty": false,
+            "X": 520,
+            "Y": 182
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 503,
+            "Height": 547
+          },
+          "X": 520,
+          "Y": 182,
+          "Width": 503,
+          "Height": 547,
+          "Left": 520,
+          "Top": 182,
+          "Right": 1023,
+          "Bottom": 729,
+          "IsEmpty": false
+        },
+        "Detail": "Do\u011Frulama kutusu bulundu \u00B7 se\u00E7enekler okunuyor"
+      },
+      "reading": {
+        "Kind": 2,
+        "Target": "SUN",
+        "Step": 1,
+        "Attempts": 3,
+        "Options": [
+          {
+            "Word": "CROWN",
+            "Center": {
+              "IsEmpty": false,
+              "X": 149,
+              "Y": 428
+            }
+          },
+          {
+            "Word": "STAR",
+            "Center": {
+              "IsEmpty": false,
+              "X": 352,
+              "Y": 428
+            }
+          },
+          {
+            "Word": "SUN",
+            "Center": {
+              "IsEmpty": false,
+              "X": 150,
+              "Y": 498
+            }
+          },
+          {
+            "Word": "LEAF",
+            "Center": {
+              "IsEmpty": false,
+              "X": 353,
+              "Y": 498
+            }
+          }
+        ],
+        "Detail": "",
+        "Key": "1:SUN:3:CROWN@149,428|STAR@352,428|SUN@150,498|LEAF@353,498",
+        "Valid": true
+      }
+    },
+    {
+      "file": "codex-clipboard-e7f7b9fb-73ef-4f85-a2ad-1a68ad3bbc54.jpg",
+      "factor": 0.85,
+      "found": {
+        "HeaderSeen": true,
+        "Bounds": {
+          "Location": {
+            "IsEmpty": false,
+            "X": 516,
+            "Y": 181
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 342,
+            "Height": 372
+          },
+          "X": 516,
+          "Y": 181,
+          "Width": 342,
+          "Height": 372,
+          "Left": 516,
+          "Top": 181,
+          "Right": 858,
+          "Bottom": 553,
+          "IsEmpty": false
+        },
+        "Detail": "Do\u011Frulama kutusu bulundu \u00B7 se\u00E7enekler okunuyor"
+      },
+      "reading": {
+        "Kind": 2,
+        "Target": "SUN",
+        "Step": 1,
+        "Attempts": 3,
+        "Options": [
+          {
+            "Word": "CROWN",
+            "Center": {
+              "IsEmpty": false,
+              "X": 102,
+              "Y": 291
+            }
+          },
+          {
+            "Word": "STAR",
+            "Center": {
+              "IsEmpty": false,
+              "X": 240,
+              "Y": 291
+            }
+          },
+          {
+            "Word": "SUN",
+            "Center": {
+              "IsEmpty": false,
+              "X": 103,
+              "Y": 339
+            }
+          },
+          {
+            "Word": "LEAF",
+            "Center": {
+              "IsEmpty": false,
+              "X": 241,
+              "Y": 339
+            }
+          }
+        ],
+        "Detail": "",
+        "Key": "1:SUN:3:CROWN@102,291|STAR@240,291|SUN@103,339|LEAF@241,339",
+        "Valid": true
+      }
+    },
+    {
+      "file": "codex-clipboard-d47d49d7-b571-44a1-9ba5-8054f18efe5f.jpg",
+      "factor": 1,
+      "found": {
+        "HeaderSeen": true,
+        "Bounds": {
+          "Location": {
+            "IsEmpty": false,
+            "X": 519,
+            "Y": 181
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 402,
+            "Height": 437
+          },
+          "X": 519,
+          "Y": 181,
+          "Width": 402,
+          "Height": 437,
+          "Left": 519,
+          "Top": 181,
+          "Right": 921,
+          "Bottom": 618,
+          "IsEmpty": false
+        },
+        "Detail": "Do\u011Frulama kutusu bulundu \u00B7 se\u00E7enekler okunuyor"
+      },
+      "reading": {
+        "Kind": 2,
+        "Target": "STAR",
+        "Step": 2,
+        "Attempts": 3,
+        "Options": [
+          {
+            "Word": "GEM",
+            "Center": {
+              "IsEmpty": false,
+              "X": 120,
+              "Y": 343
+            }
+          },
+          {
+            "Word": "STAR",
+            "Center": {
+              "IsEmpty": false,
+              "X": 282,
+              "Y": 343
+            }
+          },
+          {
+            "Word": "CROWN",
+            "Center": {
+              "IsEmpty": false,
+              "X": 119,
+              "Y": 399
+            }
+          },
+          {
+            "Word": "LEAF",
+            "Center": {
+              "IsEmpty": false,
+              "X": 283,
+              "Y": 399
+            }
+          }
+        ],
+        "Detail": "",
+        "Key": "2:STAR:3:GEM@120,343|STAR@282,343|CROWN@119,399|LEAF@283,399",
+        "Valid": true
+      }
+    },
+    {
+      "file": "codex-clipboard-d47d49d7-b571-44a1-9ba5-8054f18efe5f.jpg",
+      "factor": 1.25,
+      "found": {
+        "HeaderSeen": true,
+        "Bounds": {
+          "Location": {
+            "IsEmpty": false,
+            "X": 521,
+            "Y": 182
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 503,
+            "Height": 547
+          },
+          "X": 521,
+          "Y": 182,
+          "Width": 503,
+          "Height": 547,
+          "Left": 521,
+          "Top": 182,
+          "Right": 1024,
+          "Bottom": 729,
+          "IsEmpty": false
+        },
+        "Detail": "Do\u011Frulama kutusu bulundu \u00B7 se\u00E7enekler okunuyor"
+      },
+      "reading": {
+        "Kind": 2,
+        "Target": "STAR",
+        "Step": 2,
+        "Attempts": 3,
+        "Options": [
+          {
+            "Word": "GEM",
+            "Center": {
+              "IsEmpty": false,
+              "X": 150,
+              "Y": 428
+            }
+          },
+          {
+            "Word": "STAR",
+            "Center": {
+              "IsEmpty": false,
+              "X": 352,
+              "Y": 428
+            }
+          },
+          {
+            "Word": "CROWN",
+            "Center": {
+              "IsEmpty": false,
+              "X": 149,
+              "Y": 498
+            }
+          },
+          {
+            "Word": "LEAF",
+            "Center": {
+              "IsEmpty": false,
+              "X": 353,
+              "Y": 498
+            }
+          }
+        ],
+        "Detail": "",
+        "Key": "2:STAR:3:GEM@150,428|STAR@352,428|CROWN@149,498|LEAF@353,498",
+        "Valid": true
+      }
+    },
+    {
+      "file": "codex-clipboard-d47d49d7-b571-44a1-9ba5-8054f18efe5f.jpg",
+      "factor": 0.85,
+      "found": {
+        "HeaderSeen": true,
+        "Bounds": {
+          "Location": {
+            "IsEmpty": false,
+            "X": 518,
+            "Y": 181
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 340,
+            "Height": 370
+          },
+          "X": 518,
+          "Y": 181,
+          "Width": 340,
+          "Height": 370,
+          "Left": 518,
+          "Top": 181,
+          "Right": 858,
+          "Bottom": 551,
+          "IsEmpty": false
+        },
+        "Detail": "Do\u011Frulama kutusu bulundu \u00B7 se\u00E7enekler okunuyor"
+      },
+      "reading": {
+        "Kind": 2,
+        "Target": "STAR",
+        "Step": 2,
+        "Attempts": 3,
+        "Options": [
+          {
+            "Word": "GEM",
+            "Center": {
+              "IsEmpty": false,
+              "X": 101,
+              "Y": 291
+            }
+          },
+          {
+            "Word": "STAR",
+            "Center": {
+              "IsEmpty": false,
+              "X": 239,
+              "Y": 291
+            }
+          },
+          {
+            "Word": "CROWN",
+            "Center": {
+              "IsEmpty": false,
+              "X": 101,
+              "Y": 339
+            }
+          },
+          {
+            "Word": "LEAF",
+            "Center": {
+              "IsEmpty": false,
+              "X": 240,
+              "Y": 339
+            }
+          }
+        ],
+        "Detail": "",
+        "Key": "2:STAR:3:GEM@101,291|STAR@239,291|CROWN@101,339|LEAF@240,339",
+        "Valid": true
+      }
+    },
+    {
+      "file": "codex-clipboard-a483ba0e-1185-49aa-8e84-e00df742a535.jpg",
+      "factor": 1,
+      "found": {
+        "HeaderSeen": true,
+        "Bounds": {
+          "Location": {
+            "IsEmpty": false,
+            "X": 518,
+            "Y": 193
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 402,
+            "Height": 437
+          },
+          "X": 518,
+          "Y": 193,
+          "Width": 402,
+          "Height": 437,
+          "Left": 518,
+          "Top": 193,
+          "Right": 920,
+          "Bottom": 630,
+          "IsEmpty": false
+        },
+        "Detail": "Do\u011Frulama kutusu bulundu \u00B7 se\u00E7enekler okunuyor"
+      },
+      "reading": {
+        "Kind": 2,
+        "Target": "MOON",
+        "Step": 3,
+        "Attempts": 3,
+        "Options": [
+          {
+            "Word": "GEM",
+            "Center": {
+              "IsEmpty": false,
+              "X": 120,
+              "Y": 343
+            }
+          },
+          {
+            "Word": "MOON",
+            "Center": {
+              "IsEmpty": false,
+              "X": 282,
+              "Y": 343
+            }
+          },
+          {
+            "Word": "SHIELD",
+            "Center": {
+              "IsEmpty": false,
+              "X": 121,
+              "Y": 399
+            }
+          },
+          {
+            "Word": "CROWN",
+            "Center": {
+              "IsEmpty": false,
+              "X": 281,
+              "Y": 399
+            }
+          }
+        ],
+        "Detail": "",
+        "Key": "3:MOON:3:GEM@120,343|MOON@282,343|SHIELD@121,399|CROWN@281,399",
+        "Valid": true
+      }
+    },
+    {
+      "file": "codex-clipboard-a483ba0e-1185-49aa-8e84-e00df742a535.jpg",
+      "factor": 1.25,
+      "found": {
+        "HeaderSeen": true,
+        "Bounds": {
+          "Location": {
+            "IsEmpty": false,
+            "X": 521,
+            "Y": 197
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 501,
+            "Height": 545
+          },
+          "X": 521,
+          "Y": 197,
+          "Width": 501,
+          "Height": 545,
+          "Left": 521,
+          "Top": 197,
+          "Right": 1022,
+          "Bottom": 742,
+          "IsEmpty": false
+        },
+        "Detail": "Do\u011Frulama kutusu bulundu \u00B7 se\u00E7enekler okunuyor"
+      },
+      "reading": {
+        "Kind": 2,
+        "Target": "MOON",
+        "Step": 3,
+        "Attempts": 3,
+        "Options": [
+          {
+            "Word": "GEM",
+            "Center": {
+              "IsEmpty": false,
+              "X": 149,
+              "Y": 428
+            }
+          },
+          {
+            "Word": "MOON",
+            "Center": {
+              "IsEmpty": false,
+              "X": 352,
+              "Y": 428
+            }
+          },
+          {
+            "Word": "SHIELD",
+            "Center": {
+              "IsEmpty": false,
+              "X": 150,
+              "Y": 498
+            }
+          },
+          {
+            "Word": "CROWN",
+            "Center": {
+              "IsEmpty": false,
+              "X": 351,
+              "Y": 498
+            }
+          }
+        ],
+        "Detail": "",
+        "Key": "3:MOON:3:GEM@149,428|MOON@352,428|SHIELD@150,498|CROWN@351,498",
+        "Valid": true
+      }
+    },
+    {
+      "file": "codex-clipboard-a483ba0e-1185-49aa-8e84-e00df742a535.jpg",
+      "factor": 0.85,
+      "found": {
+        "HeaderSeen": true,
+        "Bounds": {
+          "Location": {
+            "IsEmpty": false,
+            "X": 516,
+            "Y": 191
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 342,
+            "Height": 372
+          },
+          "X": 516,
+          "Y": 191,
+          "Width": 342,
+          "Height": 372,
+          "Left": 516,
+          "Top": 191,
+          "Right": 858,
+          "Bottom": 563,
+          "IsEmpty": false
+        },
+        "Detail": "Do\u011Frulama kutusu bulundu \u00B7 se\u00E7enekler okunuyor"
+      },
+      "reading": {
+        "Kind": 2,
+        "Target": "MOON",
+        "Step": 3,
+        "Attempts": 3,
+        "Options": [
+          {
+            "Word": "GEM",
+            "Center": {
+              "IsEmpty": false,
+              "X": 103,
+              "Y": 291
+            }
+          },
+          {
+            "Word": "MOON",
+            "Center": {
+              "IsEmpty": false,
+              "X": 240,
+              "Y": 291
+            }
+          },
+          {
+            "Word": "SHIELD",
+            "Center": {
+              "IsEmpty": false,
+              "X": 103,
+              "Y": 339
+            }
+          },
+          {
+            "Word": "CROWN",
+            "Center": {
+              "IsEmpty": false,
+              "X": 239,
+              "Y": 339
+            }
+          }
+        ],
+        "Detail": "",
+        "Key": "3:MOON:3:GEM@103,291|MOON@240,291|SHIELD@103,339|CROWN@239,339",
+        "Valid": true
+      }
+    },
+    {
+      "file": "codex-clipboard-9e8d9c50-d452-425d-a43d-b8482c7d11fd.jpg",
+      "factor": 1,
+      "found": {
+        "HeaderSeen": true,
+        "Bounds": {
+          "Location": {
+            "IsEmpty": false,
+            "X": 513,
+            "Y": 187
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 402,
+            "Height": 437
+          },
+          "X": 513,
+          "Y": 187,
+          "Width": 402,
+          "Height": 437,
+          "Left": 513,
+          "Top": 187,
+          "Right": 915,
+          "Bottom": 624,
+          "IsEmpty": false
+        },
+        "Detail": "Do\u011Frulama kutusu bulundu \u00B7 se\u00E7enekler okunuyor"
+      },
+      "reading": {
+        "Kind": 2,
+        "Target": "SUN",
+        "Step": 4,
+        "Attempts": 3,
+        "Options": [
+          {
+            "Word": "SWORD",
+            "Center": {
+              "IsEmpty": false,
+              "X": 120,
+              "Y": 343
+            }
+          },
+          {
+            "Word": "SUN",
+            "Center": {
+              "IsEmpty": false,
+              "X": 282,
+              "Y": 343
+            }
+          },
+          {
+            "Word": "STAR",
+            "Center": {
+              "IsEmpty": false,
+              "X": 120,
+              "Y": 399
+            }
+          },
+          {
+            "Word": "LEAF",
+            "Center": {
+              "IsEmpty": false,
+              "X": 283,
+              "Y": 399
+            }
+          }
+        ],
+        "Detail": "",
+        "Key": "4:SUN:3:SWORD@120,343|SUN@282,343|STAR@120,399|LEAF@283,399",
+        "Valid": true
+      }
+    },
+    {
+      "file": "codex-clipboard-9e8d9c50-d452-425d-a43d-b8482c7d11fd.jpg",
+      "factor": 1.25,
+      "found": {
+        "HeaderSeen": true,
+        "Bounds": {
+          "Location": {
+            "IsEmpty": false,
+            "X": 515,
+            "Y": 189
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 500,
+            "Height": 544
+          },
+          "X": 515,
+          "Y": 189,
+          "Width": 500,
+          "Height": 544,
+          "Left": 515,
+          "Top": 189,
+          "Right": 1015,
+          "Bottom": 733,
+          "IsEmpty": false
+        },
+        "Detail": "Do\u011Frulama kutusu bulundu \u00B7 se\u00E7enekler okunuyor"
+      },
+      "reading": {
+        "Kind": 2,
+        "Target": "SUN",
+        "Step": 4,
+        "Attempts": 3,
+        "Options": [
+          {
+            "Word": "SWORD",
+            "Center": {
+              "IsEmpty": false,
+              "X": 149,
+              "Y": 428
+            }
+          },
+          {
+            "Word": "SUN",
+            "Center": {
+              "IsEmpty": false,
+              "X": 351,
+              "Y": 428
+            }
+          },
+          {
+            "Word": "STAR",
+            "Center": {
+              "IsEmpty": false,
+              "X": 148,
+              "Y": 499
+            }
+          },
+          {
+            "Word": "LEAF",
+            "Center": {
+              "IsEmpty": false,
+              "X": 352,
+              "Y": 499
+            }
+          }
+        ],
+        "Detail": "",
+        "Key": "4:SUN:3:SWORD@149,428|SUN@351,428|STAR@148,499|LEAF@352,499",
+        "Valid": true
+      }
+    },
+    {
+      "file": "codex-clipboard-9e8d9c50-d452-425d-a43d-b8482c7d11fd.jpg",
+      "factor": 0.85,
+      "found": {
+        "HeaderSeen": true,
+        "Bounds": {
+          "Location": {
+            "IsEmpty": false,
+            "X": 512,
+            "Y": 186
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 342,
+            "Height": 372
+          },
+          "X": 512,
+          "Y": 186,
+          "Width": 342,
+          "Height": 372,
+          "Left": 512,
+          "Top": 186,
+          "Right": 854,
+          "Bottom": 558,
+          "IsEmpty": false
+        },
+        "Detail": "Do\u011Frulama kutusu bulundu \u00B7 se\u00E7enekler okunuyor"
+      },
+      "reading": {
+        "Kind": 2,
+        "Target": "SUN",
+        "Step": 4,
+        "Attempts": 3,
+        "Options": [
+          {
+            "Word": "SWORD",
+            "Center": {
+              "IsEmpty": false,
+              "X": 102,
+              "Y": 291
+            }
+          },
+          {
+            "Word": "SUN",
+            "Center": {
+              "IsEmpty": false,
+              "X": 240,
+              "Y": 291
+            }
+          },
+          {
+            "Word": "STAR",
+            "Center": {
+              "IsEmpty": false,
+              "X": 102,
+              "Y": 339
+            }
+          },
+          {
+            "Word": "LEAF",
+            "Center": {
+              "IsEmpty": false,
+              "X": 240,
+              "Y": 339
+            }
+          }
+        ],
+        "Detail": "",
+        "Key": "4:SUN:3:SWORD@102,291|SUN@240,291|STAR@102,339|LEAF@240,339",
+        "Valid": true
+      }
+    }
+  ]
+}
